@@ -1,0 +1,11 @@
+__pycache__
+.ipynb_checkpoints
+slurm-*
+_scheduler*
+*.cube
+core*
+*.out
+*.npy
+*.gpw
+*.txt
+*.dat
