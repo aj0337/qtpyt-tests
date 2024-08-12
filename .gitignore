@@ -9,3 +9,4 @@ core*
 *.gpw
 *.txt
 *.dat
+*.pckl
