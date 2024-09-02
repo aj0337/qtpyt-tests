@@ -20,5 +20,5 @@ module load daint-mc cray-python cray-fftw numpy libxc libvdwxc intel
 
 source "/users/ajayaraj/software/gpaw/gpaw-env/bin/activate"
 
-# srun -n 144 gpaw python scatt.py
+# srun -n 32 gpaw python scatt.py
 srun -n 1 gpaw python dump.py
