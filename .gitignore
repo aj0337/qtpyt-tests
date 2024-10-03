@@ -11,3 +11,5 @@ core*
 *.dat
 *.pckl
 .vscode/
+!*/published_reference/**
+*/published_reference/Angelo_ase
