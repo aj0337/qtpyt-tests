@@ -13,3 +13,4 @@ core*
 .vscode/
 !*/published_reference/**
 */published_reference/Angelo_ase
+output/
