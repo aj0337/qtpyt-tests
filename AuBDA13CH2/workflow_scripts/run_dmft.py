@@ -29,7 +29,7 @@ def save_sigma(sigma_diag,outputfile,npsin):
 
 U = 4.  # Interaction
 nbaths = 4
-tol = 27
+tol = 1e-1
 max_iter = 200
 adjust_mu = True
 alpha = 0.
@@ -62,8 +62,6 @@ _HybMats = interp1d(z_mats.imag,
                     bounds_error=False,
                     fill_value=0.)
 HybMats = lambda z: _HybMats(z.imag)
-HybZro = lambda z: np.zeros((len_active, z.size), complex)
-
 
 S_active = np.eye(len_active)
 

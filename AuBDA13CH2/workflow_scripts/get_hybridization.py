@@ -1,5 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
+import pickle
 import numpy as np
 from gpaw.lcao.tools import remove_pbc
 from qtpyt.basis import Basis
@@ -48,7 +49,7 @@ device_basis = Basis.from_dictionary(device_atoms, basis_dict)
 nodes = [0,810,1116,1278,1584,2394]
 
 # Define energy range and broadening factor for the Green's function calculation
-de = 0.2
+de = 0.01
 energies = np.arange(-3., 3. + de / 2., de).round(7)
 eta = 1e-3
 
@@ -57,7 +58,7 @@ Nr = (1, 5, 3)
 unit_cell_rep_in_leads = (5, 5, 3)
 
 # Define parameters for matsubara grid
-ne = 30
+ne = 3000
 beta = 70.
 matsubara_energies = 1.j * (2 * np.arange(ne) + 1) * np.pi / beta
 
@@ -106,8 +107,8 @@ HB = gd.empty_aligned_orbs()
 for e, energy in enumerate(gd.energies):
     HB[e] = hyb.retarded(energy)
 
-filename = os.path.join(data_folder, 'hybridization.bin')
-gd.write(HB,filename)
+# filename = os.path.join(data_folder, 'hybridization.bin')
+# gd.write(HB,filename)
 del HB
 
 # Matsubara
@@ -122,18 +123,24 @@ for e, energy in enumerate(mat_gd.energies):
     HB_mat[e] = hyb.retarded(energy)
 
 # Save the Matsubara hybrid data
-filename = os.path.join(data_folder, 'matsubara_hybridization.bin')
-mat_gd.write(HB_mat, filename)
+# filename = os.path.join(data_folder, 'matsubara_hybridization.bin')
+# mat_gd.write(HB_mat, filename)
 del HB_mat
 
 if comm.rank == 0:
-    np.save(os.path.join(data_folder, 'energies.npy'), energies + 1.j * eta)
-    # Effective Hamiltonian
-    np.save(os.path.join(data_folder, 'hamiltonian.npy'), hyb.H)
-    np.save(os.path.join(data_folder, 'occupancies.npy'), get_ao_charge(gfp))
-    np.save(os.path.join(data_folder, 'matsubara_energies.npy'), matsubara_energies)
-    np.save(os.path.join(data_folder, 'hs_list_ii.npy'), hs_list_ii)
-    np.save(os.path.join(data_folder, 'hs_list_ij.npy'), hs_list_ij)
+
+    save_path = os.path.join(data_folder, 'hs_list_ii.pkl')
+    with open(save_path, 'wb') as f:
+        pickle.dump(hs_list_ii, f)
+    save_path = os.path.join(data_folder, 'hs_list_ij.pkl')
+    with open(save_path, 'wb') as f:
+        pickle.dump(hs_list_ij, f)
+
+    # np.save(os.path.join(data_folder, 'energies.npy'), energies + 1.j * eta)
+    # # Effective Hamiltonian
+    # np.save(os.path.join(data_folder, 'hamiltonian.npy'), hyb.H)
+    # np.save(os.path.join(data_folder, 'occupancies.npy'), get_ao_charge(gfp))
+    # np.save(os.path.join(data_folder, 'matsubara_energies.npy'), matsubara_energies)
     np.save(os.path.join(data_folder, 'self_energy.npy'), self_energy)
     Heff = (hyb.H + hyb.retarded(0.)).real
     np.save(os.path.join(data_folder, 'effective_hamiltonian.npy'), Heff)
