@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --no-requeue
 #SBATCH --job-name="defs1"
-#SBATCH --nodes=8
+#SBATCH --nodes=9
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=10:00:00
@@ -23,5 +23,5 @@ source "/users/ajayaraj/software/gpaw/gpaw-env/bin/activate"
 
 # srun -n 1 python get_los_prerequisites.py
 # srun -n 8 python get_hybridization.py
-srun -n 8 python run_dmft_model_parallel.py
+srun -n 8 python run_dmft_model_iterate.py
 # srun -n 8 python get_transmission.py

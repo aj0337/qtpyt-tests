@@ -1,16 +1,14 @@
 from __future__ import annotations
-import numpy as np
 
 import os
+
+import numpy as np
+from mpi4py import MPI
 from scipy.optimize import root
 
-from edpyt.nano_dmft import Gfloc, Gfimp as nanoGfimp
-from edpyt.dmft import Gfimp, DMFT, Converged
-
-import matplotlib.pyplot as plt
-import numpy as np
-
-from mpi4py import MPI
+from edpyt.dmft import DMFT, Converged, Gfimp
+from edpyt.nano_dmft import Gfimp as nanoGfimp
+from edpyt.nano_dmft import Gfloc
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -34,22 +32,23 @@ def save_sigma(sigma_diag, outputfile, npsin):
     for spin in range(nspin):
         save(spin)
 
+
 U = 4.0  # Interaction
-nbaths = 8
+nbaths = 4
 tol = 1e-4
 max_iter = 1000
 alpha = 0.0
 nspin = 1
-mu = U/2
+mu = U / 2
 eta = 3e-2
 data_folder = "../output/compute_run/"
-output_folder = "../output/compute_run/model_parallel_nbath8_minimize"
+output_folder = "../output/compute_run/model/"
 os.makedirs(output_folder, exist_ok=True)
 
 occupancy_goal = np.load(f"{data_folder}/occupancies.npy")
 len_active = 9
-energies = np.arange(-10,10,0.01)
-z_ret = energies + 1.j * eta
+energies = np.arange(-10, 10, 0.01)
+z_ret = energies + 1.0j * eta
 
 H_active = np.load(f"{data_folder}/hamiltonian.npy").real
 
@@ -85,8 +84,7 @@ dmft = DMFT(
     tol=tol,
     adjust_mu=False,
     alpha=alpha,
-    store_iterations=False,
-
+    store_iterations=True,
 )
 
 Sigma = lambda z: np.zeros((nimp, z.size), complex)
