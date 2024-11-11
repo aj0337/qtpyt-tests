@@ -20,4 +20,4 @@ module load daint-mc cray-python    # to run edpyt use this
 
 source "/users/ajayaraj/software/gpaw/gpaw-env/bin/activate"
 
-srun -n 1 python run_dmft_nbaths.py
+srun -n 1 python run_dmft_model.py
