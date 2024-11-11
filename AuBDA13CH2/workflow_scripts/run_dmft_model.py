@@ -10,6 +10,11 @@ from edpyt.dmft import Gfimp, DMFT, Converged
 import matplotlib.pyplot as plt
 import numpy as np
 
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+
 
 def distance(delta):
     global delta_prev
@@ -38,7 +43,7 @@ nspin = 1
 mu = U/2
 eta = 3e-2
 data_folder = "../output/compute_run/"
-output_folder = "../output/compute_run/model"
+output_folder = "../output/compute_run/model_parallel_nbath8_minimize"
 os.makedirs(output_folder, exist_ok=True)
 
 occupancy_goal = np.load(f"{data_folder}/occupancies.npy")
@@ -94,10 +99,14 @@ try:
 except Converged:
     pass
 
-np.save(f"{output_folder}/dmft_delta.npy", delta_prev)
-open(f"{output_folder}/mu.txt", "w").write(str(gfloc.mu))
+if rank == 0:
+    np.save(f"{output_folder}/dmft_delta.npy", delta_prev)
+    open(f"{output_folder}/mu.txt", "w").write(str(gfloc.mu))
 
-_Sigma = lambda z: -gfloc.mu + gfloc.Sigma(z)[idx_inv]
+    _Sigma = lambda z: -gfloc.mu + gfloc.Sigma(z)[idx_inv]
 
-dmft_sigma_file = f"{output_folder}/dmft_sigma.npy"
-save_sigma(_Sigma(z_ret), dmft_sigma_file, nspin)
+    dmft_sigma_file = f"{output_folder}/dmft_sigma.npy"
+    save_sigma(_Sigma(z_ret), dmft_sigma_file, nspin)
+
+    gfloc_data = gfloc(z_ret)
+    np.save(f"{output_folder}/dmft_gfloc.npy", gfloc_data)
