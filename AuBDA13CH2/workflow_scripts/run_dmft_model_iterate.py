@@ -62,7 +62,6 @@ nbaths = int(sys.argv[1])
 U = float(sys.argv[2])
 
 tol = 1e-4
-# tol = 1000
 max_iter = 1000
 alpha = 0.0
 nspin = 1
@@ -87,12 +86,7 @@ S_active = np.eye(len_active)
 idx_neq = np.arange(len_active)
 idx_inv = np.arange(len_active)
 
-# # Loop over nbath and U values
-# for nbaths in nbath_values:
-#     for U in U_values:
 
-
-# Set up V and gfloc for this U value
 V = np.eye(len_active) * U
 mu = U / 2
 
