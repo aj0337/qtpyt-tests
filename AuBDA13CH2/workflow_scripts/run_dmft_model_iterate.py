@@ -50,11 +50,6 @@ def save_sigma(sigma_diag, outputfile, npsin):
         save(spin)
 
 
-# # Parameters for looping
-# nbath_values = [4, 8]
-# U_values = [4.0, 5.0, 6.0]
-
-
 # Check for command-line arguments for nbath and U
 if len(sys.argv) < 3:
     raise ValueError("Please provide nbath and U as command-line arguments.")
@@ -171,6 +166,4 @@ if rank == 0:
 
     gfp_dmft = ProjectedGreenFunction(gf, index_active_region)
     charge_dmft = get_ao_charge(gfp_dmft)
-    np.save(
-        f"{output_folder_combination}/charge_per_orbital_dmft.npy", charge_dmft
-    )
+    np.save(f"{output_folder_combination}/charge_per_orbital_dmft.npy", charge_dmft)
