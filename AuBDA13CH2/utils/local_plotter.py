@@ -135,7 +135,7 @@ def plot_selected_quantities(
                 pl.plot_charge_per_impurity(
                     [charge, dmft_charge],
                     labels=labels,
-                    dataset_labels=["Original", "DMFT"],
+                    dataset_labels=["DFT", "DMFT"],
                     plot_params=charge_plot_params,
                 )
             except Exception as e:
