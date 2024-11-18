@@ -9,7 +9,7 @@ U_values = [4.0, 5.0, 6.0]
 job_script_template = """#!/bin/bash -l
 #SBATCH --no-requeue
 #SBATCH --job-name="dmft_nbath_{nbath}_U_{U}"
-#SBATCH --nodes=9
+#SBATCH --nodes=8
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=24:00:00
@@ -28,7 +28,8 @@ module load daint-mc cray-python
 
 source "/users/ajayaraj/software/gpaw/gpaw-env/bin/activate"
 
-srun -n 9 python run_dmft_model_iterate.py {nbath} {U}
+# srun -n 9 python run_dmft_model_iterate.py {nbath} {U}
+srun -n 8 python get_transmission_model.py {nbath} {U}
 """
 
 # Output folder for job scripts
