@@ -154,7 +154,7 @@ def plot_selected_quantities(
                     labels=labels,
                     plot_params=bath_energy_plot_params,
                     selected_impurities=selected_impurities,
-                    iteration_range=iteration_list,
+                    iteration_list=iteration_list,
                 )
             except Exception as e:
                 print(f"Error plotting bath energies for {subfolder}: {e}")
@@ -162,6 +162,7 @@ def plot_selected_quantities(
         if "bath_couplings" in quantities:
             # Load and plot bath couplings
             try:
+                h5_file = os.path.join(folder_path, "dmft_iterations.h5")
                 bath_coupling_plot_params = default_plot_params.copy()
                 bath_coupling_plot_params["title"] = (
                     f"Bath Couplings (nbaths={nbaths}, U={U})"
@@ -171,7 +172,7 @@ def plot_selected_quantities(
                     labels=labels,
                     plot_params=bath_coupling_plot_params,
                     selected_impurities=selected_impurities,
-                    iteration_range=iteration_list,
+                    iteration_list=iteration_list,
                 )
             except Exception as e:
                 print(f"Error plotting bath couplings for {subfolder}: {e}")
