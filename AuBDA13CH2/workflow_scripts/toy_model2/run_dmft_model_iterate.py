@@ -62,13 +62,13 @@ max_iter = 1000
 alpha = 0.0
 nspin = 1
 eta = 3e-2
-data_folder = "../output/compute_run/"
-output_folder = "../output/compute_run/toy_model2/"
+data_folder = "../../output/compute_run"
+output_folder = "../../output/compute_run/toy_model2"
 
 # Define output folder based on parameters
 dc_str = "with_dc" if use_double_counting else "without_dc"
 mu_str = "adjust_mu" if adjust_mu else "no_adjust_mu"
-output_folder_combination = f"{output_folder}/nbaths_{nbaths}_U_{U}_{dc_str}_{mu_str}"
+output_folder_combination = f"{output_folder}/nbaths_{nbaths}_U_{U}_DC_{dc_str}_{mu_str}"
 os.makedirs(output_folder_combination, exist_ok=True)
 
 occupancy_goal = np.load(f"{data_folder}/occupancies.npy")
