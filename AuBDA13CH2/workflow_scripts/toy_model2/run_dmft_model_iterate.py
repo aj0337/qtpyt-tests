@@ -55,7 +55,7 @@ if len(sys.argv) < 5:
 nbaths = int(sys.argv[1])
 U = float(sys.argv[2])
 adjust_mu = sys.argv[3].lower() == "true"
-use_double_counting = sys.argv[4].lower() == "true"
+use_double_counting_correction = sys.argv[4].lower() == "true"
 
 tol = 1e-4
 max_iter = 1000
@@ -66,9 +66,11 @@ data_folder = "../../output/compute_run"
 output_folder = "../../output/compute_run/toy_model2"
 
 # Define output folder based on parameters
-dc_str = "with_dc" if use_double_counting else "without_dc"
+dc_str = (
+    "with_dc_correction" if use_double_counting_correction else "without_dc_correction"
+)
 mu_str = "adjust_mu" if adjust_mu else "no_adjust_mu"
-output_folder_combination = f"{output_folder}/nbaths_{nbaths}_U_{U}_DC_{dc_str}_{mu_str}"
+output_folder_combination = f"{output_folder}/nbaths_{nbaths}_U_{U}_{dc_str}_{mu_str}"
 os.makedirs(output_folder_combination, exist_ok=True)
 
 occupancy_goal = np.load(f"{data_folder}/occupancies.npy")
@@ -92,7 +94,7 @@ V = np.eye(len_active) * U
 # Apply double counting correction if specified
 double_counting = (
     np.diag(V.diagonal() * (occupancy_goal - 0.5))
-    if use_double_counting
+    if use_double_counting_correction
     else np.zeros((len_active, len_active))
 )
 gfloc = Gfloc(H_active - double_counting, np.eye(len_active), HybMats, idx_neq, idx_inv)

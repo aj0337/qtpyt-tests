@@ -59,9 +59,9 @@ def plot_selected_quantities(
             "N",
         ]
 
-        # Default plot parameters to include nbaths and U in titles and labels
+        # Default plot parameters to include subfolder name as the title
         default_plot_params = {
-            "title": f"Plot for nbaths={nbaths}, U={U}",
+            "title": f"{subfolder}",  # Default title set to the subfolder name
             "legend_loc": "upper right",
             "grid": True,
         }
@@ -75,7 +75,9 @@ def plot_selected_quantities(
                 ne = delta.shape[1]
                 z_mats = 1.0j * (2 * np.arange(ne) + 1) * np.pi / beta
                 delta_plot_params = default_plot_params.copy()
-                delta_plot_params["title"] = f"Delta (nbaths={nbaths}, U={U})"
+                delta_plot_params["title"] = delta_plot_params.get(
+                    "title", f"{subfolder}"
+                )  # Use subfolder name as title if not set
                 pl.plot_delta(
                     delta, z_mats, labels=labels, plot_params=delta_plot_params
                 )
@@ -93,7 +95,9 @@ def plot_selected_quantities(
                 gfloc_plot_params = default_plot_params.copy()
                 gfloc_plot_params.update(
                     {
-                        "title": f"Gfloc Spectral Function (nbaths={nbaths}, U={U})",
+                        "title": gfloc_plot_params.get(
+                            "title", f"{subfolder}"
+                        ),  # Use subfolder name as title if not set
                         "xlim": (-2.5, 2.5),
                     }
                 )
@@ -111,7 +115,9 @@ def plot_selected_quantities(
                 sigma_plot_params = default_plot_params.copy()
                 sigma_plot_params.update(
                     {
-                        "title": f"Sigma Trace (nbaths={nbaths}, U={U})",
+                        "title": sigma_plot_params.get(
+                            "title", f"{subfolder}"
+                        ),  # Use subfolder name as title if not set
                         "xlim": (-2.5, 2.5),
                     }
                 )
@@ -122,16 +128,16 @@ def plot_selected_quantities(
         if "charge" in quantities:
             # Load and plot charge per impurity
             try:
-                charge_file = os.path.join(folder_path, "charge_per_orbital.npy")
+                charge_file = os.path.join(folder_path, "charge_per_orbital_dft.npy")
                 charge = np.load(charge_file)
                 dmft_charge_file = os.path.join(
                     folder_path, "charge_per_orbital_dmft.npy"
                 )
                 dmft_charge = np.load(dmft_charge_file)
                 charge_plot_params = default_plot_params.copy()
-                charge_plot_params["title"] = (
-                    f"Charge per Impurity (nbaths={nbaths}, U={U})"
-                )
+                charge_plot_params["title"] = charge_plot_params.get(
+                    "title", f"{subfolder}"
+                )  # Use subfolder name as title if not set
                 pl.plot_charge_per_impurity(
                     [charge, dmft_charge],
                     labels=labels,
@@ -146,9 +152,9 @@ def plot_selected_quantities(
             try:
                 h5_file = os.path.join(folder_path, "dmft_iterations.h5")
                 bath_energy_plot_params = default_plot_params.copy()
-                bath_energy_plot_params["title"] = (
-                    f"Bath Energies (nbaths={nbaths}, U={U})"
-                )
+                bath_energy_plot_params["title"] = bath_energy_plot_params.get(
+                    "title", f"{subfolder}"
+                )  # Use subfolder name as title if not set
                 pl.plot_bath_energies(
                     h5_file,
                     labels=labels,
@@ -164,9 +170,9 @@ def plot_selected_quantities(
             try:
                 h5_file = os.path.join(folder_path, "dmft_iterations.h5")
                 bath_coupling_plot_params = default_plot_params.copy()
-                bath_coupling_plot_params["title"] = (
-                    f"Bath Couplings (nbaths={nbaths}, U={U})"
-                )
+                bath_coupling_plot_params["title"] = bath_coupling_plot_params.get(
+                    "title", f"{subfolder}"
+                )  # Use subfolder name as title if not set
                 pl.plot_bath_couplings(
                     h5_file,
                     labels=labels,
@@ -195,6 +201,9 @@ def plot_selected_quantities(
         # Set yscale to "log" only for DFT and DMFT transmission plots
         transmission_plot_params = default_plot_params.copy()
         transmission_plot_params["yscale"] = "log"
+        transmission_plot_params["title"] = transmission_plot_params.get(
+            "title", f"{subfolder}"
+        )  # Use subfolder name as title if not set
 
         # Plot DFT and DMFT transmission on the same plot if both are available
         if dft_transmission is not None or dmft_transmission is not None:
@@ -369,26 +378,30 @@ def process_and_plot_homo_lumo(data_folder="output"):
     plt.show()
 
 
-import os
-import numpy as np
-import matplotlib.pyplot as plt
-
-
 def compute_total_charge(data_folder="output"):
     """
     Computes the total charge across all impurities for DFT and DMFT cases
-    for each nbath and U combination in the specified data folder.
+    for each nbath, U, and other parameter combinations found in the specified data folder.
 
     Parameters:
         data_folder (str): Path to the main directory containing subfolders with data files.
 
     Returns:
-        dict: Dictionary containing nbath, U, total charges for DFT and DMFT as lists.
+        dict: Dictionary containing nbath, U, additional labels, and total charges for DFT and DMFT as lists.
     """
     nbath_values = []
     U_values = []
     total_charges_dft = []
     total_charges_dmft = []
+    additional_labels = []
+
+    # Define mutually exclusive keywords to look for in folder names
+    additional_keywords = {
+        "with_dc": "with_dc",
+        "without_dc": "without_dc",
+        "adjust_mu": "adjust_mu",
+        "no_adjust_mu": "no_adjust_mu",
+    }
 
     # Loop through each subfolder in the base directory
     for subfolder in os.listdir(data_folder):
@@ -396,14 +409,37 @@ def compute_total_charge(data_folder="output"):
         if not os.path.isdir(folder_path):
             continue
 
-        # Extract nbaths and U values from folder name
-        parts = subfolder.split("_")
-        nbaths = int(parts[1])
-        U = float(parts[3])
+        # Extract nbath and U values from folder name assuming the format is "nbath_<value>_U_<value>"
+        try:
+            parts = subfolder.split("_")
+            nbaths = int(parts[1])
+            U = float(parts[3])
+        except (IndexError, ValueError) as e:
+            print(f"Error extracting nbath or U for {subfolder}: {e}")
+            continue
+
+        # Check for additional mutually exclusive keywords in the folder name
+        additional_info = []
+        if "with_dc" in subfolder and "without_dc" not in subfolder:
+            additional_info.append("with_dc_correction")
+        elif "without_dc" in subfolder:
+            additional_info.append("without_dc_correction")
+
+        if "adjust_mu" in subfolder and "no_adjust_mu" not in subfolder:
+            additional_info.append("adjust_mu")
+        elif "no_adjust_mu" in subfolder:
+            additional_info.append("no_adjust_mu")
+
+        # Construct a label based on nbath, U, and any additional information
+        label = f"({nbaths},{U}"
+        if additional_info:
+            label += ", " + ", ".join(additional_info)
+        label += ")"
+        additional_labels.append(label)
 
         # Load DFT and DMFT charge data
         try:
-            charge_file = os.path.join(folder_path, "charge_per_orbital.npy")
+            charge_file = os.path.join(folder_path, "charge_per_orbital_dft.npy")
             dmft_charge_file = os.path.join(folder_path, "charge_per_orbital_dmft.npy")
             charge = np.load(charge_file)
             dmft_charge = np.load(dmft_charge_file)
@@ -425,6 +461,7 @@ def compute_total_charge(data_folder="output"):
     return {
         "nbath_values": nbath_values,
         "U_values": U_values,
+        "additional_labels": additional_labels,
         "total_charges_dft": total_charges_dft,
         "total_charges_dmft": total_charges_dmft,
     }
@@ -433,25 +470,20 @@ def compute_total_charge(data_folder="output"):
 def plot_total_charge(total_charge_data):
     """
     Plots the total charge for DFT and DMFT as a histogram where x-axis represents
-    each combination of (nbath, U) and y-axis represents the total charge.
+    each combination of (nbath, U) with additional parameters if available.
 
     Parameters:
-        total_charge_data (dict): Dictionary containing nbath, U, total charges for DFT and DMFT.
+        total_charge_data (dict): Dictionary containing nbath, U, additional labels, and total charges for DFT and DMFT.
     """
     # Prepare x-axis labels and positions
-    x_labels = [
-        f"({nbath},{U})"
-        for nbath, U in zip(
-            total_charge_data["nbath_values"], total_charge_data["U_values"]
-        )
-    ]
+    x_labels = total_charge_data["additional_labels"]
     x = np.arange(len(x_labels))
 
     # Bar width and figure setup
     width = 0.35
     fig, ax = plt.subplots(figsize=(12, 8))
 
-    # Plotting DFT and DMFT bars side by side for each (nbath, U) pair
+    # Plotting DFT and DMFT bars side by side for each (nbath, U) combination
     ax.bar(
         x - width / 2,
         total_charge_data["total_charges_dft"],
@@ -466,9 +498,11 @@ def plot_total_charge(total_charge_data):
     )
 
     # Customizing plot appearance
-    ax.set_xlabel("(nbath, U)")
+    ax.set_xlabel("(nbath, U, additional params)")
     ax.set_ylabel("Total Charge")
-    ax.set_title("Total Charge for DFT and DMFT Across Nbath, U Combinations")
+    ax.set_title(
+        "Total Charge for DFT and DMFT Across Nbath, U, and Additional Parameters"
+    )
     ax.set_xticks(x)
     ax.set_xticklabels(x_labels, rotation=45, ha="right")
     ax.legend()
