@@ -20,5 +20,5 @@ module load daint-mc cray-python
 
 source "/users/ajayaraj/software/gpaw/gpaw-env/bin/activate"
 
-# srun -n 9 python run_dmft.py 8 0.5 True False
+srun -n 9 python run_dmft.py 8 0.5 True False
 srun -n 9 python get_transmission.py 8 0.5 True False
