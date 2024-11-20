@@ -48,8 +48,8 @@ double_counting = sys.argv[4].lower() == 'true'
 
 # Define paths and directories based on arguments
 data_folder = "../../output/compute_run"
-output_folder = f"../../output/compute_run/toy_model2/nbaths_{nbath}_U_{U}_DC_{'with_dc' if double_counting else 'without_dc'}_{'adjust_mu' if adjust_mu else 'no_adjust_mu'}"
-sigma_data_folder = f"../../output/compute_run/toy_model2/nbaths_{nbath}_U_{U}_DC_{'with_dc' if double_counting else 'without_dc'}_{'adjust_mu' if adjust_mu else 'no_adjust_mu'}"
+output_folder = f"../../output/compute_run/toy_model2/nbaths_{nbath}_U_{U}_{'with_dc_correction' if double_counting else 'without_dc_correction'}_{'adjust_mu' if adjust_mu else 'no_adjust_mu'}"
+sigma_data_folder = f"../../output/compute_run/toy_model2/nbaths_{nbath}_U_{U}_{'with_dc_correction' if double_counting else 'without_dc_correction'}_{'adjust_mu' if adjust_mu else 'no_adjust_mu'}"
 os.makedirs(output_folder, exist_ok=True)
 
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")

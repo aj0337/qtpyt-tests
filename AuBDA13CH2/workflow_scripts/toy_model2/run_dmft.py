@@ -66,9 +66,9 @@ data_folder = "../../output/compute_run"
 output_folder = "../../output/compute_run/toy_model2"
 
 # Define output folder based on parameters
-dc_str = "with_dc" if use_double_counting else "without_dc"
+dc_str = "with_dc_correction" if use_double_counting else "without_dc_correction"
 mu_str = "adjust_mu" if adjust_mu else "no_adjust_mu"
-output_folder_combination = f"{output_folder}/nbaths_{nbaths}_U_{U}_DC_{dc_str}_{mu_str}"
+output_folder_combination = f"{output_folder}/nbaths_{nbaths}_U_{U}_{dc_str}_{mu_str}"
 os.makedirs(output_folder_combination, exist_ok=True)
 
 occupancy_goal = np.load(f"{data_folder}/occupancies.npy")
@@ -95,7 +95,7 @@ double_counting = (
     if use_double_counting
     else np.zeros((len_active, len_active))
 )
-gfloc = Gfloc(H_active - double_counting, np.eye(len_active), HybMats, idx_neq, idx_inv)
+gfloc = Gfloc(H_active - double_counting, np.eye(len_active), HybMats, idx_neq, idx_inv, ne, beta)
 
 nimp = gfloc.idx_neq.size
 gfimp = [Gfimp(nbaths, z_mats.size, V[i, i], beta) for i in range(nimp)]
@@ -154,7 +154,7 @@ if rank == 0:
         eta=eta,
     )
     gfp = ProjectedGreenFunction(gf, index_active_region)
-    charge_dft = get_ao_charge(gfp)
+    charge_dft = get_ao_charge(gfp, mu=0, beta=beta)
 
     nodes = [0, 810, 1116, 1278, 1584, 2394]
     imb = 2  # index of molecule block from the nodes list
@@ -170,5 +170,5 @@ if rank == 0:
     gf.selfenergies.append((imb, self_energy[2]))
 
     gfp_dmft = ProjectedGreenFunction(gf, index_active_region)
-    charge_dmft = get_ao_charge(gfp_dmft)
+    charge_dmft = get_ao_charge(gfp_dmft, mu=gfloc.mu,beta=beta)
     np.save(f"{output_folder_combination}/charge_per_orbital_dmft.npy", charge_dmft)
