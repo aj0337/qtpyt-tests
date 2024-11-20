@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+import sys
 import pickle
 import numpy as np
 from qtpyt.block_tridiag import greenfunction
@@ -7,7 +8,6 @@ from qtpyt.base.selfenergy import DataSelfEnergy as BaseDataSelfEnergy
 from qtpyt.projector import expand
 from qtpyt.parallel import comm
 from qtpyt.parallel.egrid import GridDesc
-
 from mpi4py import MPI
 
 comm = MPI.COMM_WORLD
@@ -15,7 +15,7 @@ rank = comm.Get_rank()
 
 
 class DataSelfEnergy(BaseDataSelfEnergy):
-    """Wrapper"""
+    """Wrapper for self-energy."""
 
     def retarded(self, energy):
         return expand(S_molecule, super().retarded(energy), idx_molecule)
@@ -38,9 +38,18 @@ def run(outputfile):
         np.save(outputfile, (energies, T.real))
 
 
-data_folder = "../output/compute_run"
-sigma_data_folder = "../output/compute_run/model/nbaths_4_U_4.0"
-output_folder = "../output/compute_run/model/nbaths_4_U_4.0"
+# Parse command-line arguments
+if len(sys.argv) != 5:
+    raise ValueError("Please provide nbath, U, adjust_mu, and double_counting as command-line arguments.")
+nbath = int(sys.argv[1])
+U = float(sys.argv[2])
+adjust_mu = sys.argv[3].lower() == 'true'
+double_counting = sys.argv[4].lower() == 'true'
+
+# Define paths and directories based on arguments
+data_folder = "../../output/compute_run"
+output_folder = f"../../output/compute_run/toy_model2/nbaths_{nbath}_U_{U}_DC_{'with_dc' if double_counting else 'without_dc'}_{'adjust_mu' if adjust_mu else 'no_adjust_mu'}"
+sigma_data_folder = f"../../output/compute_run/toy_model2/nbaths_{nbath}_U_{U}_DC_{'with_dc' if double_counting else 'without_dc'}_{'adjust_mu' if adjust_mu else 'no_adjust_mu'}"
 os.makedirs(output_folder, exist_ok=True)
 
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
@@ -54,17 +63,14 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
     hs_list_ij = pickle.load(f)
 
 nodes = [0, 810, 1116, 1278, 1584, 2394]
-# Define energy range and broadening factor for the Green's function calculation
-eta = 3e-2
+eta = 3e-2  # Broadening factor for Green's function calculation
 
 # Transmission function calculation
 imb = 2  # index of molecule block from the nodes list
 S_molecule = hs_list_ii[imb][1]  # overlap of molecule
-idx_molecule = (
-    index_active_region - nodes[imb]
-)  # indices of active region w.r.t molecule
+idx_molecule = index_active_region - nodes[imb]  # indices of active region w.r.t molecule
 
-# Initialize the Green's function solver with the tridiagonalized matrices and self-energies
+# Initialize the Green's function solver with tridiagonalized matrices and self-energies
 gf = greenfunction.GreenFunction(
     hs_list_ii,
     hs_list_ij,
@@ -74,15 +80,21 @@ gf = greenfunction.GreenFunction(
 )
 
 # Transmission function for DFT
-outputfile = f"{output_folder}/dft_transmission.npy"
-run(outputfile)
+outputfile_dft = f"{output_folder}/dft_transmission.npy"
+run(outputfile_dft)
 
-# Add the DMFT self-energy for transmission
-dmft_sigma = load(dmft_sigma_file) if comm.rank == 0 else None
-dmft_sigma = comm.bcast(dmft_sigma, root=0)
-self_energy[2] = dmft_sigma
-gf.selfenergies.append((imb, self_energy[2]))
+# Load and configure DMFT self-energy if enabled
+if os.path.exists(dmft_sigma_file):
+    dmft_sigma = load(dmft_sigma_file) if comm.rank == 0 else None
+    dmft_sigma = comm.bcast(dmft_sigma, root=0)
 
-outputfile = f"{output_folder}/dmft_transmission.npy"
-run(outputfile)
-gf.selfenergies.pop()
+    # Add DMFT self-energy to Green's function and calculate transmission
+    self_energy[2] = dmft_sigma
+    gf.selfenergies.append((imb, self_energy[2]))
+    outputfile_dmft = f"{output_folder}/dmft_transmission.npy"
+    run(outputfile_dmft)
+    gf.selfenergies.pop()
+
+else:
+    if rank == 0:
+        print(f"DMFT sigma file {dmft_sigma_file} not found. Skipping DMFT transmission calculation.")

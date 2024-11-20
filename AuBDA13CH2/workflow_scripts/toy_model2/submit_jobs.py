@@ -30,7 +30,8 @@ module load daint-mc cray-python
 
 source "/users/ajayaraj/software/gpaw/gpaw-env/bin/activate"
 
-srun -n 9 python run_dmft_model_iterate.py {nbath} {U} {adjust_mu} {double_counting}
+# srun -n 9 python run_dmft.py {nbath} {U} {adjust_mu} {double_counting}
+srun -n 9 python get_transmission.py {nbath} {U} {adjust_mu} {double_counting}
 """
 
 # Output folder for job scripts
