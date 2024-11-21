@@ -3,9 +3,9 @@ import subprocess
 
 # Define parameter values
 nbath_values = [4, 8]
-U_values = [0.5]
-adjust_mu_values = [True, False]
-double_counting_values = [True, False]
+U_values = [4, 5]
+adjust_mu_values = [True]
+double_counting_values = [True]
 
 # Job script template
 job_script_template = """#!/bin/bash -l
@@ -50,7 +50,7 @@ for nbath in nbath_values:
                     adjust_mu=str(adjust_mu),
                     double_counting=str(double_counting),
                 )
-                job_script_filename = f"{job_scripts_folder}/job_nbath_{nbath}_adjustmu_{adjust_mu}_dc_{double_counting}.sh"
+                job_script_filename = f"{job_scripts_folder}/job_nbath_{nbath}_U_{U}_adjustmu_{adjust_mu}_dc_{double_counting}.sh"
 
                 with open(job_script_filename, "w") as f:
                     f.write(job_script)
