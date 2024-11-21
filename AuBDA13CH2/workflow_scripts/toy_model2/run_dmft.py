@@ -169,6 +169,5 @@ if rank == 0:
     self_energy[2] = dmft_sigma
     gf.selfenergies.append((imb, self_energy[2]))
 
-    gfp_dmft = ProjectedGreenFunction(gf, index_active_region)
-    charge_dmft = get_ao_charge(gfp_dmft, mu=gfloc.mu,beta=beta)
+    charge_dmft = gfloc.integrate(gfloc.mu,gfloc.nmats,gfloc.beta)
     np.save(f"{output_folder_combination}/charge_per_orbital_dmft.npy", charge_dmft)
