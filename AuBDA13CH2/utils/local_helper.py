@@ -98,7 +98,7 @@ def plot_selected_quantities(
                         "title": gfloc_plot_params.get(
                             "title", f"{subfolder}"
                         ),  # Use subfolder name as title if not set
-                        "xlim": (-2.5, 2.5),
+                        "xlim": (-10, 10),
                     }
                 )
                 pl.plot_gfloc_spectral_function(
@@ -110,6 +110,9 @@ def plot_selected_quantities(
         if "sigma" in quantities:
             # Load and plot sigma trace
             try:
+                eta = 3e-2
+                energies = np.arange(-10, 10, 0.01)
+                z_ret = energies + 1.0j * eta
                 sigma_file = os.path.join(folder_path, "dmft_sigma.npy")
                 sigma = np.load(sigma_file)
                 sigma_plot_params = default_plot_params.copy()
@@ -118,7 +121,8 @@ def plot_selected_quantities(
                         "title": sigma_plot_params.get(
                             "title", f"{subfolder}"
                         ),  # Use subfolder name as title if not set
-                        "xlim": (-2.5, 2.5),
+                        "xlim": (-10, 10),
+                        "ylim": (-20, 20),
                     }
                 )
                 pl.plot_trace_sigma(sigma, z_ret, plot_params=sigma_plot_params)

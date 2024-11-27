@@ -3,7 +3,7 @@ import subprocess
 
 # Define parameter values
 nbath_values = [4]
-U_values = [0,0.5,1,1.5,2,2.5,3.0,4.0]
+U_values = [8, 12]  # [0,0.5,1,1.5,2,2.5,3.0,4.0]
 adjust_mu_values = [True]
 double_counting_values = [True]
 

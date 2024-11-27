@@ -1,17 +1,19 @@
 from __future__ import annotations
-import sys
+
 import os
 import pickle
+import sys
+
 import numpy as np
+from edpyt.dmft import DMFT, Converged, Gfimp
+from edpyt.nano_dmft import Gfimp as nanoGfimp
+from edpyt.nano_dmft import Gfloc
 from mpi4py import MPI
 from qtpyt.base.selfenergy import DataSelfEnergy as BaseDataSelfEnergy
 from qtpyt.block_tridiag import greenfunction
 from qtpyt.continued_fraction import get_ao_charge
 from qtpyt.projector import ProjectedGreenFunction, expand
 from scipy.optimize import root
-from edpyt.dmft import DMFT, Converged, Gfimp
-from edpyt.nano_dmft import Gfimp as nanoGfimp
-from edpyt.nano_dmft import Gfloc
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -75,7 +77,7 @@ occupancy_goal = np.load(f"{data_folder}/occupancies.npy")
 len_active = 9
 energies = np.arange(-10, 10, 0.01)
 z_ret = energies + 1.0j * eta
-np.save(os.path.join(output_folder, 'energies.npy'), z_ret)
+np.save(os.path.join(output_folder, "energies.npy"), z_ret)
 
 H_active = np.load(f"{data_folder}/hamiltonian.npy").real
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
@@ -96,7 +98,9 @@ double_counting = (
     if use_double_counting
     else np.zeros((len_active, len_active))
 )
-gfloc = Gfloc(H_active - double_counting, np.eye(len_active), HybMats, idx_neq, idx_inv, ne, beta)
+gfloc = Gfloc(
+    H_active - double_counting, np.eye(len_active), HybMats, idx_neq, idx_inv, ne, beta
+)
 
 nimp = gfloc.idx_neq.size
 gfimp = [Gfimp(nbaths, z_mats.size, V[i, i], beta) for i in range(nimp)]
@@ -133,7 +137,11 @@ if rank == 0:
     with open(f"{output_folder_combination}/mu.txt", "w") as mu_file:
         mu_file.write(str(gfloc.mu))
 
-    _Sigma = lambda z: -double_counting.diagonal()[:, None] - gfloc.mu + gfloc.Sigma(z)[idx_inv]
+    _Sigma = (
+        lambda z: -double_counting.diagonal()[:, None]
+        - gfloc.mu
+        + gfloc.Sigma(z)[idx_inv]
+    )
     dmft_sigma_file = f"{output_folder_combination}/dmft_sigma.npy"
     save_sigma(_Sigma(z_ret), dmft_sigma_file, nspin)
 
@@ -170,5 +178,5 @@ if rank == 0:
     self_energy[2] = dmft_sigma
     gf.selfenergies.append((imb, self_energy[2]))
 
-    charge_dmft = gfloc.integrate(gfloc.mu,gfloc.nmats,gfloc.beta)
+    charge_dmft = gfloc.integrate(gfloc.mu, gfloc.nmats, gfloc.beta)
     np.save(f"{output_folder_combination}/charge_per_orbital_dmft.npy", charge_dmft)
