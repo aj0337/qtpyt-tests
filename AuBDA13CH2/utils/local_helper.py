@@ -6,7 +6,12 @@ import numpy as np
 
 
 def plot_selected_quantities(
-    data_folder="output", quantities=None, selected_impurities=None, iteration_list=None
+    data_folder="output",
+    quantities=None,
+    selected_impurities=None,
+    iteration_list=None,
+    xlims=None,
+    ylims=None,
 ):
     """
     Plots selected quantities from data files in each subfolder within the specified directory.
@@ -18,6 +23,10 @@ def plot_selected_quantities(
                            If None, all quantities will be plotted.
         selected_impurities (list of int, optional): List of impurity indices to plot for bath energies and bath couplings.
         iteration_list (list of int, optional): List of specific iteration numbers to plot for bath energies and bath couplings.
+        xlims (dict, optional): Dictionary with quantities as keys and x-axis limits (tuple) as values.
+                                Example: {"delta": (-10, 10), "gfloc": (-5, 5)}.
+        ylims (dict, optional): Dictionary with quantities as keys and y-axis limits (tuple) as values.
+                                Example: {"delta": (-1, 1), "gfloc": (-0.5, 0.5)}.
     """
     if quantities is None:
         # Plot all quantities if no specific selection is provided
@@ -31,6 +40,10 @@ def plot_selected_quantities(
             "dft_transmission",
             "dmft_transmission",
         ]
+    if xlims is None:
+        xlims = {}
+    if ylims is None:
+        ylims = {}
 
     # Loop through each subfolder in the base directory
     for subfolder in os.listdir(data_folder):
@@ -67,7 +80,6 @@ def plot_selected_quantities(
         }
 
         if "delta" in quantities:
-            # Load and plot delta
             try:
                 delta_file = os.path.join(folder_path, "dmft_delta.npy")
                 delta = np.load(delta_file)
@@ -75,9 +87,12 @@ def plot_selected_quantities(
                 ne = delta.shape[1]
                 z_mats = 1.0j * (2 * np.arange(ne) + 1) * np.pi / beta
                 delta_plot_params = default_plot_params.copy()
-                delta_plot_params["title"] = delta_plot_params.get(
-                    "title", f"{subfolder}"
-                )  # Use subfolder name as title if not set
+
+                if "delta" in xlims:
+                    delta_plot_params["xlim"] = xlims["delta"]
+                if "delta" in ylims:
+                    delta_plot_params["ylim"] = ylims["delta"]
+
                 pl.plot_delta(
                     delta, z_mats, labels=labels, plot_params=delta_plot_params
                 )
@@ -85,7 +100,6 @@ def plot_selected_quantities(
                 print(f"Error plotting delta for {subfolder}: {e}")
 
         if "gfloc" in quantities:
-            # Load and plot gfloc
             try:
                 gfloc_file = os.path.join(folder_path, "dmft_gfloc.npy")
                 gfloc = np.load(gfloc_file)
@@ -93,14 +107,12 @@ def plot_selected_quantities(
                 energies = np.arange(-10, 10, 0.01)
                 z_ret = energies + 1.0j * eta
                 gfloc_plot_params = default_plot_params.copy()
-                gfloc_plot_params.update(
-                    {
-                        "title": gfloc_plot_params.get(
-                            "title", f"{subfolder}"
-                        ),  # Use subfolder name as title if not set
-                        "xlim": (-10, 10),
-                    }
-                )
+
+                if "gfloc" in xlims:
+                    gfloc_plot_params["xlim"] = xlims["gfloc"]
+                if "gfloc" in ylims:
+                    gfloc_plot_params["ylim"] = ylims["gfloc"]
+
                 pl.plot_gfloc_spectral_function(
                     gfloc, z_ret.real, labels=labels, plot_params=gfloc_plot_params
                 )
@@ -108,7 +120,6 @@ def plot_selected_quantities(
                 print(f"Error plotting gfloc for {subfolder}: {e}")
 
         if "sigma" in quantities:
-            # Load and plot sigma trace
             try:
                 eta = 3e-2
                 energies = np.arange(-10, 10, 0.01)
@@ -116,21 +127,17 @@ def plot_selected_quantities(
                 sigma_file = os.path.join(folder_path, "dmft_sigma.npy")
                 sigma = np.load(sigma_file)
                 sigma_plot_params = default_plot_params.copy()
-                sigma_plot_params.update(
-                    {
-                        "title": sigma_plot_params.get(
-                            "title", f"{subfolder}"
-                        ),  # Use subfolder name as title if not set
-                        "xlim": (-10, 10),
-                        "ylim": (-20, 20),
-                    }
-                )
+
+                if "sigma" in xlims:
+                    sigma_plot_params["xlim"] = xlims["sigma"]
+                if "sigma" in ylims:
+                    sigma_plot_params["ylim"] = ylims["sigma"]
+
                 pl.plot_trace_sigma(sigma, z_ret, plot_params=sigma_plot_params)
             except Exception as e:
                 print(f"Error plotting sigma for {subfolder}: {e}")
 
         if "charge" in quantities:
-            # Load and plot charge per impurity
             try:
                 charge_file = os.path.join(folder_path, "charge_per_orbital_dft.npy")
                 charge = np.load(charge_file)
@@ -139,9 +146,12 @@ def plot_selected_quantities(
                 )
                 dmft_charge = np.load(dmft_charge_file)
                 charge_plot_params = default_plot_params.copy()
-                charge_plot_params["title"] = charge_plot_params.get(
-                    "title", f"{subfolder}"
-                )  # Use subfolder name as title if not set
+
+                if "charge" in xlims:
+                    charge_plot_params["xlim"] = xlims["charge"]
+                if "charge" in ylims:
+                    charge_plot_params["ylim"] = ylims["charge"]
+
                 pl.plot_charge_per_impurity(
                     [charge, dmft_charge],
                     labels=labels,
@@ -152,13 +162,15 @@ def plot_selected_quantities(
                 print(f"Error plotting charge per impurity for {subfolder}: {e}")
 
         if "bath_energies" in quantities:
-            # Load and plot bath energies
             try:
                 h5_file = os.path.join(folder_path, "dmft_iterations.h5")
                 bath_energy_plot_params = default_plot_params.copy()
-                bath_energy_plot_params["title"] = bath_energy_plot_params.get(
-                    "title", f"{subfolder}"
-                )  # Use subfolder name as title if not set
+
+                if "bath_energies" in xlims:
+                    bath_energy_plot_params["xlim"] = xlims["bath_energies"]
+                if "bath_energies" in ylims:
+                    bath_energy_plot_params["ylim"] = ylims["bath_energies"]
+
                 pl.plot_bath_energies(
                     h5_file,
                     labels=labels,
@@ -170,13 +182,15 @@ def plot_selected_quantities(
                 print(f"Error plotting bath energies for {subfolder}: {e}")
 
         if "bath_couplings" in quantities:
-            # Load and plot bath couplings
             try:
                 h5_file = os.path.join(folder_path, "dmft_iterations.h5")
                 bath_coupling_plot_params = default_plot_params.copy()
-                bath_coupling_plot_params["title"] = bath_coupling_plot_params.get(
-                    "title", f"{subfolder}"
-                )  # Use subfolder name as title if not set
+
+                if "bath_couplings" in xlims:
+                    bath_coupling_plot_params["xlim"] = xlims["bath_couplings"]
+                if "bath_couplings" in ylims:
+                    bath_coupling_plot_params["ylim"] = ylims["bath_couplings"]
+
                 pl.plot_bath_couplings(
                     h5_file,
                     labels=labels,
@@ -187,31 +201,31 @@ def plot_selected_quantities(
             except Exception as e:
                 print(f"Error plotting bath couplings for {subfolder}: {e}")
 
-        # Check if both DFT and DMFT transmission data are requested and available
-        dft_transmission = None
-        dmft_transmission = None
-        energies = None
-
-        if "dft_transmission" in quantities:
-            dft_transmission_file = os.path.join(folder_path, "dft_transmission.npy")
-            if os.path.exists(dft_transmission_file):
-                energies, dft_transmission = np.load(dft_transmission_file)
-
-        if "dmft_transmission" in quantities:
-            dmft_transmission_file = os.path.join(folder_path, "dmft_transmission.npy")
-            if os.path.exists(dmft_transmission_file):
-                energies, dmft_transmission = np.load(dmft_transmission_file)
-
-        # Set yscale to "log" only for DFT and DMFT transmission plots
-        transmission_plot_params = default_plot_params.copy()
-        transmission_plot_params["yscale"] = "log"
-        transmission_plot_params["title"] = transmission_plot_params.get(
-            "title", f"{subfolder}"
-        )  # Use subfolder name as title if not set
-
-        # Plot DFT and DMFT transmission on the same plot if both are available
-        if dft_transmission is not None or dmft_transmission is not None:
+        if "dft_transmission" in quantities or "dmft_transmission" in quantities:
             try:
+                dft_transmission_file = os.path.join(
+                    folder_path, "dft_transmission.npy"
+                )
+                dmft_transmission_file = os.path.join(
+                    folder_path, "dmft_transmission.npy"
+                )
+
+                dft_transmission = None
+                dmft_transmission = None
+
+                if os.path.exists(dft_transmission_file):
+                    energies, dft_transmission = np.load(dft_transmission_file)
+
+                if os.path.exists(dmft_transmission_file):
+                    energies, dmft_transmission = np.load(dmft_transmission_file)
+
+                transmission_plot_params = default_plot_params.copy()
+
+                if "dmft_transmission" in xlims:
+                    transmission_plot_params["xlim"] = xlims["dmft_transmission"]
+                if "dmft_transmission" in ylims:
+                    transmission_plot_params["ylim"] = ylims["dmft_transmission"]
+
                 pl.plot_transmission(
                     energies,
                     dft_transmission,
