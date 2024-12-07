@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import pickle
 import sys
 
 import numpy as np
@@ -10,9 +9,7 @@ from edpyt.nano_dmft import Gfimp as nanoGfimp
 from edpyt.nano_dmft import Gfloc
 from mpi4py import MPI
 from qtpyt.base.selfenergy import DataSelfEnergy as BaseDataSelfEnergy
-from qtpyt.block_tridiag import greenfunction
-from qtpyt.continued_fraction import get_ao_charge
-from qtpyt.projector import ProjectedGreenFunction, expand
+from qtpyt.projector import expand
 from scipy.optimize import root
 
 comm = MPI.COMM_WORLD
@@ -50,28 +47,29 @@ def save_sigma(sigma_diag, outputfile, npsin):
 
 
 # Check for command-line arguments for nbath, U, adjust_mu, and double_counting
-if len(sys.argv) < 5:
+if len(sys.argv) < 6:
     raise ValueError(
-        "Please provide nbath, U, adjust_mu (True/False), and double_counting (True/False) as command-line arguments."
+        "Please provide nbath, U, adjust_mu (True/False), double_counting (True/False), and mu as command-line arguments."
     )
 nbaths = int(sys.argv[1])
 U = float(sys.argv[2])
 adjust_mu = sys.argv[3].lower() == "true"
 use_double_counting = sys.argv[4].lower() == "true"
+mu = float(sys.argv[5])
 
 tol = 1e-4
 max_iter = 1000
 alpha = 0.0
 nspin = 1
 eta = 3e-2
-mu = U/2
+
 data_folder = "../../output/compute_run"
-output_folder = "../../output/compute_run/toy_model5"
+output_folder = "../../output/compute_run/toy_model7"
 
 # Define output folder based on parameters
 dc_str = "with_dc_correction" if use_double_counting else "without_dc_correction"
 mu_str = "adjust_mu" if adjust_mu else "no_adjust_mu"
-output_folder_combination = f"{output_folder}/nbaths_{nbaths}_U_{U}_{dc_str}_{mu_str}"
+output_folder_combination = f"{output_folder}/nbaths_{nbaths}_U_{U}_{dc_str}_{mu_str}_mu_{mu:.1f}"
 
 os.makedirs(output_folder_combination, exist_ok=True)
 
@@ -121,7 +119,7 @@ dmft = DMFT(
     adjust_mu=adjust_mu,
     alpha=alpha,
     egrid=z_ret,
-    store_iterations=False,
+    store_iterations=True,
     iter_filename=f"{output_folder_combination}/dmft_iterations.h5",
 )
 
@@ -150,37 +148,3 @@ if rank == 0:
 
     gfloc_data = gfloc(z_ret)
     np.save(f"{output_folder_combination}/dmft_gfloc.npy", gfloc_data)
-    # Compute orbital occupancy before and after including DMFT self-energy
-    self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
-    with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
-        hs_list_ii = pickle.load(f)
-    with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
-        hs_list_ij = pickle.load(f)
-
-    gf = greenfunction.GreenFunction(
-        hs_list_ii,
-        hs_list_ij,
-        [(0, self_energy[0]), (len(hs_list_ii) - 1, self_energy[1])],
-        solver="dyson",
-        eta=eta,
-    )
-    gfp = ProjectedGreenFunction(gf, index_active_region)
-    charge_dft = get_ao_charge(gfp, mu=0, beta=beta)
-    charge_dft_U = get_ao_charge(gfp, mu=U/2, beta=beta)
-
-    nodes = [0, 810, 1116, 1278, 1584, 2394]
-    imb = 2  # index of molecule block from the nodes list
-    S_molecule = hs_list_ii[imb][1]  # overlap of molecule
-    idx_molecule = (
-        index_active_region - nodes[imb]
-    )  # indices of active region w.r.t molecule
-
-    np.save(f"{output_folder_combination}/charge_per_orbital_dft.npy", charge_dft)
-    np.save(f"{output_folder_combination}/charge_per_orbital_dft_U.npy", charge_dft_U)
-
-    dmft_sigma = load(dmft_sigma_file)
-    self_energy[2] = dmft_sigma
-    gf.selfenergies.append((imb, self_energy[2]))
-
-    charge_dmft = gfloc.integrate(gfloc.mu, gfloc.nmats, gfloc.beta)
-    np.save(f"{output_folder_combination}/charge_per_orbital_dmft.npy", charge_dmft)

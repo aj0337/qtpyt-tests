@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import pickle
 import sys
 
 import numpy as np
@@ -10,9 +9,7 @@ from edpyt.nano_dmft import Gfimp as nanoGfimp
 from edpyt.nano_dmft import Gfloc
 from mpi4py import MPI
 from qtpyt.base.selfenergy import DataSelfEnergy as BaseDataSelfEnergy
-from qtpyt.block_tridiag import greenfunction
-from qtpyt.continued_fraction import get_ao_charge
-from qtpyt.projector import ProjectedGreenFunction, expand
+from qtpyt.projector import expand
 from scipy.optimize import root
 
 comm = MPI.COMM_WORLD
@@ -74,7 +71,7 @@ output_folder_combination = f"{output_folder}/nbaths_{nbaths}_U_{U}_{dc_str}_{mu
 os.makedirs(output_folder_combination, exist_ok=True)
 
 occupancy_goal = np.load(f"{data_folder}/occupancies.npy")
-len_active = 9
+len_active = len(occupancy_goal)
 energies = np.arange(-10, 10, 0.01)
 z_ret = energies + 1.0j * eta
 np.save(os.path.join(output_folder, "energies.npy"), z_ret)
@@ -136,6 +133,9 @@ if rank == 0:
     with open(f"{output_folder_combination}/mu.txt", "w") as mu_file:
         mu_file.write(str(gfloc.mu))
 
-    _Sigma = lambda z: -gfloc.mu + gfloc.Sigma(z)[idx_inv]
+    _Sigma = (
+        lambda z: +gfloc.Sigma(z)[idx_inv]
+        - gfloc.mu  # -double_counting.diagonal()[:, None]
+    )
     dmft_sigma_file = f"{output_folder_combination}/dmft_sigma.npy"
     save_sigma(_Sigma(z_ret), dmft_sigma_file, nspin)
