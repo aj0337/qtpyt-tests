@@ -17,3 +17,4 @@ output/
 **/job_scripts/
 *.bin
 *.pkl
+*.tar.gz
