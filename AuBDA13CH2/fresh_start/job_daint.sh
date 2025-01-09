@@ -1,10 +1,10 @@
 #!/bin/bash -l
 #SBATCH --no-requeue
 #SBATCH --job-name="defs1"
-#SBATCH --nodes=6
+#SBATCH --nodes=10
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=4:00:00
+#SBATCH --time=8:00:00
 #SBATCH --partition=normal
 #SBATCH --constraint=gpu
 #SBATCH --hint=nomultithread
@@ -25,7 +25,7 @@ source "/users/ajayaraj/software/gpaw/gpaw-env/bin/activate"
 # srun -n 1 python get_cubefiles.py
 # srun -n 1 python get_gf_prerequisites.py
 # srun -n 1 python get_dft_states.py
-# srun -n 4 python get_dft_transmission.py
 # srun -n 1 python get_dft_occupancies.py
-# srun -n 6 python get_dft_dos.py
-srun -n 6 python get_active_embedding_hybridization.py
+srun -n 10 python get_dft_dos.py
+# srun -n 10 python get_dft_transmission.py
+# srun -n 10 python get_active_embedding_hybridization.py
