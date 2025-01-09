@@ -26,5 +26,6 @@ source "/users/ajayaraj/software/gpaw/gpaw-env/bin/activate"
 # srun -n 1 python get_gf_prerequisites.py
 # srun -n 1 python get_dft_states.py
 # srun -n 4 python get_dft_transmission.py
-srun -n 1 python get_dft_occupancies.py
+# srun -n 1 python get_dft_occupancies.py
 # srun -n 6 python get_dft_dos.py
+srun -n 6 python get_active_embedding_hybridization.py
