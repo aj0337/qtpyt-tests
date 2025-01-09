@@ -11,7 +11,7 @@ from qtpyt.parallel.egrid import GridDesc
 from qtpyt.projector import ProjectedGreenFunction
 
 # Data paths
-data_folder = "./output"
+data_folder = "./output/lowdin"
 
 # Load data
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
@@ -22,9 +22,10 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
     hs_list_ij = pickle.load(f)
 
 # Parameters
-z_ret = np.load(f"{data_folder}/retarded_energies.npy")
-eta = z_ret.imag[0]
-energies = z_ret.real
+de = 0.01
+energies = np.arange(-2, 2 + de / 2.0, de).round(7)
+eta = 5e-3
+z_ret = energies + 1.j * eta
 beta = 1000
 
 # Green's Function Setup

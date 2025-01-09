@@ -10,7 +10,7 @@ from qtpyt.projector import ProjectedGreenFunction
 from scipy.linalg import eigvalsh
 
 # Data paths
-data_folder = "./output"
+data_folder = "./output/lowdin"
 
 # Load data
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")

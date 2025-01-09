@@ -8,7 +8,7 @@ from qtpyt.projector import ProjectedGreenFunction
 from qtpyt.continued_fraction import get_ao_charge
 
 # Data paths
-data_folder = "./output"
+data_folder = "./output/lowdin"
 
 # Load data
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
@@ -21,7 +21,6 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 # Parameters
 z_ret = np.load(f"{data_folder}/retarded_energies.npy")
 eta = z_ret.imag[0]
-energies = z_ret.real
 mu = 1e-3
 beta = 1000
 

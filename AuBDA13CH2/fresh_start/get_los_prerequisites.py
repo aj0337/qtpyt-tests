@@ -17,7 +17,7 @@ def get_species_indices(atoms,species):
         indices.extend(element_indices)
     return sorted(indices)
 
-data_folder = './output'
+data_folder = './output/lowdin'
 # Create the folder if it doesn't exist
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
@@ -27,7 +27,7 @@ GPWLEADSDIR = './dft/leads/'
 SUBDIAG_SPECIES = ("C", "N", "H")
 # Define the active region within the subdiagonalized species
 active = {'C': [3],'N': [3]}
-lowdin = False
+lowdin = True
 
 cc_path = Path(GPWDEVICEDIR)
 pl_path = Path(GPWLEADSDIR)

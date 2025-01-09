@@ -12,12 +12,17 @@ from qtpyt.surface.principallayer import PrincipalSelfEnergy
 from qtpyt.surface.tools import prepare_leads_matrices
 from qtpyt.tools import remove_pbc, rotate_couplings
 
-data_folder = "./output"
+
+lowdin = True
+data_folder = "./output/lowdin"
 # Create the folder if it doesn't exist
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
+if lowdin:
+    H_subdiagonalized, S_subdiagonalized = np.load(f"{data_folder}/hs_los_lowdin.npy")
 
-H_subdiagonalized, S_subdiagonalized = np.load(f"{data_folder}/hs_los_no_lowdin.npy")
+else:
+    H_subdiagonalized, S_subdiagonalized = np.load(f"{data_folder}/hs_los_no_lowdin.npy")
 H_subdiagonalized = H_subdiagonalized.astype(np.complex128)
 S_subdiagonalized = S_subdiagonalized.astype(np.complex128)
 

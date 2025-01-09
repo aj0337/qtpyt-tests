@@ -23,11 +23,14 @@ def run(outputfile):
         np.save(outputfile, (z_ret, T.real))
 
 
-data_folder = "./output"
+data_folder = "./output/lowdin"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
-z_ret = np.load(f"{data_folder}/retarded_energies.npy")
-eta = z_ret.imag[0]
+
+de = 0.01
+energies = np.arange(-2, 2 + de / 2.0, de).round(7)
+eta = 5e-3
+z_ret = energies + 1.j * eta
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
