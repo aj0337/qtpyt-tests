@@ -22,7 +22,9 @@ if lowdin:
     H_subdiagonalized, S_subdiagonalized = np.load(f"{data_folder}/hs_los_lowdin.npy")
 
 else:
-    H_subdiagonalized, S_subdiagonalized = np.load(f"{data_folder}/hs_los_no_lowdin.npy")
+    H_subdiagonalized, S_subdiagonalized = np.load(
+        f"{data_folder}/hs_los_no_lowdin.npy"
+    )
 H_subdiagonalized = H_subdiagonalized.astype(np.complex128)
 S_subdiagonalized = S_subdiagonalized.astype(np.complex128)
 
@@ -91,4 +93,4 @@ save_path = os.path.join(data_folder, "hs_list_ij.pkl")
 with open(save_path, "wb") as f:
     pickle.dump(hs_list_ij, f)
 np.save(os.path.join(data_folder, "self_energy.npy"), self_energy)
-np.save(os.path.join(data_folder, 'retarded_energies.npy'), energies + 1.j * eta)
+np.save(os.path.join(data_folder, "retarded_energies.npy"), energies + 1.0j * eta)
