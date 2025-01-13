@@ -81,6 +81,7 @@ iteration_counter = 0
 
 def callback(*args, **kwargs):
     global iteration_counter
+
     ax1 = plot(
         gf=gfloc_with_dccorrection,
         sigma_func=gfloc_with_dccorrection.Sigma,
@@ -92,16 +93,50 @@ def callback(*args, **kwargs):
     ax1.set_title(f"Callback Iteration {iteration_counter} | $\mu$ = {mu_value:.4f} eV")
 
     figure_filename = os.path.join(
-        figure_folder, f"callback_iter_{iteration_counter:03d}_mu_{mu_value:.4f}.png"
+        figure_folder,
+        f"callback_iter_{iteration_counter:03d}_mu_{mu_value:.4f}_dos.png",
     )
     plt.xlim(-2, 2)
     plt.savefig(figure_filename, dpi=300, bbox_inches="tight")
     plt.close()
+
+    dmft_occupancy = gfloc_with_dccorrection.integrate(gfloc_with_dccorrection.mu)
+
+    fig, ax = plt.subplots(figsize=(8, 4))
+    x_indices = np.arange(len(occupancy_goal))
+    ax.bar(
+        x_indices - 0.2,
+        occupancy_goal,
+        width=0.4,
+        label="Occupancy Goal",
+        color="blue",
+        align="center",
+    )
+    ax.bar(
+        x_indices + 0.2,
+        dmft_occupancy,
+        width=0.4,
+        label="DMFT Occupancy",
+        color="orange",
+        align="center",
+    )
+
+    ax.set_xlabel("Impurity Index")
+    ax.set_ylabel("Occupancy")
+    ax.legend()
+    ax.set_title(f"Occupancy Comparison | Iteration {iteration_counter}")
+
+    barplot_filename = os.path.join(
+        figure_folder, f"callback_iter_{iteration_counter:03d}_occupancy.png"
+    )
+    plt.savefig(barplot_filename, dpi=300, bbox_inches="tight")
+    plt.close()
+
     iteration_counter += 1
 
 
 nbaths = 4
-U = 0.01
+U = 4
 tol = 1e-4
 max_iter = 1000
 alpha = 0.0
