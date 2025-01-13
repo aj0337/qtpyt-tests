@@ -26,7 +26,7 @@ def load(filename):
 
 
 def run(outputfile):
-    gd = GridDesc(z_ret, 1, float)
+    gd = GridDesc(energies, 1, float)
     T = np.empty(gd.energies.size)
     for e, energy in enumerate(gd.energies):
         T[e] = gf.get_transmission(energy)
@@ -34,18 +34,18 @@ def run(outputfile):
     T = gd.gather_energies(T)
 
     if comm.rank == 0:
-        np.save(outputfile, (z_ret, T.real))
+        np.save(outputfile, (energies, T.real))
 
 
 data_folder = "./output/lowdin"
+dmft_data_folder = "./output/lowdin/U_4"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
-dmft_sigma_file = f"{data_folder}/dmft_U0_sigma.npy"
+dmft_sigma_file = f"{dmft_data_folder}/dmft_sigma.npy"
 
 de = 0.01
 energies = np.arange(-2, 2 + de / 2.0, de).round(7)
 eta = 5e-3
-z_ret = energies + 1.0j * eta
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
@@ -80,6 +80,6 @@ dmft_sigma = comm.bcast(dmft_sigma, root=0)
 self_energy[2] = dmft_sigma
 gf.selfenergies.append((imb, self_energy[2]))
 
-outputfile = f"{data_folder}/dmft_U0_transmission.npy"
+outputfile = f"{dmft_data_folder}/dmft_transmission.npy"
 run(outputfile)
 gf.selfenergies.pop()
