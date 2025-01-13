@@ -82,9 +82,15 @@ iteration_counter = 0
 def callback(*args, **kwargs):
     global iteration_counter
 
+    def sigma_func(z):
+        return (
+            -double_counting.diagonal()[:, None]
+            - gfloc_with_dccorrection.mu
+            + gfloc_with_dccorrection.Sigma(z)
+        )
     ax1 = plot(
         gf=gfloc_with_dccorrection,
-        sigma_func=gfloc_with_dccorrection.Sigma,
+        sigma_func=sigma_func,
         reference_gf=gfloc_no_dccorrection,
         label_ref="DFT",
         semilogy=kwargs.get("semilogy", True),
