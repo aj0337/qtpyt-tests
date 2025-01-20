@@ -142,8 +142,8 @@ def callback(*args, **kwargs):
 
 
 nbaths = 4
-U = 4
-tol = 1e-2
+# U = 4
+tol = 1e-4
 max_iter = 1000
 alpha = 0.0
 nspin = 1
@@ -152,12 +152,11 @@ energies = np.arange(-2, 2 + de / 2.0, de).round(7)
 eta = 5e-3
 z_ret = energies + 1.0j * eta
 beta = 1000
-mu = 1e-3
 adjust_mu = True
 use_double_counting = True
 
 data_folder = "output/lowdin"
-output_folder = f"output/lowdin/U_{U}"
+output_folder = "./output/lowdin/mu_1e-3/U_matrix/restart"
 figure_folder = f"{output_folder}/figures"
 occupancy_goal = np.load(f"{data_folder}/occupancies_gfloc.npy")
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
@@ -196,7 +195,10 @@ S_active = np.eye(len_active)
 idx_neq = np.arange(len_active)
 idx_inv = np.arange(len_active)
 
-V = np.eye(len_active) * U
+# V = np.eye(len_active) * U
+V = np.loadtxt(f"{data_folder}/U_matrix.txt")
+delta = np.load(f"{data_folder}/mu_1e-3/U_matrix/opt_delta_dmft.npy")
+dmft_mu = np.load(f"{data_folder}/mu_1e-3/U_matrix/opt_mu_dmft.npy")
 
 # Apply double counting correction if specified
 double_counting = (
@@ -214,17 +216,19 @@ gfloc_with_dccorrection = Gfloc(
     beta=beta,
 )
 
+
 nimp = gfloc_with_dccorrection.idx_neq.size
-gfimp = [Gfimp(nbaths, z_mats.size, V[i, i], beta) for i in range(nimp)]
-gfimp = nanoGfimp(gfimp)
-
 Sigma = lambda z: np.zeros((nimp, z.size), complex)
-
+mu = 1e-3
 gfloc_no_dccorrection = Gfloc(
     H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
 )
+gfloc_with_dccorrection.update(mu=dmft_mu)
 gfloc_no_dccorrection.update(mu=mu)
 gfloc_no_dccorrection.set_local(Sigma)
+
+gfimp = [Gfimp(nbaths, z_mats.size, V[i, i], beta) for i in range(nimp)]
+gfimp = nanoGfimp(gfimp)
 
 # Initialize DMFT with adjust_mu parameter
 dmft = DMFT(
@@ -238,12 +242,9 @@ dmft = DMFT(
     DC=double_counting,
 )
 
-delta = dmft.initialize(V.diagonal().mean(), Sigma, mu=mu)
-delta_prev = delta.copy()
-dmft.delta = delta
 
 try:
-    dmft.solve(dmft.delta, alpha=1.0, callback=callback)
+    dmft.solve(delta, alpha=0.5, callback=callback)
 except:
     pass
 
@@ -259,5 +260,5 @@ save_sigma(_Sigma(z_ret), dmft_sigma_file, nspin)
 gfloc_data = gfloc_with_dccorrection(z_ret)
 np.save(f"{output_folder}/dmft_gfloc.npy", gfloc_data)
 
-np.save(f"{output_folder}/opt_delta_dmft", delta_prev)
+np.save(f"{output_folder}/opt_delta_dmft", dmft.delta)
 np.save(f"{output_folder}/opt_mu_dmft", gfloc_with_dccorrection.mu)

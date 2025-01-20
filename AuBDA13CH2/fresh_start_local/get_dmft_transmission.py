@@ -18,7 +18,7 @@ class DataSelfEnergy(BaseDataSelfEnergy):
     """Wrapper"""
 
     def retarded(self, energy):
-        return expand(S_molecule, super().retarded(energy), idx_molecule)
+        return expand(S_molecule_identity, super().retarded(energy), idx_molecule)
 
 
 def load(filename):
@@ -34,11 +34,11 @@ def run(outputfile):
     T = gd.gather_energies(T)
 
     if comm.rank == 0:
-        np.save(outputfile, (energies, T.real))
+        np.save(outputfile, (z_ret, T.real))
 
 
 data_folder = "./output/lowdin"
-dmft_data_folder = "./output/lowdin/U_4"
+dmft_data_folder = "./output/lowdin/mu_1e-3/U_matrix/occ_gfp/restart"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 dmft_sigma_file = f"{dmft_data_folder}/dmft_sigma.npy"
@@ -46,6 +46,7 @@ dmft_sigma_file = f"{dmft_data_folder}/dmft_sigma.npy"
 de = 0.01
 energies = np.arange(-2, 2 + de / 2.0, de).round(7)
 eta = 5e-3
+z_ret = energies + 1.j * eta
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
@@ -63,23 +64,24 @@ gf = greenfunction.GreenFunction(
     eta=eta,
 )
 
-# Add the DMFT self-energy for transmission
-if comm.rank == 0:
-    dmft_sigma = load(dmft_sigma_file)
-else:
-    dmft_sigma = None
+# # Add the DMFT self-energy for transmission
+# if comm.rank == 0:
+#     dmft_sigma = load(dmft_sigma_file)
+# else:
+#     dmft_sigma = None
 
-# Transmission function calculation
-imb = 2  # index of molecule block from the nodes list
-S_molecule = hs_list_ii[imb][1]  # overlap of molecule
-idx_molecule = (
-    index_active_region - nodes[imb]
-)  # indices of active region w.r.t molecule
+# # Transmission function calculation
+# imb = 2  # index of molecule block from the nodes list
+# S_molecule = hs_list_ii[imb][1]  # overlap of molecule
+# S_molecule_identity = np.eye(S_molecule.shape[0])
+# idx_molecule = (
+#     index_active_region - nodes[imb]
+# )  # indices of active region w.r.t molecule
 
-dmft_sigma = comm.bcast(dmft_sigma, root=0)
-self_energy[2] = dmft_sigma
-gf.selfenergies.append((imb, self_energy[2]))
+# dmft_sigma = comm.bcast(dmft_sigma, root=0)
+# self_energy[2] = dmft_sigma
+# gf.selfenergies.append((imb, self_energy[2]))
 
-outputfile = f"{dmft_data_folder}/dmft_transmission.npy"
+outputfile = f"{dmft_data_folder}/dmft_transmission_tester_z_ret.npy"
 run(outputfile)
 gf.selfenergies.pop()

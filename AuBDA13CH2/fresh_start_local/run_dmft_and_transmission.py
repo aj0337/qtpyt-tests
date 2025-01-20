@@ -4,11 +4,22 @@ import numpy as np
 from edpyt.dmft import DMFT, Gfimp
 from edpyt.nano_dmft import Gfimp as nanoGfimp
 from scipy.interpolate import interp1d
+from qtpyt.projector import expand
+from qtpyt.base.selfenergy import DataSelfEnergy as BaseDataSelfEnergy
+from qtpyt.block_tridiag import greenfunction
 from edpyt.nano_dmft import Gfloc
+from qtpyt.parallel.egrid import GridDesc
 
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+
+
+class DataSelfEnergy(BaseDataSelfEnergy):
+    """Wrapper"""
+
+    def retarded(self, energy):
+        return expand(S_molecule_identity, super().retarded(energy), idx_molecule)
 
 
 def distance(delta):
@@ -17,24 +28,22 @@ def distance(delta):
     return dmft.distance(delta)
 
 
-def save_sigma(sigma_diag, outputfile, npsin):
+def get_sigma(sigma_diag):
     L, ne = sigma_diag.shape
     sigma = np.zeros((ne, L, L), complex)
 
-    def save(spin):
-        for diag, mat in zip(sigma_diag.T, sigma):
-            mat.flat[:: (L + 1)] = diag
-        np.save(outputfile, sigma)
-
-    for spin in range(nspin):
-        save(spin)
+    for diag, mat in zip(sigma_diag.T, sigma):
+        mat.flat[:: (L + 1)] = diag
+    return DataSelfEnergy(energies, sigma)
 
 
-def plot(gf, sigma_func, semilogy=True, reference_gf=None, label_ref="DFT"):
+def plot(
+    gf, sigma_func, transmission, semilogy=True, reference_gf=None, reference_T=None, label_ref="DFT"
+):
     """Plot the Green's function DOS and Tr(Sigma) with an optional reference DOS."""
 
-    fig, axes = plt.subplots(2, 1, sharex=True)
-    ax1, ax2 = axes
+    fig, axes = plt.subplots(3, 1, sharex=True)
+    ax1, ax2, ax3 = axes
 
     w = z_ret.real
     dos = -1 / np.pi * gf(z_ret).sum(axis=0).imag
@@ -68,9 +77,21 @@ def plot(gf, sigma_func, semilogy=True, reference_gf=None, label_ref="DFT"):
     ax2.plot(w, trace_sigma.real, label="Re Tr(Sigma)", color="blue")
     ax2.plot(w, trace_sigma.imag, label="Im Tr(Sigma)", color="orange")
 
-    ax2.set_xlabel("E-E$_F$ [eV]")
     ax2.set_ylabel("Tr(Sigma) [eV]")
-    ax2.legend(loc="upper right")
+    ax2.legend(loc="lower right")
+
+    if reference_T is not None:
+        ax3.semilogy(reference_T[0,:], reference_T[1,:], label="Reference DMFT")
+
+    if semilogy:
+        ax3.semilogy(w, transmission, label="Computed")
+    else:
+        ax3.plot(w, transmission, label="Computed")
+    ax3.set_xlim(-2, 2)
+    ax3.set_ylim(bottom=1e-5)
+    ax3.legend(loc="lower right")
+    ax3.set_xlabel("E-E$_F$ [eV]")
+    ax3.set_ylabel("T(E)")
 
     plt.subplots_adjust(hspace=0)
     return ax1
@@ -88,10 +109,33 @@ def callback(*args, **kwargs):
             - gfloc_with_dccorrection.mu
             + gfloc_with_dccorrection.Sigma(z)
         )
+
+    # compute transmission
+    gf = greenfunction.GreenFunction(
+        hs_list_ii,
+        hs_list_ij,
+        [(0, self_energy[0]), (len(hs_list_ii) - 1, self_energy[1])],
+        solver="dyson",
+        eta=eta,
+    )
+    dmft_sigma = get_sigma(sigma_func(z_ret))
+    self_energy[2] = dmft_sigma
+    gf.selfenergies.append((imb, self_energy[2]))
+
+    gd = GridDesc(energies, 1, float)
+    T = np.empty(gd.energies.size)
+    for e, energy in enumerate(gd.energies):
+        T[e] = gf.get_transmission(energy)
+
+    T = gd.gather_energies(T)
+    ###
+
     ax1 = plot(
         gf=gfloc_with_dccorrection,
         sigma_func=sigma_func,
+        transmission=T,
         reference_gf=gfloc_no_dccorrection,
+        reference_T=reference_T,
         label_ref="DFT",
         semilogy=kwargs.get("semilogy", True),
     )
@@ -143,13 +187,14 @@ def callback(*args, **kwargs):
 
 nbaths = 4
 U = 4
-tol = 1e-2
+tol = 1e-4
 max_iter = 1000
 alpha = 0.0
 nspin = 1
 de = 0.01
 energies = np.arange(-2, 2 + de / 2.0, de).round(7)
-eta = 5e-3
+# eta = 5e-3
+eta = 3e-2
 z_ret = energies + 1.0j * eta
 beta = 1000
 mu = 1e-3
@@ -157,20 +202,28 @@ adjust_mu = True
 use_double_counting = True
 
 data_folder = "output/lowdin"
-output_folder = f"output/lowdin/U_{U}"
+output_folder = f"output/lowdin/U_{U}/occp_gfp/tol_1e-4/eta_{eta}"
 figure_folder = f"{output_folder}/figures"
-occupancy_goal = np.load(f"{data_folder}/occupancies_gfloc.npy")
+occupancy_goal = np.load(f"{data_folder}/occupancies_gfp.npy")
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
 z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 dft_dos = np.load(f"{data_folder}/dft_dos.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 
+
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
 
 with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
     hs_list_ij = pickle.load(f)
+
+
+nodes = [0, 810, 1116, 1278, 1584, 2394]
+imb = 2  # index of molecule block from the nodes list
+S_molecule = hs_list_ii[imb][1]  # overlap of molecule
+S_molecule_identity = np.eye(S_molecule.shape[0])
+idx_molecule = index_active_region - nodes[imb]
 
 os.makedirs(output_folder, exist_ok=True)
 os.makedirs(figure_folder, exist_ok=True)
@@ -225,7 +278,7 @@ gfloc_no_dccorrection = Gfloc(
 )
 gfloc_no_dccorrection.update(mu=mu)
 gfloc_no_dccorrection.set_local(Sigma)
-
+reference_T = np.load(f"reference/ET_dmft.npy")
 # Initialize DMFT with adjust_mu parameter
 dmft = DMFT(
     gfimp,
@@ -241,20 +294,12 @@ dmft = DMFT(
 delta = dmft.initialize(V.diagonal().mean(), Sigma, mu=mu)
 delta_prev = delta.copy()
 dmft.delta = delta
+dmft.solve(dmft.delta, alpha=1.0, callback=callback)
 
-try:
-    dmft.solve(dmft.delta, alpha=1.0, callback=callback)
-except:
-    pass
-
-
-_Sigma = (
-    lambda z: -double_counting.diagonal()[:, None]
-    - gfloc_with_dccorrection.mu
-    + gfloc_with_dccorrection.Sigma(z)[idx_inv]
-)
-dmft_sigma_file = f"{output_folder}/dmft_sigma.npy"
-save_sigma(_Sigma(z_ret), dmft_sigma_file, nspin)
+# try:
+#     dmft.solve(dmft.delta, alpha=1.0, callback=callback)
+# except:
+#     pass
 
 gfloc_data = gfloc_with_dccorrection(z_ret)
 np.save(f"{output_folder}/dmft_gfloc.npy", gfloc_data)

@@ -21,7 +21,7 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 # Parameters
 z_ret = np.load(f"{data_folder}/retarded_energies.npy")
 eta = z_ret.imag[0]
-mu = 1e-3
+mu = 0.0009274486653969923
 beta = 1000
 
 # Green's Function Setup
@@ -34,4 +34,4 @@ gf = greenfunction.GreenFunction(
 )
 gfp = ProjectedGreenFunction(gf, index_active_region)
 
-np.save(os.path.join(data_folder, 'occupancies.npy'), get_ao_charge(gfp,mu=mu,beta=beta))
+np.save(os.path.join(data_folder, 'occupancies_gfp.npy'), get_ao_charge(gfp,mu=mu,beta=beta))
