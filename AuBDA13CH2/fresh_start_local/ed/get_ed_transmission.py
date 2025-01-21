@@ -37,8 +37,8 @@ def run(outputfile):
         np.save(outputfile, (z_ret, T.real))
 
 
-data_folder = "./output/lowdin"
-ed_data_folder = "./output/lowdin/ed"
+data_folder = "../output/lowdin"
+ed_data_folder = "../output/lowdin/ed"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 ed_sigma_file = f"{ed_data_folder}/ed_sigma.npy"
