@@ -38,7 +38,13 @@ def get_sigma(sigma_diag):
 
 
 def plot(
-    gf, sigma_func, transmission, semilogy=True, reference_gf=None, reference_T=None, label_ref="DFT"
+    gf,
+    sigma_func,
+    transmission,
+    semilogy=True,
+    reference_gf=None,
+    reference_T=None,
+    label_ref="DFT",
 ):
     """Plot the Green's function DOS and Tr(Sigma) with an optional reference DOS."""
 
@@ -81,7 +87,7 @@ def plot(
     ax2.legend(loc="lower right")
 
     if reference_T is not None:
-        ax3.semilogy(reference_T[0,:], reference_T[1,:], label="Reference DMFT")
+        ax3.semilogy(reference_T[0, :], reference_T[1, :], label="Reference DMFT")
 
     if semilogy:
         ax3.semilogy(w, transmission, label="Computed")
@@ -193,8 +199,7 @@ alpha = 0.0
 nspin = 1
 de = 0.01
 energies = np.arange(-2, 2 + de / 2.0, de).round(7)
-# eta = 5e-3
-eta = 3e-2
+eta = 5e-3
 z_ret = energies + 1.0j * eta
 beta = 1000
 mu = 1e-3
