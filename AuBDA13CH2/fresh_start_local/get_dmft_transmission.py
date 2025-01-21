@@ -46,7 +46,7 @@ dmft_sigma_file = f"{dmft_data_folder}/dmft_sigma.npy"
 de = 0.01
 energies = np.arange(-2, 2 + de / 2.0, de).round(7)
 eta = 5e-3
-z_ret = energies + 1.j * eta
+z_ret = energies + 1.0j * eta
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
@@ -64,23 +64,23 @@ gf = greenfunction.GreenFunction(
     eta=eta,
 )
 
-# # Add the DMFT self-energy for transmission
-# if comm.rank == 0:
-#     dmft_sigma = load(dmft_sigma_file)
-# else:
-#     dmft_sigma = None
+# Add the DMFT self-energy for transmission
+if comm.rank == 0:
+    dmft_sigma = load(dmft_sigma_file)
+else:
+    dmft_sigma = None
 
-# # Transmission function calculation
-# imb = 2  # index of molecule block from the nodes list
-# S_molecule = hs_list_ii[imb][1]  # overlap of molecule
-# S_molecule_identity = np.eye(S_molecule.shape[0])
-# idx_molecule = (
-#     index_active_region - nodes[imb]
-# )  # indices of active region w.r.t molecule
+# Transmission function calculation
+imb = 2  # index of molecule block from the nodes list
+S_molecule = hs_list_ii[imb][1]  # overlap of molecule
+S_molecule_identity = np.eye(S_molecule.shape[0])
+idx_molecule = (
+    index_active_region - nodes[imb]
+)  # indices of active region w.r.t molecule
 
-# dmft_sigma = comm.bcast(dmft_sigma, root=0)
-# self_energy[2] = dmft_sigma
-# gf.selfenergies.append((imb, self_energy[2]))
+dmft_sigma = comm.bcast(dmft_sigma, root=0)
+self_energy[2] = dmft_sigma
+gf.selfenergies.append((imb, self_energy[2]))
 
 outputfile = f"{dmft_data_folder}/dmft_transmission_tester_z_ret.npy"
 run(outputfile)

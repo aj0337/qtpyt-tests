@@ -26,7 +26,7 @@ def load(filename):
 
 
 def run(outputfile):
-    gd = GridDesc(energies, 1, float)
+    gd = GridDesc(z_ret, 1, float)
     T = np.empty(gd.energies.size)
     for e, energy in enumerate(gd.energies):
         T[e] = gf.get_transmission(energy)
@@ -46,7 +46,7 @@ ed_sigma_file = f"{ed_data_folder}/ed_sigma.npy"
 de = 0.01
 energies = np.arange(-2, 2 + de / 2.0, de).round(7)
 eta = 5e-3
-z_ret = energies + 1.j * eta
+z_ret = energies + 1.0j * eta
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
