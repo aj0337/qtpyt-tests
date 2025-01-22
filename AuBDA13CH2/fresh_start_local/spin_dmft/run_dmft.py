@@ -157,8 +157,8 @@ mu = 1e-3
 adjust_mu = True
 use_double_counting = True
 
-data_folder = "output/lowdin"
-output_folder = "output/lowdin/spin_dmft/U_matrix"
+data_folder = "../output/lowdin"
+output_folder = "../output/lowdin/spin_dmft/U_matrix"
 figure_folder = f"{output_folder}/figures"
 occupancy_goal = np.load(f"{data_folder}/occupancies_gfloc.npy")
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
