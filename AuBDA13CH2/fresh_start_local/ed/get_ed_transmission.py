@@ -26,7 +26,7 @@ def load(filename):
 
 
 def run(outputfile):
-    gd = GridDesc(z_ret, 1, float)
+    gd = GridDesc(energies, 1, float)
     T = np.empty(gd.energies.size)
     for e, energy in enumerate(gd.energies):
         T[e] = gf.get_transmission(energy)
@@ -34,7 +34,7 @@ def run(outputfile):
     T = gd.gather_energies(T)
 
     if comm.rank == 0:
-        np.save(outputfile, (z_ret, T.real))
+        np.save(outputfile, (energies, T.real))
 
 
 data_folder = "../output/lowdin"
