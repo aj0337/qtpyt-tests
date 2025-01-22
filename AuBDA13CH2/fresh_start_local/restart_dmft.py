@@ -88,6 +88,7 @@ def callback(*args, **kwargs):
             - gfloc_with_dccorrection.mu
             + gfloc_with_dccorrection.Sigma(z)
         )
+
     ax1 = plot(
         gf=gfloc_with_dccorrection,
         sigma_func=sigma_func,
@@ -149,7 +150,7 @@ alpha = 0.0
 nspin = 1
 de = 0.01
 energies = np.arange(-2, 2 + de / 2.0, de).round(7)
-eta = 5e-3
+eta = 1e-2
 z_ret = energies + 1.0j * eta
 beta = 1000
 adjust_mu = True

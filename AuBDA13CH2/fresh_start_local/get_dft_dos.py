@@ -26,7 +26,7 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 
 de = 0.01
 energies = np.arange(-2, 2 + de / 2.0, de).round(7)
-eta = 5e-3
+eta = 1e-2
 
 # Green's Function Setup
 gf = greenfunction.GreenFunction(

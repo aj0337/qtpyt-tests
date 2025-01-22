@@ -24,8 +24,8 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 # Parameters
 de = 0.01
 energies = np.arange(-2, 2 + de / 2.0, de).round(7)
-eta = 5e-3
-z_ret = energies + 1.j * eta
+eta = 1e-2
+z_ret = energies + 1.0j * eta
 beta = 1000
 
 # Green's Function Setup
@@ -47,17 +47,17 @@ HB = gd.empty_aligned_orbs()
 for e, energy in enumerate(gd.energies):
     HB[e] = hyb.retarded(energy)
 
-filename = os.path.join(data_folder, 'hybridization.bin')
-gd.write(HB,filename)
+filename = os.path.join(data_folder, "hybridization.bin")
+gd.write(HB, filename)
 del HB
 
 # Define parameters for matsubara grid
 ne = 3000
-matsubara_energies = 1.j * (2 * np.arange(ne) + 1) * np.pi / beta
+matsubara_energies = 1.0j * (2 * np.arange(ne) + 1) * np.pi / beta
 
-gf.eta = 0.
-assert self_energy[0].eta == 0.
-assert self_energy[1].eta == 0.
+gf.eta = 0.0
+assert self_energy[0].eta == 0.0
+assert self_energy[1].eta == 0.0
 
 mat_gd = GridDesc(matsubara_energies, n_A, complex)
 HB_mat = mat_gd.empty_aligned_orbs()
@@ -66,9 +66,9 @@ for e, energy in enumerate(mat_gd.energies):
     HB_mat[e] = hyb.retarded(energy)
 
 # Save the Matsubara hybrid data
-filename = os.path.join(data_folder, 'matsubara_hybridization.bin')
+filename = os.path.join(data_folder, "matsubara_hybridization.bin")
 mat_gd.write(HB_mat, filename)
 del HB_mat
 
 if comm.rank == 0:
-    np.save(os.path.join(data_folder, 'matsubara_energies.npy'), matsubara_energies)
+    np.save(os.path.join(data_folder, "matsubara_energies.npy"), matsubara_energies)

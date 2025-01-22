@@ -45,7 +45,7 @@ ed_sigma_file = f"{ed_data_folder}/ed_sigma.npy"
 
 de = 0.01
 energies = np.arange(-2, 2 + de / 2.0, de).round(7)
-eta = 5e-3
+eta = 1e-2
 z_ret = energies + 1.0j * eta
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
