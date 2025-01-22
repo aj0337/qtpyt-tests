@@ -185,14 +185,6 @@ hyb_mats = np.fromfile(f"{data_folder}/matsubara_hybridization.bin", complex).re
 _HybMats = interp1d(z_mats.imag, hyb_mats, axis=0, bounds_error=False, fill_value=0.0)
 HybMats = lambda z: _HybMats(z.imag)
 
-hyb_ret = np.fromfile(f"{data_folder}/hybridization.bin", complex).reshape(
-    z_ret.size,
-    len_active,
-    len_active,
-)
-_HybRet = interp1d(z_ret.real, hyb_ret, axis=0, bounds_error=False, fill_value=0.0)
-HybRet = lambda z: _HybRet(z.real)
-
 S_active = np.eye(len_active)
 idx_neq = np.arange(len_active)
 idx_inv = np.arange(len_active)
