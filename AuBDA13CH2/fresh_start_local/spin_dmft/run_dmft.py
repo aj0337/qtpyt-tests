@@ -199,7 +199,7 @@ idx_neq = np.arange(len_active)
 idx_inv = np.arange(len_active)
 
 # V = np.eye(len_active) * U
-V = np.load(f"{data_folder}/U_matrix.npy")
+V = np.loadtxt(f"{data_folder}/U_matrix.txt")
 
 # Apply double counting correction if specified
 double_counting = (
@@ -245,11 +245,12 @@ dmft = DMFT(
 delta = dmft.initialize(V.diagonal().mean(), Sigma, mu=mu)
 delta_prev = delta.copy()
 dmft.delta = delta
+dmft.solve(dmft.delta, alpha=1.0, callback=callback)
 
-try:
-    dmft.solve(dmft.delta, alpha=1.0, callback=callback)
-except:
-    pass
+# try:
+#     dmft.solve(dmft.delta, alpha=1.0, callback=callback)
+# except:
+#     pass
 
 
 _Sigma = (
