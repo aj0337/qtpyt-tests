@@ -212,7 +212,7 @@ gfloc_with_dccorrection = Gfloc(
 
 nimp = gfloc_with_dccorrection.idx_neq.size
 Sigma = lambda z: np.zeros((nimp, z.size), complex)
-mu = 1e-3
+mu = 0.0
 gfloc_no_dccorrection = Gfloc(
     H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
 )

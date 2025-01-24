@@ -143,7 +143,7 @@ def callback(*args, **kwargs):
 
 
 nbaths = 4
-U = 4
+# U = 4
 tol = 1e-2
 max_iter = 1000
 alpha = 0.0
@@ -153,14 +153,14 @@ energies = np.arange(-2, 2 + de / 2.0, de).round(7)
 eta = 1e-2
 z_ret = energies + 1.0j * eta
 beta = 1000
-mu = 1e-3
+mu = 0.0
 adjust_mu = True
 use_double_counting = True
 
 data_folder = "output/lowdin"
-output_folder = f"output/lowdin/U_{U}"
+output_folder = f"output/lowdin/U_matrix"
 figure_folder = f"{output_folder}/figures"
-occupancy_goal = np.load(f"{data_folder}/occupancies_gfloc.npy")
+occupancy_goal = np.load(f"{data_folder}/occupancies_gfp_mu_{mu}.npy")
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
 z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
@@ -189,8 +189,8 @@ S_active = np.eye(len_active)
 idx_neq = np.arange(len_active)
 idx_inv = np.arange(len_active)
 
-V = np.eye(len_active) * U
-
+# V = np.eye(len_active) * U
+V = np.loadtxt(f"{data_folder}/U_matrix.txt")
 # Apply double counting correction if specified
 double_counting = (
     np.diag(V.diagonal() * (occupancy_goal - 0.5))

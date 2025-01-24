@@ -47,8 +47,8 @@ device_basis = Basis.from_dictionary(device_atoms, basis_dict)
 nodes = [0, 810, 1116, 1278, 1584, 2394]
 
 # Define energy range and broadening factor for the Green's function calculation
-de = 0.001
-energies = np.arange(-10.0, 10.0 + de / 2.0, de).round(7)
+de = 0.01
+energies = np.arange(-2.0, 2.0 + de / 2.0, de).round(7)
 eta = 1e-2
 
 # Define the number of repetitions (Nr) and unit cell repetition in the leads

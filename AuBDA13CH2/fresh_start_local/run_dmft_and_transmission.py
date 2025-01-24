@@ -202,7 +202,7 @@ energies = np.arange(-2, 2 + de / 2.0, de).round(7)
 eta = 1e-2
 z_ret = energies + 1.0j * eta
 beta = 1000
-mu = 1e-3
+mu = 0.0
 adjust_mu = True
 use_double_counting = True
 
