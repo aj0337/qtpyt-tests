@@ -23,11 +23,12 @@ conda activate qtpyt
 # mpirun -n 1 python get_gf_prerequisites.py
 # mpirun -n 1 python get_dft_states.py
 # mpirun -n 1 python get_dft_occupancies.py
-# mpirun -n 1 python get_dft_occupancies_gfloc.py
+mpirun -n 1 python get_dft_occupancies_gfloc.py
 # mpirun -n 8 python get_dft_dos.py
+mpirun -n 1 python get_dft_dos_gfloc.py
 # mpirun -n 8 python get_dft_transmission.py
 # mpirun -n 8 python get_active_embedding_hybridization.py
 # mpirun -n 1 python run_dmft.py
-mpirun -n 1 python restart_dmft.py
+# mpirun -n 1 python restart_dmft.py
 # mpirun -n 1 python run_dmft_and_transmission.py
 # mpirun -n 1 python get_dmft_transmission.py

@@ -8,10 +8,10 @@ import os
 
 
 beta = 1000
-mu = 1e-3
+mus = [-0.5,0.5]
 
 data_folder = "output/lowdin"
-output_folder = f"output/lowdin"
+output_folder = f"output/lowdin/occupancy"
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
 z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 
@@ -34,10 +34,11 @@ nimp = len_active
 
 Sigma = lambda z: np.zeros((nimp, z.size), complex)
 
-gfloc = Gfloc(
-    H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
-)
-gfloc.update(mu=mu)
-gfloc.set_local(Sigma)
+for mu in mus:
+    gfloc = Gfloc(
+        H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
+    )
+    gfloc.update(mu=mu)
+    gfloc.set_local(Sigma)
 
-np.save(os.path.join(data_folder, 'occupancies_gfloc.npy'), gfloc.integrate(mu=mu))
+    np.save(os.path.join(output_folder, f'occupancies_gfloc_test_mu_{mu}.npy'), gfloc.integrate(mu=mu))
