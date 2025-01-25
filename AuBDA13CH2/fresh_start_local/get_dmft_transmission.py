@@ -34,11 +34,11 @@ def run(outputfile):
     T = gd.gather_energies(T)
 
     if comm.rank == 0:
-        np.save(outputfile, (z_ret, T.real))
+        np.save(outputfile, (energies, T.real))
 
 
 data_folder = "./output/lowdin"
-dmft_data_folder = "./output/lowdin/mu_1e-3/U_matrix/occ_gfp/restart"
+dmft_data_folder = "./output/lowdin/U_matrix"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 dmft_sigma_file = f"{dmft_data_folder}/dmft_sigma.npy"
@@ -82,6 +82,6 @@ dmft_sigma = comm.bcast(dmft_sigma, root=0)
 self_energy[2] = dmft_sigma
 gf.selfenergies.append((imb, self_energy[2]))
 
-outputfile = f"{dmft_data_folder}/dmft_transmission_tester_z_ret.npy"
+outputfile = f"{dmft_data_folder}/dmft_transmission.npy"
 run(outputfile)
 gf.selfenergies.pop()

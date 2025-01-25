@@ -164,7 +164,6 @@ occupancy_goal = np.load(f"{data_folder}/occupancies_gfp_mu_{mu}.npy")
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
 z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
-dft_dos = np.load(f"{data_folder}/dft_dos.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:

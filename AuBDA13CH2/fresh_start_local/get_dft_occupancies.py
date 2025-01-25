@@ -20,7 +20,7 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
     hs_list_ij = pickle.load(f)
 
 # Parameters
-mu = 0
+mu = 0.0
 beta = 1000
 
 # Green's Function Setup

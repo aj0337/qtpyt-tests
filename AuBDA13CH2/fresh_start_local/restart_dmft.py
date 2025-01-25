@@ -152,14 +152,15 @@ de = 0.01
 energies = np.arange(-2, 2 + de / 2.0, de).round(7)
 eta = 1e-2
 z_ret = energies + 1.0j * eta
+mu = 0.0
 beta = 1000
 adjust_mu = True
 use_double_counting = True
 
 data_folder = "output/lowdin"
-output_folder = "./output/lowdin/mu_1e-3/U_matrix/restart"
+output_folder = "./output/lowdin/U_matrix/restart"
 figure_folder = f"{output_folder}/figures"
-occupancy_goal = np.load(f"{data_folder}/occupancies_gfloc.npy")
+occupancy_goal = np.load(f"{data_folder}/occupancies_gfp_mu_{mu}.npy")
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
 z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
@@ -190,8 +191,8 @@ idx_inv = np.arange(len_active)
 
 # V = np.eye(len_active) * U
 V = np.loadtxt(f"{data_folder}/U_matrix.txt")
-delta = np.load(f"{data_folder}/mu_1e-3/U_matrix/opt_delta_dmft.npy")
-dmft_mu = np.load(f"{data_folder}/mu_1e-3/U_matrix/opt_mu_dmft.npy")
+delta = np.load(f"{data_folder}/U_matrix/opt_delta_dmft.npy")
+dmft_mu = np.load(f"{data_folder}/U_matrix/opt_mu_dmft.npy")
 
 # Apply double counting correction if specified
 double_counting = (
@@ -212,7 +213,6 @@ gfloc_with_dccorrection = Gfloc(
 
 nimp = gfloc_with_dccorrection.idx_neq.size
 Sigma = lambda z: np.zeros((nimp, z.size), complex)
-mu = 0.0
 gfloc_no_dccorrection = Gfloc(
     H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
 )

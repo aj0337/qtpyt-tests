@@ -34,7 +34,8 @@ pl_path = Path(GPWLEADSDIR)
 gpwfile = f'{cc_path}/scatt.gpw'
 
 atoms, calc = restart(gpwfile, txt=None)
-fermi = calc.get_fermi_level()
+# fermi = calc.get_fermi_level()
+fermi = 4.265
 nao_a = np.array([setup.nao for setup in calc.wfs.setups])
 basis = Basis(atoms, nao_a)
 
