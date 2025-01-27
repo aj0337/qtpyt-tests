@@ -144,7 +144,7 @@ def callback(*args, **kwargs):
 
 nbaths = 4
 # U = 4
-tol = 1e-2
+tol = 1e-4
 max_iter = 1000
 alpha = 0.0
 nspin = 1
@@ -160,7 +160,7 @@ use_double_counting = True
 data_folder = "output/lowdin"
 output_folder = f"output/lowdin/U_matrix"
 figure_folder = f"{output_folder}/figures"
-occupancy_goal = np.load(f"{data_folder}/occupancies_gfp_mu_{mu}.npy")
+occupancy_goal = np.load(f"{data_folder}/occupancies_gfp_mu_0.0.npy")
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
 z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
