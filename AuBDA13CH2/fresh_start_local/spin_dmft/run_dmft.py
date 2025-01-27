@@ -17,12 +17,12 @@ def distance(delta):
     return dmft.distance(delta)
 
 
-def save_sigma(sigma_diag, outputfile, npsin):
-    L, ne = sigma_diag.shape
-    sigma = np.zeros((ne, L, L), complex)
+def save_sigma(sigma_diag, outputfile):
+    L, ne, nspin = sigma_diag.shape
+    sigma = np.zeros((ne, L, L, nspin), complex)
 
     def save(spin):
-        for diag, mat in zip(sigma_diag.T, sigma):
+        for diag, mat in zip(sigma_diag[:, :, spin].T, sigma[:, :, :, spin]):
             mat.flat[:: (L + 1)] = diag
         np.save(outputfile, sigma)
 
@@ -37,7 +37,7 @@ def plot(gf, sigma_func, semilogy=True, reference_gf=None, label_ref="DFT"):
     ax1, ax2 = axes
 
     w = z_ret.real
-    dos = -1 / np.pi * gf(z_ret).sum(axis=0).imag
+    dos = -1 / np.pi * gf(z_ret).sum(axis=(0, 1)).imag
     if semilogy:
         ax1.semilogy(w, dos, label="DMFT") if dos.ndim == 1 else ax1.semilogy(
             w, dos[0], label=r"spin $\uparrow$"
@@ -48,7 +48,7 @@ def plot(gf, sigma_func, semilogy=True, reference_gf=None, label_ref="DFT"):
         )
 
     if reference_gf is not None:
-        reference_dos = -1 / np.pi * reference_gf(z_ret).sum(axis=0).imag
+        reference_dos = -1 / np.pi * reference_gf(z_ret).sum(axis=(0, 1)).imag
         ax1.plot(
             w, reference_dos, linestyle="--", label=label_ref
         ) if reference_dos.ndim == 1 else ax1.plot(
@@ -60,11 +60,10 @@ def plot(gf, sigma_func, semilogy=True, reference_gf=None, label_ref="DFT"):
 
     ax1.set_ylabel("DOS [a.u.]")
     ax1.legend(loc="upper right")
-
     ax1.tick_params(axis="x", which="both", bottom=False, top=False, labelbottom=False)
 
     sigma = sigma_func(z_ret)
-    trace_sigma = sigma.sum(axis=0)
+    trace_sigma = sigma.sum(axis=(0, 1))
     ax2.plot(w, trace_sigma.real, label="Re Tr(Sigma)", color="blue")
     ax2.plot(w, trace_sigma.imag, label="Im Tr(Sigma)", color="orange")
 
@@ -82,16 +81,12 @@ iteration_counter = 0
 def callback(*args, **kwargs):
     global iteration_counter
 
-    def sigma_func(z):
-        return (
-            -double_counting.diagonal()[:, None]
-            - gfloc_with_dccorrection.mu
-            + gfloc_with_dccorrection.Sigma(z)
-        )
+    print(double_counting.diagonal()[:, None, None].shape)
+    print(gfloc_with_dccorrection.Sigma(z_ret)[idx_inv, :].shape)
 
     ax1 = plot(
         gf=gfloc_with_dccorrection,
-        sigma_func=sigma_func,
+        sigma_func=_Sigma,
         reference_gf=gfloc_no_dccorrection,
         label_ref="DFT",
         semilogy=kwargs.get("semilogy", True),
@@ -143,8 +138,7 @@ def callback(*args, **kwargs):
 
 
 nbaths = 4
-# U = 4
-tol = 1e-2
+tol = 1e-4
 max_iter = 1000
 alpha = 0.0
 nspin = 1
@@ -160,7 +154,7 @@ use_double_counting = True
 data_folder = "../output/lowdin"
 output_folder = "../output/lowdin/spin_dmft/U_matrix"
 figure_folder = f"{output_folder}/figures"
-occupancy_goal = np.load(f"{data_folder}/occupancies_gfloc.npy")
+occupancy_goal = np.load(f"{data_folder}/occupancies_gfp.npy")
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
 z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
@@ -213,13 +207,23 @@ nimp = gfloc_with_dccorrection.idx_neq.size
 gfimp = [SpinGfimp(nbaths, z_mats.size, V[i, i], beta) for i in range(nimp)]
 gfimp = nanoGfimp(gfimp)
 
-Sigma = lambda z: np.zeros((nimp, z.size), complex)
+nspin = 2
+
+Sigma = lambda z: np.zeros((nimp, nspin, z.size), complex)
 
 gfloc_no_dccorrection = Gfloc(
     H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
 )
 gfloc_no_dccorrection.update(mu=mu)
 gfloc_no_dccorrection.set_local(Sigma)
+
+
+def _Sigma(z):
+    return (
+        -double_counting.diagonal()[:, None, None]
+        - gfloc_with_dccorrection.mu
+        + gfloc_with_dccorrection.Sigma(z)[idx_inv, :]
+    )
 
 
 # Initialize DMFT with adjust_mu parameter
@@ -245,11 +249,6 @@ dmft.solve(dmft.delta, alpha=1.0, callback=callback)
 #     pass
 
 
-_Sigma = (
-    lambda z: -double_counting.diagonal()[:, None]
-    - gfloc_with_dccorrection.mu
-    + gfloc_with_dccorrection.Sigma(z)[idx_inv]
-)
 dmft_sigma_file = f"{output_folder}/dmft_sigma.npy"
 save_sigma(_Sigma(z_ret), dmft_sigma_file, nspin)
 
