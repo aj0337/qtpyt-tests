@@ -5,6 +5,7 @@ import numpy as np
 from mpi4py import MPI
 from qtpyt.block_tridiag import greenfunction
 from qtpyt.projector import ProjectedGreenFunction
+import matplotlib.pyplot as plt
 
 # MPI Initialization
 comm = MPI.COMM_WORLD
@@ -13,6 +14,8 @@ size = comm.Get_size()
 
 # Data paths
 data_folder = "./output/lowdin"
+output_folder = "./output/lowdin/occupancies"
+os.makedirs(output_folder, exist_ok=True)
 
 # Load data
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
@@ -63,5 +66,7 @@ comm.Gatherv(local_dft_dos, [all_dft_dos, all_sizes, displacements, MPI.DOUBLE],
 
 # Save results on root
 if rank == 0:
-    filename = os.path.join(data_folder, "dft_dos.npy")
+    filename = os.path.join(output_folder, "dft_dos_gfp.npy")
     np.save(filename, all_dft_dos)
+    plt.plot(energies, all_dft_dos)
+    plt.savefig(os.path.join(output_folder, "dft_dos_gfp.png"))
