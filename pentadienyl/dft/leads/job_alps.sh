@@ -1,6 +1,6 @@
 #!/bin/bash -l
 #SBATCH --job-name=gpaw-example
-#SBATCH --time=2:00:00
+#SBATCH --time=4:00:00
 #SBATCH --partition=normal
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -22,5 +22,4 @@ MINICONDA_PATH=/users/ajayaraj/miniconda3
 source $MINICONDA_PATH/etc/profile.d/conda.sh
 conda activate qtpyt
 
-# mpirun -n 48 gpaw python scatt.py
-mpirun -n 1 gpaw python dump.py
+mpirun -n 1 gpaw python leads.py
