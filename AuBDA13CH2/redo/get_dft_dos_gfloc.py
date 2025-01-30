@@ -2,18 +2,18 @@ from __future__ import annotations
 import numpy as np
 from scipy.interpolate import interp1d
 from edpyt.nano_dmft import Gfloc
-
+import matplotlib.pyplot as plt
 import numpy as np
 import os
 
 
 beta = 1000
-mus = [0.0, 0.5]
 
 data_folder = "output/lowdin"
 output_folder = f"output/lowdin/occupancies"
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
 z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
+z_ret = np.load(f"{data_folder}/retarded_energies.npy")
 
 os.makedirs(output_folder, exist_ok=True)
 
@@ -32,14 +32,15 @@ idx_inv = np.arange(len_active)
 
 nimp = len_active
 
-for mu in mus:
-    Sigma = lambda z: np.zeros((nimp, z.size), complex)
-    print(f"Calculating occupancy for mu = {mu}",flush=True)
-    gfloc = Gfloc(
-        H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
-    )
-    gfloc.update(mu=0.0)
-    gfloc.set_local(Sigma)
-    occupancies = gfloc.integrate(mu=mu)
-    print(f"Total occupancy for mu = {mu} are: {np.sum(occupancies)}",flush=True)
-    np.save(os.path.join(output_folder, f'occupancies_gfloc_mu_{mu}.npy'), occupancies)
+Sigma = lambda z: np.zeros((nimp, z.size), complex)
+
+gfloc = Gfloc(
+    H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
+)
+gfloc.update(mu=0.0)
+gfloc.set_local(Sigma)
+dos = -1 / np.pi * gfloc(z_ret).sum(axis=0).imag
+dos_file = f"{output_folder}/dft_dos_gfloc.npy"
+np.save(dos_file, dos)
+plt.plot(z_ret.real, dos)
+plt.savefig(f"{output_folder}/dft_dos_gfloc.png")

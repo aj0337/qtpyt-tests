@@ -8,7 +8,7 @@ import os
 
 
 beta = 1000
-mus = [0.0, 0.5]
+mus = [0.0] #, 0.5, -0.5]
 
 data_folder = "output/lowdin"
 output_folder = f"output/lowdin/occupancies"
@@ -32,8 +32,9 @@ idx_inv = np.arange(len_active)
 
 nimp = len_active
 
+Sigma = lambda z: np.zeros((nimp, z.size), complex)
+
 for mu in mus:
-    Sigma = lambda z: np.zeros((nimp, z.size), complex)
     print(f"Calculating occupancy for mu = {mu}",flush=True)
     gfloc = Gfloc(
         H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
@@ -41,5 +42,5 @@ for mu in mus:
     gfloc.update(mu=0.0)
     gfloc.set_local(Sigma)
     occupancies = gfloc.integrate(mu=mu)
-    print(f"Total occupancy for mu = {mu} are: {np.sum(occupancies)}",flush=True)
+    print(f"Total occupancy for mu = {mu} using matsubara summation are: {np.sum(occupancies)}",flush=True)
     np.save(os.path.join(output_folder, f'occupancies_gfloc_mu_{mu}.npy'), occupancies)
