@@ -1,0 +1,1011 @@
+/users/ajayaraj/miniconda3/envs/qtpyt/lib/python3.9/site-packages/numba/cpython/hashing.py:524: UserWarning: FNV hashing is not implemented in Numba. See PEP 456 https://www.python.org/dev/peps/pep-0456/ for rationale over not using FNV. Numba will continue to work, but hashes for built in types will be computed using siphash24. This will permit e.g. dictionaries to continue to behave as expected, however anything relying on the value of the hash opposed to hash as a derived property is likely to not work as expected.
+  warnings.warn(msg)
+Iteration :  0
+Occupation : 11.02796 Chemical potential : -0.52029 Error : 160.11988939 Relative Error : 1.03246630
+Iteration :  1
+Occupation : 11.02796 Chemical potential : -0.08721 Error : 95.09409771 Relative Error : 0.51767143
+0:  |F(x)| = 21.5329; step 1
+Iteration :  2
+Occupation : 11.02796 Chemical potential : 0.31868 Error : 27.27660850 Relative Error : 0.17348701
+1:  |F(x)| = 9.76686; step 1
+Iteration :  3
+Occupation : 11.02796 Chemical potential : 0.26053 Error : 31.76677264 Relative Error : 0.20184104
+Iteration :  4
+Occupation : 11.02796 Chemical potential : 0.30212 Error : 26.42179703 Relative Error : 0.16844782
+2:  |F(x)| = 7.05823; step 0.368642
+Iteration :  5
+Occupation : 11.02796 Chemical potential : 0.31903 Error : 22.97337646 Relative Error : 0.14372478
+3:  |F(x)| = 4.18399; step 1
+Iteration :  6
+Occupation : 11.02796 Chemical potential : 0.21073 Error : 25.60589596 Relative Error : 0.15959652
+Iteration :  7
+Occupation : 11.02796 Chemical potential : 0.26122 Error : 26.70170401 Relative Error : 0.16688071
+Iteration :  8
+Occupation : 11.02796 Chemical potential : 0.31623 Error : 23.87109513 Relative Error : 0.14931897
+Iteration :  9
+Occupation : 11.02796 Chemical potential : 0.31634 Error : 22.33575153 Relative Error : 0.13972023
+4:  |F(x)| = 4.09349; step 0.0611144
+Iteration : 10
+Occupation : 11.02796 Chemical potential : 0.24090 Error : 20.67276488 Relative Error : 0.12820622
+5:  |F(x)| = 4.18347; step 1
+Iteration : 11
+Occupation : 11.02796 Chemical potential : 0.18447 Error : 9.92073693 Relative Error : 0.06222875
+6:  |F(x)| = 2.23513; step 1
+Iteration : 12
+Occupation : 11.02796 Chemical potential : 0.15711 Error : 13.80940700 Relative Error : 0.08722492
+Iteration : 13
+Occupation : 11.02796 Chemical potential : 0.15849 Error : 11.49843608 Relative Error : 0.07226189
+Iteration : 14
+Occupation : 11.02796 Chemical potential : 0.15980 Error : 10.14626590 Relative Error : 0.06366531
+Iteration : 15
+Occupation : 11.02796 Chemical potential : 0.15998 Error : 10.04090876 Relative Error : 0.06300347
+Iteration : 16
+Occupation : 11.02796 Chemical potential : 0.16026 Error : 9.88497228 Relative Error : 0.06201279
+7:  |F(x)| = 2.18163; step 0.0180896
+Iteration : 17
+Occupation : 11.02796 Chemical potential : 0.18886 Error : 8.43624965 Relative Error : 0.05286519
+8:  |F(x)| = 1.88657; step 1
+Iteration : 18
+Occupation : 11.02796 Chemical potential : 0.18594 Error : 5.37574845 Relative Error : 0.03362355
+9:  |F(x)| = 1.11697; step 1
+Iteration : 19
+Occupation : 11.02796 Chemical potential : 0.18618 Error : 7.45493579 Relative Error : 0.04658748
+Iteration : 20
+Occupation : 11.02796 Chemical potential : 0.18556 Error : 6.14118902 Relative Error : 0.03840248
+Iteration : 21
+Occupation : 11.02796 Chemical potential : 0.18586 Error : 6.00107019 Relative Error : 0.03753310
+Iteration : 22
+Occupation : 11.02796 Chemical potential : 0.18592 Error : 5.89859330 Relative Error : 0.03689330
+Iteration : 23
+Occupation : 11.02796 Chemical potential : 0.18594 Error : 5.89593378 Relative Error : 0.03687698
+Iteration : 24
+Occupation : 11.02796 Chemical potential : 0.18594 Error : 5.89524932 Relative Error : 0.03687281
+Iteration : 25
+Occupation : 11.02796 Chemical potential : 0.18594 Error : 5.89512591 Relative Error : 0.03687207
+Iteration : 26
+Occupation : 11.02796 Chemical potential : 0.18654 Error : 7.50722931 Relative Error : 0.04691428
+10:  |F(x)| = 1.58672; step 1
+Iteration : 27
+Occupation : 11.02796 Chemical potential : 0.18658 Error : 7.05189408 Relative Error : 0.04407643
+11:  |F(x)| = 1.49186; step 1
+Iteration : 28
+Occupation : 11.02796 Chemical potential : 0.18712 Error : 6.96629186 Relative Error : 0.04353976
+12:  |F(x)| = 1.46613; step 1
+Iteration : 29
+Occupation : 11.02796 Chemical potential : 0.18777 Error : 6.90178160 Relative Error : 0.04312292
+13:  |F(x)| = 1.45269; step 1
+Iteration : 30
+Occupation : 11.02796 Chemical potential : 0.18799 Error : 6.65553275 Relative Error : 0.04161390
+14:  |F(x)| = 1.39546; step 1
+Iteration : 31
+Occupation : 11.02796 Chemical potential : 0.18798 Error : 6.46580241 Relative Error : 0.04042774
+15:  |F(x)| = 1.36114; step 1
+Iteration : 32
+Occupation : 11.02796 Chemical potential : 0.18743 Error : 6.62625916 Relative Error : 0.04145400
+Iteration : 33
+Occupation : 11.02796 Chemical potential : 0.18757 Error : 6.56459003 Relative Error : 0.04105627
+Iteration : 34
+Occupation : 11.02796 Chemical potential : 0.18773 Error : 6.51306317 Relative Error : 0.04072746
+Iteration : 35
+Occupation : 11.02796 Chemical potential : 0.18783 Error : 6.49686083 Relative Error : 0.04062403
+Iteration : 36
+Occupation : 11.02796 Chemical potential : 0.18788 Error : 6.48688730 Relative Error : 0.04056059
+Iteration : 37
+Occupation : 11.02796 Chemical potential : 0.18788 Error : 6.48280833 Relative Error : 0.04053456
+Iteration : 38
+Occupation : 11.02796 Chemical potential : 0.18790 Error : 6.48183062 Relative Error : 0.04052818
+Iteration : 39
+Occupation : 11.02796 Chemical potential : 0.18791 Error : 6.48018631 Relative Error : 0.04051777
+Iteration : 40
+Occupation : 11.02796 Chemical potential : 0.18736 Error : 6.64480732 Relative Error : 0.04157004
+16:  |F(x)| = 1.39051; step 1
+Iteration : 41
+Occupation : 11.02796 Chemical potential : 0.18681 Error : 6.79299895 Relative Error : 0.04249685
+Iteration : 42
+Occupation : 11.02796 Chemical potential : 0.18697 Error : 6.77787590 Relative Error : 0.04240241
+Iteration : 43
+Occupation : 11.02796 Chemical potential : 0.18704 Error : 6.71982673 Relative Error : 0.04203933
+Iteration : 44
+Occupation : 11.02796 Chemical potential : 0.18706 Error : 6.68621048 Relative Error : 0.04182904
+Iteration : 45
+Occupation : 11.02796 Chemical potential : 0.18706 Error : 6.67139094 Relative Error : 0.04173634
+Iteration : 46
+Occupation : 11.02796 Chemical potential : 0.18707 Error : 6.66435175 Relative Error : 0.04169231
+Iteration : 47
+Occupation : 11.02796 Chemical potential : 0.18707 Error : 6.66050744 Relative Error : 0.04166826
+Iteration : 48
+Occupation : 11.02796 Chemical potential : 0.18707 Error : 6.65867793 Relative Error : 0.04165682
+Iteration : 49
+Occupation : 11.02796 Chemical potential : 0.18671 Error : 6.80798675 Relative Error : 0.04259062
+17:  |F(x)| = 1.44231; step 1
+Iteration : 50
+Occupation : 11.02796 Chemical potential : 0.18708 Error : 6.29226434 Relative Error : 0.03940305
+18:  |F(x)| = 1.32103; step 1
+Iteration : 51
+Occupation : 11.02796 Chemical potential : 0.18896 Error : 4.74089886 Relative Error : 0.02968009
+19:  |F(x)| = 1.00044; step 1
+Iteration : 52
+Occupation : 11.02796 Chemical potential : 0.20948 Error : 6.74809896 Relative Error : 0.04156774
+Iteration : 53
+Occupation : 11.02796 Chemical potential : 0.19930 Error : 4.35695045 Relative Error : 0.02716952
+20:  |F(x)| = 0.872857; step 0.246791
+Iteration : 54
+Occupation : 11.02796 Chemical potential : 0.19353 Error : 4.02933344 Relative Error : 0.02514801
+21:  |F(x)| = 0.835433; step 1
+Iteration : 55
+Occupation : 11.02796 Chemical potential : 0.19532 Error : 5.72619172 Relative Error : 0.03558252
+Iteration : 56
+Occupation : 11.02796 Chemical potential : 0.19351 Error : 4.53981462 Relative Error : 0.02830357
+Iteration : 57
+Occupation : 11.02796 Chemical potential : 0.19282 Error : 4.37126216 Relative Error : 0.02727609
+Iteration : 58
+Occupation : 11.02796 Chemical potential : 0.19254 Error : 4.37117951 Relative Error : 0.02727947
+Iteration : 59
+Occupation : 11.02796 Chemical potential : 0.19244 Error : 4.37002282 Relative Error : 0.02727374
+Iteration : 60
+Occupation : 11.02796 Chemical potential : 0.19239 Error : 4.37264609 Relative Error : 0.02729054
+Iteration : 61
+Occupation : 11.02796 Chemical potential : 0.19238 Error : 4.37421277 Relative Error : 0.02730044
+Iteration : 62
+Occupation : 11.02796 Chemical potential : 0.19516 Error : 5.79472144 Relative Error : 0.03600837
+22:  |F(x)| = 1.27124; step 1
+Iteration : 63
+Occupation : 11.02796 Chemical potential : 0.19083 Error : 4.32893808 Relative Error : 0.02705127
+23:  |F(x)| = 0.913909; step 1
+Iteration : 64
+Occupation : 11.02796 Chemical potential : 0.18575 Error : 5.18744650 Relative Error : 0.03248731
+Iteration : 65
+Occupation : 11.02796 Chemical potential : 0.18756 Error : 5.25295102 Relative Error : 0.03285068
+Iteration : 66
+Occupation : 11.02796 Chemical potential : 0.18907 Error : 4.94252693 Relative Error : 0.03088939
+Iteration : 67
+Occupation : 11.02796 Chemical potential : 0.18947 Error : 4.80086133 Relative Error : 0.03000173
+Iteration : 68
+Occupation : 11.02796 Chemical potential : 0.18958 Error : 4.76063482 Relative Error : 0.02974943
+Iteration : 69
+Occupation : 11.02796 Chemical potential : 0.18961 Error : 4.74846287 Relative Error : 0.02967300
+Iteration : 70
+Occupation : 11.02796 Chemical potential : 0.18964 Error : 4.74506027 Relative Error : 0.02965163
+Iteration : 71
+Occupation : 11.02796 Chemical potential : 0.18964 Error : 4.74319040 Relative Error : 0.02963992
+Iteration : 72
+Occupation : 11.02796 Chemical potential : 0.18546 Error : 5.28730777 Relative Error : 0.03311270
+24:  |F(x)| = 1.11509; step 1
+Iteration : 73
+Occupation : 11.02796 Chemical potential : 0.19767 Error : 5.28593156 Relative Error : 0.03280663
+25:  |F(x)| = 1.17357; step 1
+Iteration : 74
+Occupation : 11.02796 Chemical potential : 0.18744 Error : 6.69968099 Relative Error : 0.04179854
+Iteration : 75
+Occupation : 11.02796 Chemical potential : 0.19510 Error : 6.01132085 Relative Error : 0.03737260
+Iteration : 76
+Occupation : 11.02796 Chemical potential : 0.19892 Error : 4.95897048 Relative Error : 0.03078860
+26:  |F(x)| = 1.08943; step 0.0651274
+Iteration : 77
+Occupation : 11.02796 Chemical potential : 0.19765 Error : 6.20983371 Relative Error : 0.03853044
+Iteration : 78
+Occupation : 11.02796 Chemical potential : 0.19949 Error : 5.40413169 Relative Error : 0.03354589
+Iteration : 79
+Occupation : 11.02796 Chemical potential : 0.20008 Error : 4.98360745 Relative Error : 0.03093998
+Iteration : 80
+Occupation : 11.02796 Chemical potential : 0.20023 Error : 4.95273742 Relative Error : 0.03074862
+27:  |F(x)| = 1.08166; step 0.0689065
+Iteration : 81
+Occupation : 11.02796 Chemical potential : 0.20019 Error : 5.39583091 Relative Error : 0.03347238
+Iteration : 82
+Occupation : 11.02796 Chemical potential : 0.20000 Error : 5.10608056 Relative Error : 0.03168984
+Iteration : 83
+Occupation : 11.02796 Chemical potential : 0.19986 Error : 4.97403327 Relative Error : 0.03087697
+Iteration : 84
+Occupation : 11.02796 Chemical potential : 0.19987 Error : 4.94723735 Relative Error : 0.03071233
+28:  |F(x)| = 1.0783; step 0.0862718
+Iteration : 85
+Occupation : 11.02796 Chemical potential : 0.20249 Error : 5.36902506 Relative Error : 0.03324796
+Iteration : 86
+Occupation : 11.02796 Chemical potential : 0.20200 Error : 5.10877623 Relative Error : 0.03168174
+Iteration : 87
+Occupation : 11.02796 Chemical potential : 0.20099 Error : 4.98659215 Relative Error : 0.03094480
+Iteration : 88
+Occupation : 11.02796 Chemical potential : 0.20072 Error : 4.98663004 Relative Error : 0.03095052
+Iteration : 89
+Occupation : 11.02796 Chemical potential : 0.20045 Error : 4.99059055 Relative Error : 0.03097865
+Iteration : 90
+Occupation : 11.02796 Chemical potential : 0.20036 Error : 4.99277937 Relative Error : 0.03099390
+Iteration : 91
+Occupation : 11.02796 Chemical potential : 0.20034 Error : 4.99200578 Relative Error : 0.03098983
+Iteration : 92
+Occupation : 11.02796 Chemical potential : 0.20033 Error : 4.99197067 Relative Error : 0.03098989
+Iteration : 93
+Occupation : 11.02796 Chemical potential : 0.20272 Error : 5.36449149 Relative Error : 0.03321988
+29:  |F(x)| = 1.14295; step 1
+Iteration : 94
+Occupation : 11.02796 Chemical potential : 0.20363 Error : 3.55733169 Relative Error : 0.02214193
+30:  |F(x)| = 0.660595; step 1
+Iteration : 95
+Occupation : 11.02796 Chemical potential : 0.20314 Error : 4.23675597 Relative Error : 0.02630072
+Iteration : 96
+Occupation : 11.02796 Chemical potential : 0.20335 Error : 3.79453847 Relative Error : 0.02359627
+Iteration : 97
+Occupation : 11.02796 Chemical potential : 0.20361 Error : 3.65125300 Relative Error : 0.02272010
+Iteration : 98
+Occupation : 11.02796 Chemical potential : 0.20393 Error : 3.61393509 Relative Error : 0.02249102
+Iteration : 99
+Occupation : 11.02796 Chemical potential : 0.20400 Error : 3.60533854 Relative Error : 0.02243926
+Iteration : 100
+Occupation : 11.02796 Chemical potential : 0.20402 Error : 3.59844094 Relative Error : 0.02239722
+Iteration : 101
+Occupation : 11.02796 Chemical potential : 0.20405 Error : 3.59387203 Relative Error : 0.02236914
+Iteration : 102
+Occupation : 11.02796 Chemical potential : 0.20405 Error : 3.59312903 Relative Error : 0.02236466
+Iteration : 103
+Occupation : 11.02796 Chemical potential : 0.20323 Error : 4.24785618 Relative Error : 0.02636962
+31:  |F(x)| = 0.866642; step 1
+Iteration : 104
+Occupation : 11.02796 Chemical potential : 0.20244 Error : 4.04037162 Relative Error : 0.02509932
+32:  |F(x)| = 0.841101; step 1
+Iteration : 105
+Occupation : 11.02796 Chemical potential : 0.20459 Error : 3.80212422 Relative Error : 0.02362195
+33:  |F(x)| = 0.754986; step 1
+Iteration : 106
+Occupation : 11.02796 Chemical potential : 0.20570 Error : 4.34760882 Relative Error : 0.02695437
+Iteration : 107
+Occupation : 11.02796 Chemical potential : 0.20547 Error : 4.15420644 Relative Error : 0.02578872
+Iteration : 108
+Occupation : 11.02796 Chemical potential : 0.20511 Error : 4.05257527 Relative Error : 0.02517261
+Iteration : 109
+Occupation : 11.02796 Chemical potential : 0.20500 Error : 3.99530589 Relative Error : 0.02482006
+Iteration : 110
+Occupation : 11.02796 Chemical potential : 0.20497 Error : 3.97507089 Relative Error : 0.02469562
+Iteration : 111
+Occupation : 11.02796 Chemical potential : 0.20497 Error : 3.96674340 Relative Error : 0.02464443
+Iteration : 112
+Occupation : 11.02796 Chemical potential : 0.20497 Error : 3.96501229 Relative Error : 0.02463386
+Iteration : 113
+Occupation : 11.02796 Chemical potential : 0.20500 Error : 3.96839059 Relative Error : 0.02465491
+Iteration : 114
+Occupation : 11.02796 Chemical potential : 0.20573 Error : 4.36773763 Relative Error : 0.02707917
+34:  |F(x)| = 0.911753; step 1
+Iteration : 115
+Occupation : 11.02796 Chemical potential : 0.20372 Error : 3.67799031 Relative Error : 0.02286055
+35:  |F(x)| = 0.756971; step 1
+Iteration : 116
+Occupation : 11.02796 Chemical potential : 0.19971 Error : 3.49086587 Relative Error : 0.02172589
+36:  |F(x)| = 0.742825; step 1
+Iteration : 117
+Occupation : 11.02796 Chemical potential : 0.20243 Error : 3.42581285 Relative Error : 0.02131503
+37:  |F(x)| = 0.702558; step 1
+Iteration : 118
+Occupation : 11.02796 Chemical potential : 0.19815 Error : 2.63670014 Relative Error : 0.01647675
+38:  |F(x)| = 0.55677; step 1
+Iteration : 119
+Occupation : 11.02796 Chemical potential : 0.20751 Error : 4.34928374 Relative Error : 0.02696629
+Iteration : 120
+Occupation : 11.02796 Chemical potential : 0.20120 Error : 3.66246499 Relative Error : 0.02285431
+Iteration : 121
+Occupation : 11.02796 Chemical potential : 0.19793 Error : 2.54491691 Relative Error : 0.01590163
+39:  |F(x)| = 0.535588; step 0.0128
+Iteration : 122
+Occupation : 11.02796 Chemical potential : 0.19946 Error : 2.86745090 Relative Error : 0.01790076
+Iteration : 123
+Occupation : 11.02796 Chemical potential : 0.19850 Error : 2.56902746 Relative Error : 0.01604660
+Iteration : 124
+Occupation : 11.02796 Chemical potential : 0.19781 Error : 2.32828104 Relative Error : 0.01454582
+40:  |F(x)| = 0.488591; step 0.167205
+Iteration : 125
+Occupation : 11.02796 Chemical potential : 0.19876 Error : 2.78757254 Relative Error : 0.01741156
+Iteration : 126
+Occupation : 11.02796 Chemical potential : 0.19826 Error : 2.50448596 Relative Error : 0.01564552
+Iteration : 127
+Occupation : 11.02796 Chemical potential : 0.19785 Error : 2.34632142 Relative Error : 0.01465822
+Iteration : 128
+Occupation : 11.02796 Chemical potential : 0.19773 Error : 2.30010294 Relative Error : 0.01436957
+41:  |F(x)| = 0.482163; step 0.070808
+Iteration : 129
+Occupation : 11.02796 Chemical potential : 0.19886 Error : 2.96044061 Relative Error : 0.01848571
+Iteration : 130
+Occupation : 11.02796 Chemical potential : 0.19822 Error : 2.61367574 Relative Error : 0.01632613
+Iteration : 131
+Occupation : 11.02796 Chemical potential : 0.19776 Error : 2.39309742 Relative Error : 0.01495008
+Iteration : 132
+Occupation : 11.02796 Chemical potential : 0.19763 Error : 2.34021722 Relative Error : 0.01461989
+Iteration : 133
+Occupation : 11.02796 Chemical potential : 0.19758 Error : 2.32080490 Relative Error : 0.01449876
+Iteration : 134
+Occupation : 11.02796 Chemical potential : 0.19754 Error : 2.31361966 Relative Error : 0.01445394
+Iteration : 135
+Occupation : 11.02796 Chemical potential : 0.19753 Error : 2.30761215 Relative Error : 0.01441645
+Iteration : 136
+Occupation : 11.02796 Chemical potential : 0.19886 Error : 2.87567941 Relative Error : 0.01795644
+42:  |F(x)| = 0.601316; step 1
+Iteration : 137
+Occupation : 11.02796 Chemical potential : 0.19860 Error : 3.57806763 Relative Error : 0.02230952
+Iteration : 138
+Occupation : 11.02796 Chemical potential : 0.19932 Error : 2.94280180 Relative Error : 0.01836700
+Iteration : 139
+Occupation : 11.02796 Chemical potential : 0.19960 Error : 2.90709801 Relative Error : 0.01814932
+Iteration : 140
+Occupation : 11.02796 Chemical potential : 0.19969 Error : 2.87568790 Relative Error : 0.01795501
+Iteration : 141
+Occupation : 11.02796 Chemical potential : 0.19972 Error : 2.89178301 Relative Error : 0.01805609
+Iteration : 142
+Occupation : 11.02796 Chemical potential : 0.19973 Error : 2.90077367 Relative Error : 0.01811283
+Iteration : 143
+Occupation : 11.02796 Chemical potential : 0.19975 Error : 2.90275344 Relative Error : 0.01812540
+Iteration : 144
+Occupation : 11.02796 Chemical potential : 0.19971 Error : 2.91040202 Relative Error : 0.01817323
+Iteration : 145
+Occupation : 11.02796 Chemical potential : 0.19878 Error : 3.64284661 Relative Error : 0.02271342
+43:  |F(x)| = 0.762766; step 1
+Iteration : 146
+Occupation : 11.02796 Chemical potential : 0.19661 Error : 2.16952712 Relative Error : 0.01355917
+44:  |F(x)| = 0.467655; step 1
+Iteration : 147
+Occupation : 11.02796 Chemical potential : 0.19496 Error : 2.15160596 Relative Error : 0.01345078
+45:  |F(x)| = 0.470395; step 1
+Iteration : 148
+Occupation : 11.02796 Chemical potential : 0.19352 Error : 1.61691557 Relative Error : 0.01012587
+46:  |F(x)| = 0.34364; step 1
+Iteration : 149
+Occupation : 11.02796 Chemical potential : 0.19242 Error : 1.73463218 Relative Error : 0.01086456
+Iteration : 150
+Occupation : 11.02796 Chemical potential : 0.19276 Error : 1.62724840 Relative Error : 0.01019120
+Iteration : 151
+Occupation : 11.02796 Chemical potential : 0.19306 Error : 1.59131464 Relative Error : 0.00996580
+47:  |F(x)| = 0.342981; step 0.184539
+Iteration : 152
+Occupation : 11.02796 Chemical potential : 0.19288 Error : 1.57178686 Relative Error : 0.00984584
+48:  |F(x)| = 0.333126; step 1
+Iteration : 153
+Occupation : 11.02796 Chemical potential : 0.19211 Error : 1.54148178 Relative Error : 0.00966008
+49:  |F(x)| = 0.3222; step 1
+Iteration : 154
+Occupation : 11.02796 Chemical potential : 0.19368 Error : 1.57678333 Relative Error : 0.00987195
+Iteration : 155
+Occupation : 11.02796 Chemical potential : 0.19308 Error : 1.59896476 Relative Error : 0.01001578
+Iteration : 156
+Occupation : 11.02796 Chemical potential : 0.19245 Error : 1.55757896 Relative Error : 0.00975944
+Iteration : 157
+Occupation : 11.02796 Chemical potential : 0.19220 Error : 1.53189802 Relative Error : 0.00959919
+50:  |F(x)| = 0.321785; step 0.0916283
+Iteration : 158
+Occupation : 11.02796 Chemical potential : 0.19317 Error : 1.79042506 Relative Error : 0.01120755
+Iteration : 159
+Occupation : 11.02796 Chemical potential : 0.19276 Error : 1.64249625 Relative Error : 0.01028832
+Iteration : 160
+Occupation : 11.02796 Chemical potential : 0.19241 Error : 1.56845460 Relative Error : 0.00982717
+Iteration : 161
+Occupation : 11.02796 Chemical potential : 0.19231 Error : 1.54406872 Relative Error : 0.00967486
+Iteration : 162
+Occupation : 11.02796 Chemical potential : 0.19226 Error : 1.53455972 Relative Error : 0.00961555
+Iteration : 163
+Occupation : 11.02796 Chemical potential : 0.19225 Error : 1.52865049 Relative Error : 0.00957866
+51:  |F(x)| = 0.32128; step 0.0179009
+Iteration : 164
+Occupation : 11.02796 Chemical potential : 0.19217 Error : 1.59943028 Relative Error : 0.01002025
+Iteration : 165
+Occupation : 11.02796 Chemical potential : 0.19215 Error : 1.55866183 Relative Error : 0.00976586
+Iteration : 166
+Occupation : 11.02796 Chemical potential : 0.19222 Error : 1.53739572 Relative Error : 0.00963314
+Iteration : 167
+Occupation : 11.02796 Chemical potential : 0.19224 Error : 1.53265428 Relative Error : 0.00960358
+Iteration : 168
+Occupation : 11.02796 Chemical potential : 0.19224 Error : 1.52949417 Relative Error : 0.00958387
+Iteration : 169
+Occupation : 11.02796 Chemical potential : 0.19224 Error : 1.52804205 Relative Error : 0.00957481
+52:  |F(x)| = 0.321595; step 0.0236425
+Iteration : 170
+Occupation : 11.02796 Chemical potential : 0.19150 Error : 1.54527741 Relative Error : 0.00968437
+Iteration : 171
+Occupation : 11.02796 Chemical potential : 0.19180 Error : 1.52370543 Relative Error : 0.00954839
+53:  |F(x)| = 0.323221; step 0.488909
+Iteration : 172
+Occupation : 11.02796 Chemical potential : 0.19108 Error : 1.33441346 Relative Error : 0.00836982
+54:  |F(x)| = 0.280276; step 1
+Iteration : 173
+Occupation : 11.02796 Chemical potential : 0.19022 Error : 1.23956500 Relative Error : 0.00777844
+55:  |F(x)| = 0.268396; step 1
+Iteration : 174
+Occupation : 11.02796 Chemical potential : 0.19040 Error : 1.08253705 Relative Error : 0.00679427
+56:  |F(x)| = 0.231028; step 1
+Iteration : 175
+Occupation : 11.02796 Chemical potential : 0.19066 Error : 0.95989792 Relative Error : 0.00602641
+57:  |F(x)| = 0.202853; step 1
+Iteration : 176
+Occupation : 11.02796 Chemical potential : 0.18820 Error : 1.34637584 Relative Error : 0.00845958
+Iteration : 177
+Occupation : 11.02796 Chemical potential : 0.18946 Error : 1.03452257 Relative Error : 0.00649625
+Iteration : 178
+Occupation : 11.02796 Chemical potential : 0.19016 Error : 0.94391745 Relative Error : 0.00592641
+58:  |F(x)| = 0.201526; step 0.0680605
+Iteration : 179
+Occupation : 11.02796 Chemical potential : 0.19068 Error : 0.82917188 Relative Error : 0.00520700
+59:  |F(x)| = 0.178123; step 1
+Iteration : 180
+Occupation : 11.02796 Chemical potential : 0.18966 Error : 0.44682622 Relative Error : 0.00281029
+60:  |F(x)| = 0.0936284; step 1
+Iteration : 181
+Occupation : 11.02796 Chemical potential : 0.19078 Error : 1.48688121 Relative Error : 0.00932127
+Iteration : 182
+Occupation : 11.02796 Chemical potential : 0.18960 Error : 0.49508791 Relative Error : 0.00311337
+Iteration : 183
+Occupation : 11.02796 Chemical potential : 0.18934 Error : 0.43708371 Relative Error : 0.00274898
+61:  |F(x)| = 0.090514; step 0.00359894
+Iteration : 184
+Occupation : 11.02796 Chemical potential : 0.18943 Error : 0.42693750 Relative Error : 0.00268507
+62:  |F(x)| = 0.0892097; step 1
+Iteration : 185
+Occupation : 11.02796 Chemical potential : 0.18951 Error : 0.45637391 Relative Error : 0.00286986
+Iteration : 186
+Occupation : 11.02796 Chemical potential : 0.18949 Error : 0.44663174 Relative Error : 0.00280878
+Iteration : 187
+Occupation : 11.02796 Chemical potential : 0.18947 Error : 0.43854516 Relative Error : 0.00275803
+Iteration : 188
+Occupation : 11.02796 Chemical potential : 0.18946 Error : 0.43561007 Relative Error : 0.00273959
+Iteration : 189
+Occupation : 11.02796 Chemical potential : 0.18945 Error : 0.43487003 Relative Error : 0.00273495
+Iteration : 190
+Occupation : 11.02796 Chemical potential : 0.18945 Error : 0.43375984 Relative Error : 0.00272798
+Iteration : 191
+Occupation : 11.02796 Chemical potential : 0.18945 Error : 0.43345921 Relative Error : 0.00272609
+Iteration : 192
+Occupation : 11.02796 Chemical potential : 0.18945 Error : 0.43335848 Relative Error : 0.00272546
+Iteration : 193
+Occupation : 11.02796 Chemical potential : 0.18951 Error : 0.45736584 Relative Error : 0.00287609
+63:  |F(x)| = 0.0999435; step 1
+Iteration : 194
+Occupation : 11.02796 Chemical potential : 0.18920 Error : 0.44735535 Relative Error : 0.00281415
+64:  |F(x)| = 0.0955723; step 1
+Iteration : 195
+Occupation : 11.02796 Chemical potential : 0.18910 Error : 0.45796584 Relative Error : 0.00288065
+Iteration : 196
+Occupation : 11.02796 Chemical potential : 0.18909 Error : 0.44036348 Relative Error : 0.00277005
+65:  |F(x)| = 0.0946918; step 0.4771
+Iteration : 197
+Occupation : 11.02796 Chemical potential : 0.18897 Error : 0.42199242 Relative Error : 0.00265461
+66:  |F(x)| = 0.0894928; step 1
+Iteration : 198
+Occupation : 11.02796 Chemical potential : 0.18957 Error : 0.34909327 Relative Error : 0.00219578
+67:  |F(x)| = 0.0717782; step 1
+Iteration : 199
+Occupation : 11.02796 Chemical potential : 0.18876 Error : 0.30353578 Relative Error : 0.00191031
+68:  |F(x)| = 0.0595553; step 1
+Iteration : 200
+Occupation : 11.02796 Chemical potential : 0.18950 Error : 0.81467124 Relative Error : 0.00511714
+Iteration : 201
+Occupation : 11.02796 Chemical potential : 0.18847 Error : 0.44666897 Relative Error : 0.00281074
+Iteration : 202
+Occupation : 11.02796 Chemical potential : 0.18832 Error : 0.26794966 Relative Error : 0.00168634
+69:  |F(x)| = 0.052499; step 0.00182373
+Iteration : 203
+Occupation : 11.02796 Chemical potential : 0.18830 Error : 0.33927850 Relative Error : 0.00213519
+Iteration : 204
+Occupation : 11.02796 Chemical potential : 0.18833 Error : 0.26571598 Relative Error : 0.00167227
+70:  |F(x)| = 0.0516643; step 0.311863
+Iteration : 205
+Occupation : 11.02796 Chemical potential : 0.18838 Error : 0.30340837 Relative Error : 0.00190946
+Iteration : 206
+Occupation : 11.02796 Chemical potential : 0.18841 Error : 0.26962239 Relative Error : 0.00169684
+Iteration : 207
+Occupation : 11.02796 Chemical potential : 0.18839 Error : 0.27288650 Relative Error : 0.00171739
+Iteration : 208
+Occupation : 11.02796 Chemical potential : 0.18838 Error : 0.27196085 Relative Error : 0.00171157
+Iteration : 209
+Occupation : 11.02796 Chemical potential : 0.18837 Error : 0.27169381 Relative Error : 0.00170989
+Iteration : 210
+Occupation : 11.02796 Chemical potential : 0.18837 Error : 0.27116299 Relative Error : 0.00170655
+Iteration : 211
+Occupation : 11.02796 Chemical potential : 0.18836 Error : 0.27191369 Relative Error : 0.00171127
+Iteration : 212
+Occupation : 11.02796 Chemical potential : 0.18836 Error : 0.27135469 Relative Error : 0.00170775
+Iteration : 213
+Occupation : 11.02796 Chemical potential : 0.18843 Error : 0.29213229 Relative Error : 0.00183850
+71:  |F(x)| = 0.0597559; step 1
+Iteration : 214
+Occupation : 11.02796 Chemical potential : 0.18855 Error : 0.26023368 Relative Error : 0.00163776
+72:  |F(x)| = 0.0572706; step 1
+Iteration : 215
+Occupation : 11.02796 Chemical potential : 0.18840 Error : 0.29982449 Relative Error : 0.00188698
+Iteration : 216
+Occupation : 11.02796 Chemical potential : 0.18840 Error : 0.28582744 Relative Error : 0.00179885
+Iteration : 217
+Occupation : 11.02796 Chemical potential : 0.18843 Error : 0.28356835 Relative Error : 0.00178462
+Iteration : 218
+Occupation : 11.02796 Chemical potential : 0.18844 Error : 0.28607808 Relative Error : 0.00180041
+Iteration : 219
+Occupation : 11.02796 Chemical potential : 0.18844 Error : 0.28660968 Relative Error : 0.00180376
+Iteration : 220
+Occupation : 11.02796 Chemical potential : 0.18844 Error : 0.28675497 Relative Error : 0.00180467
+Iteration : 221
+Occupation : 11.02796 Chemical potential : 0.18844 Error : 0.28678514 Relative Error : 0.00180486
+Iteration : 222
+Occupation : 11.02796 Chemical potential : 0.18844 Error : 0.28679143 Relative Error : 0.00180490
+Iteration : 223
+Occupation : 11.02796 Chemical potential : 0.18838 Error : 0.29057187 Relative Error : 0.00182875
+73:  |F(x)| = 0.061992; step 1
+Iteration : 224
+Occupation : 11.02796 Chemical potential : 0.18849 Error : 0.27077846 Relative Error : 0.00170418
+74:  |F(x)| = 0.0640483; step 1
+Iteration : 225
+Occupation : 11.02796 Chemical potential : 0.18845 Error : 0.28116138 Relative Error : 0.00176960
+Iteration : 226
+Occupation : 11.02796 Chemical potential : 0.18846 Error : 0.27739151 Relative Error : 0.00174583
+Iteration : 227
+Occupation : 11.02796 Chemical potential : 0.18849 Error : 0.27621712 Relative Error : 0.00173842
+Iteration : 228
+Occupation : 11.02796 Chemical potential : 0.18850 Error : 0.27851656 Relative Error : 0.00175288
+Iteration : 229
+Occupation : 11.02796 Chemical potential : 0.18850 Error : 0.27898092 Relative Error : 0.00175580
+Iteration : 230
+Occupation : 11.02796 Chemical potential : 0.18851 Error : 0.27912009 Relative Error : 0.00175668
+Iteration : 231
+Occupation : 11.02796 Chemical potential : 0.18851 Error : 0.27927466 Relative Error : 0.00175765
+Iteration : 232
+Occupation : 11.02796 Chemical potential : 0.18851 Error : 0.27931328 Relative Error : 0.00175789
+Iteration : 233
+Occupation : 11.02796 Chemical potential : 0.18846 Error : 0.28144312 Relative Error : 0.00177137
+75:  |F(x)| = 0.0637023; step 1
+Iteration : 234
+Occupation : 11.02796 Chemical potential : 0.18836 Error : 0.30119791 Relative Error : 0.00189582
+Iteration : 235
+Occupation : 11.02796 Chemical potential : 0.18837 Error : 0.28488210 Relative Error : 0.00179306
+Iteration : 236
+Occupation : 11.02796 Chemical potential : 0.18839 Error : 0.27977878 Relative Error : 0.00176091
+76:  |F(x)| = 0.0640703; step 0.178475
+Iteration : 237
+Occupation : 11.02796 Chemical potential : 0.18802 Error : 0.31393225 Relative Error : 0.00197623
+Iteration : 238
+Occupation : 11.02796 Chemical potential : 0.18817 Error : 0.27627731 Relative Error : 0.00173900
+77:  |F(x)| = 0.0639003; step 0.397125
+Iteration : 239
+Occupation : 11.02796 Chemical potential : 0.18825 Error : 0.29182081 Relative Error : 0.00183680
+Iteration : 240
+Occupation : 11.02796 Chemical potential : 0.18824 Error : 0.29010642 Relative Error : 0.00182603
+Iteration : 241
+Occupation : 11.02796 Chemical potential : 0.18824 Error : 0.28650363 Relative Error : 0.00180336
+Iteration : 242
+Occupation : 11.02796 Chemical potential : 0.18823 Error : 0.28558248 Relative Error : 0.00179757
+Iteration : 243
+Occupation : 11.02796 Chemical potential : 0.18823 Error : 0.28472133 Relative Error : 0.00179215
+Iteration : 244
+Occupation : 11.02796 Chemical potential : 0.18823 Error : 0.28445023 Relative Error : 0.00179044
+Iteration : 245
+Occupation : 11.02796 Chemical potential : 0.18823 Error : 0.28435978 Relative Error : 0.00178988
+Iteration : 246
+Occupation : 11.02796 Chemical potential : 0.18823 Error : 0.28433224 Relative Error : 0.00178970
+Iteration : 247
+Occupation : 11.02796 Chemical potential : 0.18826 Error : 0.29470223 Relative Error : 0.00185494
+78:  |F(x)| = 0.0678907; step 1
+Iteration : 248
+Occupation : 11.02796 Chemical potential : 0.18828 Error : 0.28392380 Relative Error : 0.00178704
+79:  |F(x)| = 0.0630407; step 1
+Iteration : 249
+Occupation : 11.02796 Chemical potential : 0.18842 Error : 0.29077587 Relative Error : 0.00183012
+Iteration : 250
+Occupation : 11.02796 Chemical potential : 0.18842 Error : 0.28226626 Relative Error : 0.00177659
+80:  |F(x)| = 0.0639749; step 0.476713
+Iteration : 251
+Occupation : 11.02796 Chemical potential : 0.18838 Error : 0.28435655 Relative Error : 0.00178977
+Iteration : 252
+Occupation : 11.02796 Chemical potential : 0.18838 Error : 0.28245434 Relative Error : 0.00177778
+Iteration : 253
+Occupation : 11.02796 Chemical potential : 0.18838 Error : 0.28307718 Relative Error : 0.00178170
+Iteration : 254
+Occupation : 11.02796 Chemical potential : 0.18838 Error : 0.28327316 Relative Error : 0.00178293
+Iteration : 255
+Occupation : 11.02796 Chemical potential : 0.18838 Error : 0.28336245 Relative Error : 0.00178349
+Iteration : 256
+Occupation : 11.02796 Chemical potential : 0.18839 Error : 0.28298836 Relative Error : 0.00178113
+Iteration : 257
+Occupation : 11.02796 Chemical potential : 0.18839 Error : 0.28322422 Relative Error : 0.00178261
+Iteration : 258
+Occupation : 11.02796 Chemical potential : 0.18840 Error : 0.28264655 Relative Error : 0.00177898
+Iteration : 259
+Occupation : 11.02796 Chemical potential : 0.18838 Error : 0.28287543 Relative Error : 0.00178045
+81:  |F(x)| = 0.0642932; step 1
+Iteration : 260
+Occupation : 11.02796 Chemical potential : 0.18850 Error : 0.29335143 Relative Error : 0.00184617
+Iteration : 261
+Occupation : 11.02796 Chemical potential : 0.18846 Error : 0.29175128 Relative Error : 0.00183622
+Iteration : 262
+Occupation : 11.02796 Chemical potential : 0.18841 Error : 0.28703758 Relative Error : 0.00180661
+Iteration : 263
+Occupation : 11.02796 Chemical potential : 0.18840 Error : 0.28363106 Relative Error : 0.00178519
+Iteration : 264
+Occupation : 11.02796 Chemical potential : 0.18839 Error : 0.28296137 Relative Error : 0.00178098
+Iteration : 265
+Occupation : 11.02796 Chemical potential : 0.18839 Error : 0.28264649 Relative Error : 0.00177900
+82:  |F(x)| = 0.0642217; step 0.0243994
+Iteration : 266
+Occupation : 11.02796 Chemical potential : 0.18839 Error : 0.29640802 Relative Error : 0.00186549
+Iteration : 267
+Occupation : 11.02796 Chemical potential : 0.18839 Error : 0.28877591 Relative Error : 0.00181752
+Iteration : 268
+Occupation : 11.02796 Chemical potential : 0.18839 Error : 0.28474103 Relative Error : 0.00179216
+Iteration : 269
+Occupation : 11.02796 Chemical potential : 0.18839 Error : 0.28372455 Relative Error : 0.00178578
+Iteration : 270
+Occupation : 11.02796 Chemical potential : 0.18839 Error : 0.28325410 Relative Error : 0.00178282
+Iteration : 271
+Occupation : 11.02796 Chemical potential : 0.18838 Error : 0.28304829 Relative Error : 0.00178153
+Iteration : 272
+Occupation : 11.02796 Chemical potential : 0.18838 Error : 0.28277463 Relative Error : 0.00177981
+Iteration : 273
+Occupation : 11.02796 Chemical potential : 0.18838 Error : 0.28268095 Relative Error : 0.00177922
+Iteration : 274
+Occupation : 11.02796 Chemical potential : 0.18839 Error : 0.29661714 Relative Error : 0.00186681
+83:  |F(x)| = 0.0692037; step 1
+Iteration : 275
+Occupation : 11.02796 Chemical potential : 0.18831 Error : 0.25398057 Relative Error : 0.00159878
+84:  |F(x)| = 0.0597184; step 1
+Iteration : 276
+Occupation : 11.02796 Chemical potential : 0.18821 Error : 0.25154359 Relative Error : 0.00158349
+85:  |F(x)| = 0.0580265; step 1
+Iteration : 277
+Occupation : 11.02796 Chemical potential : 0.18814 Error : 0.25504487 Relative Error : 0.00160550
+Iteration : 278
+Occupation : 11.02796 Chemical potential : 0.18814 Error : 0.24864777 Relative Error : 0.00156525
+86:  |F(x)| = 0.057628; step 0.486366
+Iteration : 279
+Occupation : 11.02796 Chemical potential : 0.18804 Error : 0.20937159 Relative Error : 0.00131817
+87:  |F(x)| = 0.0499502; step 1
+Iteration : 280
+Occupation : 11.02796 Chemical potential : 0.18786 Error : 0.19478106 Relative Error : 0.00122640
+88:  |F(x)| = 0.0451317; step 1
+Iteration : 281
+Occupation : 11.02796 Chemical potential : 0.18805 Error : 0.21952510 Relative Error : 0.00138203
+Iteration : 282
+Occupation : 11.02796 Chemical potential : 0.18793 Error : 0.20928860 Relative Error : 0.00131768
+Iteration : 283
+Occupation : 11.02796 Chemical potential : 0.18786 Error : 0.19321229 Relative Error : 0.00121650
+89:  |F(x)| = 0.0448748; step 0.114486
+Iteration : 284
+Occupation : 11.02796 Chemical potential : 0.18811 Error : 0.24746763 Relative Error : 0.00155776
+Iteration : 285
+Occupation : 11.02796 Chemical potential : 0.18799 Error : 0.21857542 Relative Error : 0.00137610
+Iteration : 286
+Occupation : 11.02796 Chemical potential : 0.18787 Error : 0.20112210 Relative Error : 0.00126629
+Iteration : 287
+Occupation : 11.02796 Chemical potential : 0.18785 Error : 0.19410210 Relative Error : 0.00122209
+Iteration : 288
+Occupation : 11.02796 Chemical potential : 0.18784 Error : 0.19255037 Relative Error : 0.00121233
+90:  |F(x)| = 0.0447838; step 0.0301908
+Iteration : 289
+Occupation : 11.02796 Chemical potential : 0.18770 Error : 0.21526478 Relative Error : 0.00135537
+Iteration : 290
+Occupation : 11.02796 Chemical potential : 0.18774 Error : 0.19900612 Relative Error : 0.00125298
+Iteration : 291
+Occupation : 11.02796 Chemical potential : 0.18779 Error : 0.19308960 Relative Error : 0.00121573
+Iteration : 292
+Occupation : 11.02796 Chemical potential : 0.18780 Error : 0.19381727 Relative Error : 0.00122031
+Iteration : 293
+Occupation : 11.02796 Chemical potential : 0.18782 Error : 0.19283158 Relative Error : 0.00121410
+Iteration : 294
+Occupation : 11.02796 Chemical potential : 0.18782 Error : 0.19322600 Relative Error : 0.00121658
+Iteration : 295
+Occupation : 11.02796 Chemical potential : 0.18782 Error : 0.19325913 Relative Error : 0.00121679
+Iteration : 296
+Occupation : 11.02796 Chemical potential : 0.18784 Error : 0.19191112 Relative Error : 0.00120830
+91:  |F(x)| = 0.0447656; step 0.00281774
+Iteration : 297
+Occupation : 11.02796 Chemical potential : 0.18785 Error : 0.18276520 Relative Error : 0.00115076
+92:  |F(x)| = 0.0418845; step 1
+Iteration : 298
+Occupation : 11.02796 Chemical potential : 0.18783 Error : 0.17532530 Relative Error : 0.00110394
+93:  |F(x)| = 0.0405628; step 1
+Iteration : 299
+Occupation : 11.02796 Chemical potential : 0.18783 Error : 0.16774235 Relative Error : 0.00105620
+94:  |F(x)| = 0.0376796; step 1
+Iteration : 300
+Occupation : 11.02796 Chemical potential : 0.18654 Error : 0.27189504 Relative Error : 0.00171360
+Iteration : 301
+Occupation : 11.02796 Chemical potential : 0.18727 Error : 0.16184951 Relative Error : 0.00101927
+95:  |F(x)| = 0.0383; step 0.190306
+Iteration : 302
+Occupation : 11.02796 Chemical potential : 0.18744 Error : 0.15545940 Relative Error : 0.00097898
+96:  |F(x)| = 0.0318272; step 1
+Iteration : 303
+Occupation : 11.02796 Chemical potential : 0.18738 Error : 0.18533166 Relative Error : 0.00116715
+Iteration : 304
+Occupation : 11.02796 Chemical potential : 0.18737 Error : 0.18488404 Relative Error : 0.00116430
+Iteration : 305
+Occupation : 11.02796 Chemical potential : 0.18738 Error : 0.18733793 Relative Error : 0.00117973
+Iteration : 306
+Occupation : 11.02796 Chemical potential : 0.18738 Error : 0.18843295 Relative Error : 0.00118663
+Iteration : 307
+Occupation : 11.02796 Chemical potential : 0.18738 Error : 0.18867905 Relative Error : 0.00118818
+Iteration : 308
+Occupation : 11.02796 Chemical potential : 0.18738 Error : 0.18873780 Relative Error : 0.00118855
+Iteration : 309
+Occupation : 11.02796 Chemical potential : 0.18738 Error : 0.18875281 Relative Error : 0.00118864
+Iteration : 310
+Occupation : 11.02796 Chemical potential : 0.18738 Error : 0.18875641 Relative Error : 0.00118866
+Iteration : 311
+Occupation : 11.02796 Chemical potential : 0.18737 Error : 0.18038905 Relative Error : 0.00113602
+97:  |F(x)| = 0.0390226; step 1
+Iteration : 312
+Occupation : 11.02796 Chemical potential : 0.18762 Error : 0.29341889 Relative Error : 0.00184749
+Iteration : 313
+Occupation : 11.02796 Chemical potential : 0.18745 Error : 0.19593019 Relative Error : 0.00123385
+Iteration : 314
+Occupation : 11.02796 Chemical potential : 0.18742 Error : 0.17421731 Relative Error : 0.00109715
+98:  |F(x)| = 0.0382439; step 0.0434947
+Iteration : 315
+Occupation : 11.02796 Chemical potential : 0.18737 Error : 0.17973454 Relative Error : 0.00113187
+Iteration : 316
+Occupation : 11.02796 Chemical potential : 0.18737 Error : 0.17288229 Relative Error : 0.00108873
+99:  |F(x)| = 0.0391297; step 0.469775
+Iteration : 317
+Occupation : 11.02796 Chemical potential : 0.18722 Error : 0.13925904 Relative Error : 0.00087711
+100:  |F(x)| = 0.0326819; step 1
+Iteration : 318
+Occupation : 11.02796 Chemical potential : 0.18674 Error : 0.13981518 Relative Error : 0.00088077
+Iteration : 319
+Occupation : 11.02796 Chemical potential : 0.18684 Error : 0.13367712 Relative Error : 0.00084203
+101:  |F(x)| = 0.0312835; step 0.49603
+Iteration : 320
+Occupation : 11.02796 Chemical potential : 0.18701 Error : 0.09718391 Relative Error : 0.00061222
+102:  |F(x)| = 0.0208239; step 1
+Iteration : 321
+Occupation : 11.02796 Chemical potential : 0.18705 Error : 0.10462134 Relative Error : 0.00065904
+Iteration : 322
+Occupation : 11.02796 Chemical potential : 0.18706 Error : 0.09391972 Relative Error : 0.00059165
+103:  |F(x)| = 0.0206372; step 0.431438
+Iteration : 323
+Occupation : 11.02796 Chemical potential : 0.18706 Error : 0.09287703 Relative Error : 0.00058507
+104:  |F(x)| = 0.0203803; step 1
+Iteration : 324
+Occupation : 11.02796 Chemical potential : 0.18706 Error : 0.08849787 Relative Error : 0.00055748
+105:  |F(x)| = 0.0195513; step 1
+Iteration : 325
+Occupation : 11.02796 Chemical potential : 0.18699 Error : 0.05447307 Relative Error : 0.00034317
+106:  |F(x)| = 0.0114765; step 1
+Iteration : 326
+Occupation : 11.02796 Chemical potential : 0.18675 Error : 0.01907302 Relative Error : 0.00012018
+107:  |F(x)| = 0.00507956; step 1
+Iteration : 327
+Occupation : 11.02796 Chemical potential : 0.18658 Error : 0.10945581 Relative Error : 0.00068973
+Iteration : 328
+Occupation : 11.02796 Chemical potential : 0.18665 Error : 0.07065277 Relative Error : 0.00044518
+Iteration : 329
+Occupation : 11.02796 Chemical potential : 0.18667 Error : 0.06008921 Relative Error : 0.00037862
+Iteration : 330
+Occupation : 11.02796 Chemical potential : 0.18657 Error : 0.11923042 Relative Error : 0.00075133
+108:  |F(x)| = 0.0270456; step 1
+Iteration : 331
+Occupation : 11.02796 Chemical potential : 0.18665 Error : 0.07340699 Relative Error : 0.00046256
+109:  |F(x)| = 0.015958; step 1
+Iteration : 332
+Occupation : 11.02796 Chemical potential : 0.18683 Error : 0.01796915 Relative Error : 0.00011322
+110:  |F(x)| = 0.00483823; step 1
+Iteration : 333
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00563651 Relative Error : 0.00003551
+111:  |F(x)| = 0.00164652; step 1
+Iteration : 334
+Occupation : 11.02796 Chemical potential : 0.18679 Error : 0.02532449 Relative Error : 0.00015958
+Iteration : 335
+Occupation : 11.02796 Chemical potential : 0.18679 Error : 0.00530819 Relative Error : 0.00003345
+112:  |F(x)| = 0.00118939; step 0.0247691
+Iteration : 336
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00549473 Relative Error : 0.00003462
+Iteration : 337
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00488172 Relative Error : 0.00003076
+113:  |F(x)| = 0.00120699; step 0.466627
+Iteration : 338
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00568958 Relative Error : 0.00003585
+Iteration : 339
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00510338 Relative Error : 0.00003216
+Iteration : 340
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00493155 Relative Error : 0.00003107
+Iteration : 341
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00489681 Relative Error : 0.00003085
+Iteration : 342
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00487697 Relative Error : 0.00003073
+114:  |F(x)| = 0.00119577; step 0.0359804
+Iteration : 343
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00641238 Relative Error : 0.00004040
+Iteration : 344
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00522312 Relative Error : 0.00003291
+Iteration : 345
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00496503 Relative Error : 0.00003128
+Iteration : 346
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00492447 Relative Error : 0.00003103
+Iteration : 347
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00489740 Relative Error : 0.00003086
+Iteration : 348
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00488797 Relative Error : 0.00003080
+Iteration : 349
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00488172 Relative Error : 0.00003076
+Iteration : 350
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00641210 Relative Error : 0.00004040
+115:  |F(x)| = 0.00143394; step 1
+Iteration : 351
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00690091 Relative Error : 0.00004348
+Iteration : 352
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00660784 Relative Error : 0.00004164
+Iteration : 353
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00648115 Relative Error : 0.00004084
+Iteration : 354
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00644717 Relative Error : 0.00004062
+Iteration : 355
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00642958 Relative Error : 0.00004051
+Iteration : 356
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00642108 Relative Error : 0.00004046
+Iteration : 357
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00641682 Relative Error : 0.00004043
+Iteration : 358
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00641470 Relative Error : 0.00004042
+Iteration : 359
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00688455 Relative Error : 0.00004338
+116:  |F(x)| = 0.0015272; step 1
+Iteration : 360
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00829363 Relative Error : 0.00005226
+Iteration : 361
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00725105 Relative Error : 0.00004569
+Iteration : 362
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00703031 Relative Error : 0.00004430
+Iteration : 363
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00698648 Relative Error : 0.00004402
+Iteration : 364
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00696469 Relative Error : 0.00004388
+Iteration : 365
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00695515 Relative Error : 0.00004382
+Iteration : 366
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00695092 Relative Error : 0.00004380
+Iteration : 367
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00694926 Relative Error : 0.00004379
+Iteration : 368
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00809397 Relative Error : 0.00005100
+117:  |F(x)| = 0.00180266; step 1
+Iteration : 369
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00683523 Relative Error : 0.00004307
+118:  |F(x)| = 0.00146564; step 1
+Iteration : 370
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00636778 Relative Error : 0.00004012
+119:  |F(x)| = 0.00134344; step 1
+Iteration : 371
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00413287 Relative Error : 0.00002604
+120:  |F(x)| = 0.000834807; step 1
+Iteration : 372
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00515630 Relative Error : 0.00003249
+Iteration : 373
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00442695 Relative Error : 0.00002789
+Iteration : 374
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00423676 Relative Error : 0.00002670
+Iteration : 375
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00420366 Relative Error : 0.00002649
+Iteration : 376
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00418209 Relative Error : 0.00002635
+Iteration : 377
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00417341 Relative Error : 0.00002630
+Iteration : 378
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00416938 Relative Error : 0.00002627
+Iteration : 379
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00416776 Relative Error : 0.00002626
+Iteration : 380
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00515826 Relative Error : 0.00003250
+121:  |F(x)| = 0.00109712; step 1
+Iteration : 381
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00339608 Relative Error : 0.00002140
+122:  |F(x)| = 0.000701297; step 1
+Iteration : 382
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00250514 Relative Error : 0.00001578
+123:  |F(x)| = 0.000514516; step 1
+Iteration : 383
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00410587 Relative Error : 0.00002587
+Iteration : 384
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00286638 Relative Error : 0.00001806
+Iteration : 385
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00270140 Relative Error : 0.00001702
+Iteration : 386
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00268552 Relative Error : 0.00001692
+Iteration : 387
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00267807 Relative Error : 0.00001687
+Iteration : 388
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00267588 Relative Error : 0.00001686
+Iteration : 389
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00267524 Relative Error : 0.00001686
+Iteration : 390
+Occupation : 11.02796 Chemical potential : 0.18680 Error : 0.00409123 Relative Error : 0.00002578
+124:  |F(x)| = 0.000873504; step 1
+Iteration : 391
+Occupation : 11.02796 Chemical potential : 0.18683 Error : 0.00878285 Relative Error : 0.00005534
+Iteration : 392
+Occupation : 11.02796 Chemical potential : 0.18683 Error : 0.00685487 Relative Error : 0.00004319
+Iteration : 393
+Occupation : 11.02796 Chemical potential : 0.18683 Error : 0.00651825 Relative Error : 0.00004107
+Iteration : 394
+Occupation : 11.02796 Chemical potential : 0.18683 Error : 0.00647582 Relative Error : 0.00004080
+Iteration : 395
+Occupation : 11.02796 Chemical potential : 0.18683 Error : 0.00646747 Relative Error : 0.00004075
+Iteration : 396
+Occupation : 11.02796 Chemical potential : 0.18683 Error : 0.00646581 Relative Error : 0.00004074
+Iteration : 397
+Occupation : 11.02796 Chemical potential : 0.18684 Error : 0.01201718 Relative Error : 0.00007572
+125:  |F(x)| = 0.00227093; step 1
+Iteration : 398
+Occupation : 11.02796 Chemical potential : 0.18683 Error : 0.00334168 Relative Error : 0.00002106
+126:  |F(x)| = 0.000650951; step 1
+Iteration : 399
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00275412 Relative Error : 0.00001735
+127:  |F(x)| = 0.000578797; step 1
+Iteration : 400
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00106941 Relative Error : 0.00000674
+128:  |F(x)| = 0.000230441; step 1
+Iteration : 401
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00230265 Relative Error : 0.00001451
+Iteration : 402
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00060122 Relative Error : 0.00000379
+129:  |F(x)| = 0.000141763; step 0.107845
+Iteration : 403
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00092643 Relative Error : 0.00000584
+Iteration : 404
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00068676 Relative Error : 0.00000433
+Iteration : 405
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00065508 Relative Error : 0.00000413
+Iteration : 406
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00065116 Relative Error : 0.00000410
+Iteration : 407
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00065172 Relative Error : 0.00000411
+Iteration : 408
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00065169 Relative Error : 0.00000411
+Iteration : 409
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00065166 Relative Error : 0.00000411
+Iteration : 410
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00092996 Relative Error : 0.00000586
+130:  |F(x)| = 0.000242333; step 1
+Iteration : 411
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00062745 Relative Error : 0.00000395
+131:  |F(x)| = 0.000164526; step 1
+Iteration : 412
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00058356 Relative Error : 0.00000368
+132:  |F(x)| = 0.000138673; step 1
+Iteration : 413
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00060121 Relative Error : 0.00000379
+Iteration : 414
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00057278 Relative Error : 0.00000361
+133:  |F(x)| = 0.000121501; step 0.471072
+Iteration : 415
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00055902 Relative Error : 0.00000352
+134:  |F(x)| = 0.000112249; step 1
+Iteration : 416
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00048215 Relative Error : 0.00000304
+135:  |F(x)| = 9.82668e-05; step 1
+Iteration : 417
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00018525 Relative Error : 0.00000117
+136:  |F(x)| = 4.90818e-05; step 1
+Iteration : 418
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00042188 Relative Error : 0.00000266
+Iteration : 419
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00020692 Relative Error : 0.00000130
+Iteration : 420
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00019496 Relative Error : 0.00000123
+Iteration : 421
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00019413 Relative Error : 0.00000122
+Iteration : 422
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00019363 Relative Error : 0.00000122
+Iteration : 423
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00019349 Relative Error : 0.00000122
+Iteration : 424
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00043199 Relative Error : 0.00000272
+137:  |F(x)| = 0.000109142; step 1
+Iteration : 425
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00020750 Relative Error : 0.00000131
+138:  |F(x)| = 5.38148e-05; step 1
+Iteration : 426
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00022245 Relative Error : 0.00000140
+Iteration : 427
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00020918 Relative Error : 0.00000132
+Iteration : 428
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00020576 Relative Error : 0.00000130
+139:  |F(x)| = 5.17234e-05; step 0.182745
+Iteration : 429
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00017612 Relative Error : 0.00000111
+140:  |F(x)| = 3.53931e-05; step 1
+Iteration : 430
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00015431 Relative Error : 0.00000097
+141:  |F(x)| = 3.01637e-05; step 1
+Iteration : 431
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00011928 Relative Error : 0.00000075
+142:  |F(x)| = 2.35022e-05; step 1
+Iteration : 432
+Occupation : 11.02796 Chemical potential : 0.18682 Error : 0.00008355 Relative Error : 0.00000053
