@@ -1,0 +1,8 @@
+FD width = 1e-3
+
+Calculating occupancy for mu = 0.0
+Total occupancy for mu = 0.0 using Matsubara summation for eta 0.001 : 11.108670940091574
+Calculating occupancy for mu = 0.0
+Total occupancy for mu = 0.0 using Matsubara summation for eta 0.005 : 11.75192985780084
+Calculating occupancy for mu = 0.0
+Total occupancy for mu = 0.0 using Matsubara summation for eta 0.01 : 18.439715554216868

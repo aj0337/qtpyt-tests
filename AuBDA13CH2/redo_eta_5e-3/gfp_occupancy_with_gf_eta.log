@@ -1,0 +1,8 @@
+FD width = 1e-3
+
+Calculating occupancy for mu = 0.0
+Total occupancy for mu = 0.0 using contour integration for eta 0.001 are: 10.951773256892652
+Calculating occupancy for mu = 0.0
+Total occupancy for mu = 0.0 using contour integration for eta 0.005 are: 10.951773256892652
+Calculating occupancy for mu = 0.0
+Total occupancy for mu = 0.0 using contour integration for eta 0.01 are: 10.951773256892652
