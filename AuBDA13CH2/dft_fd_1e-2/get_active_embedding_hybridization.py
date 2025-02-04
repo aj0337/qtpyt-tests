@@ -12,7 +12,7 @@ from qtpyt.projector import ProjectedGreenFunction
 
 
 # Data paths
-data_folder = f"./output/lowdin/beta_70"
+data_folder = f"./output/lowdin/"
 
 # Load data
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
@@ -56,8 +56,8 @@ del HB
 ne = 3000
 matsubara_energies = 1.0j * (2 * np.arange(ne) + 1) * np.pi / beta
 
-gf.eta = 0.0
-# gfp.eta = 0.0
+# gf.eta = 0.0
+gfp.eta = 0.0
 assert self_energy[0].eta == 0.0
 assert self_energy[1].eta == 0.0
 
