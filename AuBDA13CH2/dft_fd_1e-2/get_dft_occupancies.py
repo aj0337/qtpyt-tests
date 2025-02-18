@@ -8,8 +8,8 @@ from qtpyt.projector import ProjectedGreenFunction
 from qtpyt.continued_fraction import get_ao_charge
 
 # Data paths
-data_folder = f"./output/lowdin/beta_70/"
-output_folder = f"./output/lowdin/beta_70/occupancies"
+data_folder = f"./output/lowdin/dyson/beta_70/"
+output_folder = f"./output/lowdin/dyson/beta_38.68/occupancies"
 os.makedirs(output_folder, exist_ok=True)
 
 # Load data
@@ -22,7 +22,8 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 
 # Parameters
 mu = 0.0
-beta = 70.0
+# beta = 70.0
+beta = 38.68
 
 print(f"Calculating occupancy for mu = {mu}",flush=True)
 # Green's Function Setup
@@ -34,7 +35,7 @@ gf = greenfunction.GreenFunction(
 )
 gfp = ProjectedGreenFunction(gf, index_active_region)
 occupancies = get_ao_charge(gfp, mu=mu, beta=beta)
-print(f"Total occupancy for mu = {mu} using contour integration are: {np.sum(occupancies)}",flush=True)
+print(f"Total occupancy for mu = {mu} using contour integration for beta = {beta} are: {np.sum(occupancies)}",flush=True)
 np.save(
     os.path.join(output_folder, f"occupancies_gfp_mu_{mu}.npy"),
     occupancies,

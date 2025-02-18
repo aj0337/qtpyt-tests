@@ -1,6 +1,6 @@
 #!/bin/bash -l
 #SBATCH --job-name=aubda13ch2-los
-#SBATCH --time=6:00:00
+#SBATCH --time=4:00:00
 #SBATCH --partition=normal
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=12

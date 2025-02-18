@@ -25,7 +25,7 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 # Parameters
 de = 0.01
 energies = np.arange(-2, 2 + de / 2.0, de).round(7)
-eta = 2*1e-2
+eta = 1e-2
 z_ret = energies + 1.0j * eta
 beta = 70.0
 

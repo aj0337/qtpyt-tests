@@ -150,17 +150,20 @@ alpha = 0.0
 nspin = 1
 de = 0.01
 energies = np.arange(-2, 2 + de / 2.0, de).round(7)
-eta = 2 * 1e-2
+eta = 1e-2
 z_ret = energies + 1.0j * eta
 beta = 70.0
 mu = 0.0
 adjust_mu = True
 use_double_counting = True
 
-data_folder = "output/lowdin/"
-output_folder = f"output/lowdin/U_matrix"
+data_folder = "output/lowdin/dyson/beta_70/"
+output_folder = f"output/lowdin/dyson/beta_38.68/nbaths_{nbaths}/U_matrix"
 figure_folder = f"{output_folder}/figures"
-occupancy_goal = np.load(f"{data_folder}/occupancies_gfp_mu_0.0.npy")
+# occupancy_goal = np.load(f"{data_folder}/occupancies_gfp_mu_0.0.npy")
+occupancy_goal = np.load(
+    f"/capstor/scratch/cscs/ajayaraj/qtpyt-tests/AuBDA13CH2/dft_fd_1e-2/output/lowdin/dyson/beta_38.68/occupancies/occupancies_gfp_mu_0.0.npy"
+)
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
 z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")

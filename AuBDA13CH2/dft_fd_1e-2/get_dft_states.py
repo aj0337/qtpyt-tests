@@ -21,7 +21,7 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
     hs_list_ij = pickle.load(f)
 
 # Parameters
-eta = 2 * 1e-2
+eta = 1e-2
 
 # Green's Function Setup
 gf = greenfunction.GreenFunction(
