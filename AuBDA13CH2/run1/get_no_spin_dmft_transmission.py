@@ -37,15 +37,15 @@ def run(outputfile):
         np.save(outputfile, (energies, T.real))
 
 
-data_folder = "./output/lowdin/dyson/beta_70"
-dmft_data_folder = "./output/lowdin/dyson/beta_38.68/nbaths_4/U_matrix"
+data_folder = "./output/lowdin"
+dmft_data_folder = "./output/lowdin/dmft/no_spin"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 dmft_sigma_file = f"{dmft_data_folder}/dmft_sigma.npy"
 
 de = 0.01
-energies = np.arange(-2, 2 + de / 2.0, de).round(7)
-eta = 1e-2
+energies = np.arange(-3, 3 + de / 2.0, de).round(7)
+eta = 1e-3
 z_ret = energies + 1.0j * eta
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:

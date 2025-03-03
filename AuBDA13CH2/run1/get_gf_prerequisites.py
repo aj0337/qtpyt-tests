@@ -14,9 +14,7 @@ from qtpyt.tools import remove_pbc, rotate_couplings
 
 lowdin = True
 data_folder = f"./output/lowdin" if lowdin else f"./output/no_lowdin"
-# Create the folder if it doesn't exist
-if not os.path.exists(data_folder):
-    os.makedirs(data_folder)
+
 if lowdin:
     H_subdiagonalized, S_subdiagonalized = np.load(f"{data_folder}/hs_los_lowdin.npy")
 
@@ -47,8 +45,8 @@ nodes = [0, 810, 1116, 1278, 1584, 2394]
 
 # Define energy range and broadening factor for the Green's function calculation
 de = 0.01
-energies = np.arange(-2.0, 2.0 + de / 2.0, de).round(7)
-eta = 1e-2
+energies = np.arange(-3.0, 3.0 + de / 2.0, de).round(7)
+eta = 1e-3
 
 # Define the number of repetitions (Nr) and unit cell repetition in the leads
 Nr = (1, 5, 3)

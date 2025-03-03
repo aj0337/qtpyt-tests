@@ -24,10 +24,10 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 
 # Parameters
 de = 0.01
-energies = np.arange(-2, 2 + de / 2.0, de).round(7)
-eta = 1e-2
+energies = np.arange(-3, 3 + de / 2.0, de).round(7)
+eta = 1e-3
 z_ret = energies + 1.0j * eta
-beta = 70.0
+beta = 100.0
 
 # Green's Function Setup
 gf = greenfunction.GreenFunction(
@@ -56,7 +56,6 @@ del HB
 ne = 3000
 matsubara_energies = 1.0j * (2 * np.arange(ne) + 1) * np.pi / beta
 
-# gf.eta = 0.0
 gfp.eta = 0.0
 assert self_energy[0].eta == 0.0
 assert self_energy[1].eta == 0.0
