@@ -6,16 +6,16 @@ from edpyt.nano_dmft import Gfloc
 import numpy as np
 import os
 
-
-beta = 1000
-mus = [0.0] #, 0.5, -0.5]
-
-data_folder = "output/lowdin"
-output_folder = f"output/lowdin/occupancies"
+# Data paths
+data_folder = f"./output/lowdin"
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
 z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 
-os.makedirs(output_folder, exist_ok=True)
+os.makedirs(data_folder, exist_ok=True)
+
+# Parameters
+mu = 0.0
+beta = 38.68
 
 len_active = H_active.shape[0]
 hyb_mats = np.fromfile(f"{data_folder}/matsubara_hybridization.bin", complex).reshape(
@@ -34,13 +34,16 @@ nimp = len_active
 
 Sigma = lambda z: np.zeros((nimp, z.size), complex)
 
-for mu in mus:
-    print(f"Calculating occupancy for mu = {mu}",flush=True)
-    gfloc = Gfloc(
-        H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
-    )
-    gfloc.update(mu=0.0)
-    gfloc.set_local(Sigma)
-    occupancies = gfloc.integrate(mu=mu)
-    print(f"Total occupancy for mu = {mu} using matsubara summation are: {np.sum(occupancies)}",flush=True)
-    np.save(os.path.join(output_folder, f'occupancies_gfloc_mu_{mu}.npy'), occupancies)
+print(f"Calculating occupancy for mu = {mu}", flush=True)
+gfloc = Gfloc(
+    H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
+)
+gfloc.update(mu=0.0)
+gfloc.set_local(Sigma)
+occupancies = gfloc.integrate(mu=mu)
+
+print(
+    f"Total occupancy for mu = {mu} using matsubara summation are: {np.sum(occupancies)}",
+    flush=True,
+)
+np.save(os.path.join(data_folder, "occupancies.npy"), occupancies)

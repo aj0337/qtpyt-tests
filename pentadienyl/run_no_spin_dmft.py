@@ -103,7 +103,7 @@ def callback(*args, **kwargs):
         figure_folder,
         f"callback_iter_{iteration_counter:03d}_mu_{mu_value:.4f}_dos.png",
     )
-    plt.xlim(-2, 2)
+    plt.xlim(-3, 3)
     plt.savefig(figure_filename, dpi=300, bbox_inches="tight")
     plt.close()
 
@@ -144,27 +144,26 @@ def callback(*args, **kwargs):
 
 nbaths = 4
 # U = 4
-tol = 1e-2
+tol = 1e-4
 max_iter = 1000
 alpha = 0.0
 nspin = 1
 de = 0.01
-energies = np.arange(-2, 2 + de / 2.0, de).round(7)
-eta = 1e-2
+energies = np.arange(-3, 3 + de / 2.0, de).round(7)
+eta = 1e-3
 z_ret = energies + 1.0j * eta
-beta = 1000
+beta = 38.68
 mu = 0.0
 adjust_mu = True
 use_double_counting = True
 
 data_folder = "output/lowdin"
-output_folder = f"output/lowdin/U_matrix"
+output_folder = f"{data_folder}/dmft/no_spin"
 figure_folder = f"{output_folder}/figures"
-occupancy_goal = np.load(f"{data_folder}/occupancies_gfp_mu_0.0.npy")
+
+occupancy_goal = np.load(f"{data_folder}/occupancies.npy")
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
 z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
-index_active_region = np.load(f"{data_folder}/index_active_region.npy")
-self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
@@ -253,3 +252,5 @@ np.save(f"{output_folder}/dmft_gfloc.npy", gfloc_data)
 
 np.save(f"{output_folder}/opt_delta_dmft", delta_prev)
 np.save(f"{output_folder}/opt_mu_dmft", gfloc_with_dccorrection.mu)
+
+print("Spin unresolved DMFT calculation finished.", flush=True)

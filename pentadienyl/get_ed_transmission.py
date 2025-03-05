@@ -37,15 +37,15 @@ def run(outputfile):
         np.save(outputfile, (energies, T.real))
 
 
-data_folder = "./output/lowdin"
-dmft_data_folder = "./output/lowdin/U_matrix"
+data_folder = "output/lowdin"
+ed_data_folder = "output/lowdin/ed"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
-dmft_sigma_file = f"{dmft_data_folder}/dmft_sigma.npy"
+ed_sigma_file = f"{ed_data_folder}/ed_sigma_test.npy"
 
 de = 0.01
-energies = np.arange(-2, 2 + de / 2.0, de).round(7)
-eta = 1e-2
+energies = np.arange(-3, 3 + de / 2.0, de).round(7)
+eta = 1e-3
 z_ret = energies + 1.0j * eta
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
@@ -53,7 +53,7 @@ with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
 with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
     hs_list_ij = pickle.load(f)
 
-nodes = [0, 810, 1116, 1278, 1584, 2394]
+nodes = [0, 810, 1116, 1252, 1558, 2368]
 
 # Initialize the Green's function solver with the tridiagonalized matrices and self-energies
 gf = greenfunction.GreenFunction(
@@ -66,9 +66,9 @@ gf = greenfunction.GreenFunction(
 
 # Add the DMFT self-energy for transmission
 if comm.rank == 0:
-    dmft_sigma = load(dmft_sigma_file)
+    ed_sigma = load(ed_sigma_file)
 else:
-    dmft_sigma = None
+    ed_sigma = None
 
 # Transmission function calculation
 imb = 2  # index of molecule block from the nodes list
@@ -78,10 +78,10 @@ idx_molecule = (
     index_active_region - nodes[imb]
 )  # indices of active region w.r.t molecule
 
-dmft_sigma = comm.bcast(dmft_sigma, root=0)
-self_energy[2] = dmft_sigma
+ed_sigma = comm.bcast(ed_sigma, root=0)
+self_energy[2] = ed_sigma
 gf.selfenergies.append((imb, self_energy[2]))
 
-outputfile = f"{dmft_data_folder}/dmft_transmission.npy"
+outputfile = f"{ed_data_folder}/ed_transmission_test.npy"
 run(outputfile)
 gf.selfenergies.pop()

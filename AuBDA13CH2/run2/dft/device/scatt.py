@@ -7,11 +7,11 @@ from gpaw import *
 atoms = read('scatt.xyz')
 basis = {'Au':'szp(dzp)','H':'dzp','C':'dzp','N':'dzp'}
 
-
+kbt = 0.01
 calc = GPAW(h=0.2,
             xc='PBE',
             basis=basis,
-            occupations=FermiDirac(width=0.0),
+            occupations=FermiDirac(width=kbt),
             kpts=(1, 1, 1),
             mode='lcao',
             txt='scatt.txt',

@@ -1,42 +1,49 @@
 from __future__ import annotations
-import os
-import pickle
 import numpy as np
-from mpi4py import MPI
-from qtpyt.block_tridiag import greenfunction
-from qtpyt.projector import ProjectedGreenFunction
-from qtpyt.continued_fraction import get_ao_charge
+from scipy.interpolate import interp1d
+from edpyt.nano_dmft import Gfloc
+
+import numpy as np
+import os
 
 # Data paths
-data_folder = "./output/lowdin"
-output_folder = "./output/lowdin/occupancies"
-os.makedirs(output_folder, exist_ok=True)
+data_folder = f"./output/lowdin"
+H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
+z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 
-# Load data
-index_active_region = np.load(f"{data_folder}/index_active_region.npy")
-self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
-with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
-    hs_list_ii = pickle.load(f)
-with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
-    hs_list_ij = pickle.load(f)
+os.makedirs(data_folder, exist_ok=True)
 
 # Parameters
-mus = [0.0, 0.5, -0.5]
-beta = 1000
+mu = 0.0
+beta = 38.68
 
-for mu in mus:
-    print(f"Calculating occupancy for mu = {mu}",flush=True)
-    # Green's Function Setup
-    gf = greenfunction.GreenFunction(
-        hs_list_ii,
-        hs_list_ij,
-        [(0, self_energy[0]), (len(hs_list_ii) - 1, self_energy[1])],
-        solver="dyson",
-    )
-    gfp = ProjectedGreenFunction(gf, index_active_region)
-    occupancies = get_ao_charge(gfp, mu=mu, beta=beta)
-    print(f"Total occupancy for mu = {mu} using contour integration are: {np.sum(occupancies)}",flush=True)
-    np.save(
-        os.path.join(output_folder, f"occupancies_gfp_mu_{mu}.npy"),
-        occupancies,
-    )
+len_active = H_active.shape[0]
+hyb_mats = np.fromfile(f"{data_folder}/matsubara_hybridization.bin", complex).reshape(
+    z_mats.size,
+    len_active,
+    len_active,
+)
+_HybMats = interp1d(z_mats.imag, hyb_mats, axis=0, bounds_error=False, fill_value=0.0)
+HybMats = lambda z: _HybMats(z.imag)
+
+S_active = np.eye(len_active)
+idx_neq = np.arange(len_active)
+idx_inv = np.arange(len_active)
+
+nimp = len_active
+
+Sigma = lambda z: np.zeros((nimp, z.size), complex)
+
+print(f"Calculating occupancy for mu = {mu}", flush=True)
+gfloc = Gfloc(
+    H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
+)
+gfloc.update(mu=0.0)
+gfloc.set_local(Sigma)
+occupancies = gfloc.integrate(mu=mu)
+
+print(
+    f"Total occupancy for mu = {mu} using matsubara summation are: {np.sum(occupancies)}",
+    flush=True,
+)
+np.save(os.path.join(data_folder, "occupancies.npy"), occupancies)
