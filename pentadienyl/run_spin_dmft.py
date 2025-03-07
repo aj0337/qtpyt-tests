@@ -17,14 +17,15 @@ def distance(delta):
     return dmft.distance(delta)
 
 
-def save_sigma(sigma_diag, outputfile, nspin):
-    L, ne, nspin = sigma_diag.shape
-    sigma = np.zeros((ne, L, L, nspin), complex)
+def save_sigma(sigma_diag, output_folder, nspin):
+    L, nspin, ne = sigma_diag.shape
+    sigma = np.zeros((ne, L, L), complex)
 
     def save(spin):
-        for diag, mat in zip(sigma_diag[:, :, spin].T, sigma[:, :, :, spin]):
+        suffix = ["up", "dw"][spin]
+        for diag, mat in zip(sigma_diag[:, spin, :].T, sigma):
             mat.flat[:: (L + 1)] = diag
-        np.save(outputfile, sigma)
+        np.save(f"{output_folder}/sigma_dmft_{suffix}.npy", sigma)
 
     for spin in range(nspin):
         save(spin)
@@ -45,16 +46,16 @@ def plot(gf, sigma_func, semilogy=True, reference_gf=None, label_ref="DFT"):
         ax1.plot(w, dos[0], label=r"spin $\uparrow$")
         ax1.plot(w, dos[1], label=r"spin $\downarrow$")
 
-    if reference_gf is not None:
-        reference_dos = -1 / np.pi * reference_gf(z_ret).sum(axis=(0, 1)).imag
-        ax1.plot(
-            w, reference_dos, linestyle="--", label=label_ref
-        ) if reference_dos.ndim == 1 else ax1.plot(
-            w,
-            reference_dos[0],
-            linestyle="--",
-            label=label_ref,
-        )
+    # if reference_gf is not None:
+    #     reference_dos = -1 / np.pi * reference_gf(z_ret).sum(axis=(0, 1)).imag
+    #     ax1.plot(
+    #         w, reference_dos, linestyle="--", label=label_ref
+    #     ) if reference_dos.ndim == 1 else ax1.plot(
+    #         w,
+    #         reference_dos[0],
+    #         linestyle="--",
+    #         label=label_ref,
+    #     )
 
     ax1.set_ylabel("DOS [a.u.]")
     ax1.legend(loc="upper right")
@@ -149,6 +150,7 @@ def callback(*args, **kwargs):
 nbaths = 4
 # U = 4
 tol = 1e-4
+tol = 70
 max_iter = 1000
 alpha = 0.0
 de = 0.01
@@ -215,7 +217,8 @@ gfimp = nanoGfimp(gfimp)
 
 nspin = 2
 
-Sigma = lambda z: np.zeros((nimp, nspin, z.size), complex)
+# Sigma = lambda z: np.zeros((nimp, nspin, z.size), complex)
+Sigma = lambda z: np.zeros((nimp, z.size), complex)
 
 gfloc_no_dccorrection = Gfloc(
     H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
@@ -244,7 +247,12 @@ dmft = DMFT(
     DC=double_counting,
 )
 
-delta = dmft.initialize(V.diagonal().mean(), Sigma, mu=mu)
+field = 0.5
+signs = np.zeros(nimp, int)
+signs[: nimp // 2] = 1
+signs[nimp // 2 :] = -1
+# delta = dmft.initialize(V.diagonal().mean(), Sigma, mu=mu)
+delta = dmft.initialize_magnetic(V.diagonal().mean(), Sigma, signs, field, mu=mu)
 delta_prev = delta.copy()
 dmft.delta = delta
 
@@ -254,8 +262,7 @@ except:
     pass
 
 
-dmft_sigma_file = f"{output_folder}/dmft_sigma.npy"
-save_sigma(_Sigma(z_ret), dmft_sigma_file, nspin)
+save_sigma(_Sigma(z_ret), output_folder, nspin)
 
 gfloc_data = gfloc_with_dccorrection(z_ret)
 np.save(f"{output_folder}/dmft_gfloc.npy", gfloc_data)
