@@ -150,7 +150,6 @@ def callback(*args, **kwargs):
 nbaths = 4
 # U = 4
 tol = 1e-4
-tol = 70
 max_iter = 1000
 alpha = 0.0
 de = 0.01
@@ -260,7 +259,6 @@ try:
     dmft.solve(dmft.delta, alpha=1.0, callback=callback)
 except:
     pass
-
 
 save_sigma(_Sigma(z_ret), output_folder, nspin)
 
