@@ -1,0 +1,24 @@
+#!/bin/bash -l
+#SBATCH --job-name=gpaw-example
+#SBATCH --time=0:20:00
+#SBATCH --partition=debug
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=1
+#SBATCH --constraint=gpu
+#SBATCH --hint=nomultithread
+#SBATCH --no-requeue
+#SBATCH --account=s1276
+#SBATCH --uenv=gpaw/25.1:1639708786
+#SBATCH --view=gpaw
+
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
+ulimit -s unlimited
+
+# MINICONDA_PATH=/users/ajayaraj/miniconda3
+
+# source $MINICONDA_PATH/etc/profile.d/conda.sh
+# conda activate qtpyt
+
+# srun -n 1 gpaw python leads.py
+python leads.py

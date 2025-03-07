@@ -36,4 +36,3 @@ if rank == 0:
     np.save("hs_pl_k.npy", (H_kMM, S_kMM))
     # with open('hs_pl_k.pkl', 'wb') as file:
     #     pickle.dump((H_kMM, S_kMM), file)
-print("Done")

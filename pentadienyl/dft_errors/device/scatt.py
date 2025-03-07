@@ -27,4 +27,3 @@ calc.write("scatt.gpw", mode="all")
 
 fermi = calc.get_fermi_level()
 print(repr(fermi), file=open("fermi.txt", "w"))
-print("Done")

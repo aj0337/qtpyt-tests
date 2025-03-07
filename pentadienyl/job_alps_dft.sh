@@ -25,4 +25,4 @@ conda activate qtpyt
 
 # mpirun -N 1 -n 1 python get_los_prerequisites.py
 # mpirun -N 1 -n 1 python get_gf_prerequisites.py
-# mpirun -n 24 python get_dft_transmission.py
+mpirun -n 24 python get_dft_transmission.py
