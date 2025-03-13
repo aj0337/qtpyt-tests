@@ -36,7 +36,7 @@ def run(outputfile):
 
 
 data_folder = "./output/lowdin"
-dmft_data_folder = "./output/lowdin/dmft/spin"
+dmft_data_folder = "./output/lowdin/beta_1000.0/dmft/spin"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 

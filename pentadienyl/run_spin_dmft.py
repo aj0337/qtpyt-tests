@@ -200,7 +200,7 @@ def callback(*args, **kwargs):
 nbaths = 4
 
 tol = 1e-4
-max_iter = 5
+max_iter = 1000
 alpha = 0.0
 de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
@@ -212,10 +212,11 @@ adjust_mu = True
 use_double_counting = True
 
 data_folder = "output/lowdin"
-output_folder = f"{data_folder}/dmft/spin"
+temperature_data_folder = f"{data_folder}/beta_{beta}"
+output_folder = f"{temperature_data_folder}/dmft/spin"
 figure_folder = f"{output_folder}/figures"
 
-occupancy_goal = np.load(f"{data_folder}/occupancies.npy")
+occupancy_goal = np.load(f"{temperature_data_folder}/occupancies.npy")
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
 z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 
@@ -229,7 +230,7 @@ os.makedirs(output_folder, exist_ok=True)
 os.makedirs(figure_folder, exist_ok=True)
 
 len_active = occupancy_goal.size
-hyb_mats = np.fromfile(f"{data_folder}/matsubara_hybridization.bin", complex).reshape(
+hyb_mats = np.fromfile(f"{temperature_data_folder}/matsubara_hybridization.bin", complex).reshape(
     z_mats.size,
     len_active,
     len_active,
@@ -266,7 +267,6 @@ gfimp = nanoGfimp(gfimp)
 
 nspin = 2
 
-
 Sigma = lambda z: np.zeros((nimp, z.size), complex)
 
 gfloc0 = Gfloc(
@@ -297,9 +297,8 @@ dmft = DMFT(
 
 field = 0.5
 signs = np.zeros(nimp, int)
-signs[::2] = 1
+signs[::2] = 1  # antiferromagnetic ordering between the impurities
 signs[1::2] = -1
-
 delta = dmft.initialize_magnetic(V.diagonal().mean(), Sigma, signs, field, mu=mu)
 delta_prev = delta.copy()
 dmft.delta = delta

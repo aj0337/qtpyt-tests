@@ -15,7 +15,7 @@ os.makedirs(data_folder, exist_ok=True)
 
 # Parameters
 mu = 0.0
-beta = 38.68
+beta = 1000.0
 
 len_active = H_active.shape[0]
 hyb_mats = np.fromfile(f"{data_folder}/matsubara_hybridization.bin", complex).reshape(

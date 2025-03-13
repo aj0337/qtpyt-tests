@@ -3,7 +3,7 @@
 #SBATCH --time=0:20:00
 #SBATCH --partition=debug
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
+#SBATCH --ntasks-per-node=48
 #SBATCH --cpus-per-task=1
 #SBATCH --constraint=gpu
 #SBATCH --hint=nomultithread
@@ -13,12 +13,13 @@
 #SBATCH --view=gpaw
 
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
-ulimit -s unlimited
+export MPICH_GPU_SUPPORT_ENABLED=0
+export GPAW_SETUP_PATH=${HOME}/gpaw-setups-24.11.0
 
 # MINICONDA_PATH=/users/ajayaraj/miniconda3
 
 # source $MINICONDA_PATH/etc/profile.d/conda.sh
 # conda activate qtpyt
 
-# srun -n 1 gpaw python leads.py
-python leads.py
+srun gpaw python leads.py
+# python leads.py
