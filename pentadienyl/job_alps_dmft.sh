@@ -24,7 +24,7 @@ source $MINICONDA_PATH/etc/profile.d/conda.sh
 conda activate qtpyt
 
 # mpirun -n 1 python get_dft_states.py
-# mpirun -n 24 python get_active_embedding_hybridization.py
+mpirun -n 24 python get_active_embedding_hybridization.py
 # mpirun -n 1 python get_dft_occupancies.py
 
 # mpirun -n 1 python run_no_spin_dmft.py

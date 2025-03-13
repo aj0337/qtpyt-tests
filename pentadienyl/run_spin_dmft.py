@@ -230,7 +230,9 @@ os.makedirs(output_folder, exist_ok=True)
 os.makedirs(figure_folder, exist_ok=True)
 
 len_active = occupancy_goal.size
-hyb_mats = np.fromfile(f"{temperature_data_folder}/matsubara_hybridization.bin", complex).reshape(
+hyb_mats = np.fromfile(
+    f"{temperature_data_folder}/matsubara_hybridization.bin", complex
+).reshape(
     z_mats.size,
     len_active,
     len_active,
@@ -295,7 +297,7 @@ dmft = DMFT(
     DC=double_counting,
 )
 
-field = 0.5
+field = 5
 signs = np.zeros(nimp, int)
 signs[::2] = 1  # antiferromagnetic ordering between the impurities
 signs[1::2] = -1
