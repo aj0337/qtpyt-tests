@@ -25,7 +25,6 @@ def run(outputfile):
 
 
 data_folder = "./output/lowdin"
-index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 
 de = 0.01
