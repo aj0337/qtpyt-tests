@@ -206,7 +206,7 @@ de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
 eta = 1e-3
 z_ret = energies + 1.0j * eta
-beta = 1000.0
+beta = 38.68
 mu = 0.0
 adjust_mu = True
 use_double_counting = True
@@ -298,7 +298,7 @@ dmft = DMFT(
 )
 
 field = 0.5
-signs = -1 * np.ones(len(nimp))
+signs = -1 * np.ones(nimp)
 signs[[0, 1, 4, 7, 8, 5]] = 1  # antiferromagnetic ordering between the impurities
 delta = dmft.initialize_magnetic(V.diagonal().mean(), Sigma, signs, field, mu=mu)
 delta_prev = delta.copy()

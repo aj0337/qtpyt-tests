@@ -206,116 +206,116 @@ de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
 eta = 1e-3
 z_ret = energies + 1.0j * eta
-beta = 1000.0
+betas = [2000.0,2500.0]
 mu = 0.0
 adjust_mu = True
 use_double_counting = True
 
 data_folder = "output/lowdin"
-temperature_data_folder = f"{data_folder}/beta_{beta}"
-output_folder = f"{temperature_data_folder}/dmft/spin"
-figure_folder = f"{output_folder}/figures"
 
-occupancy_goal = np.load(f"{temperature_data_folder}/occupancies.npy")
-H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
-z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
+for beta in betas:
+    temperature_data_folder = f"{data_folder}/beta_{beta}"
+    output_folder = f"{temperature_data_folder}/dmft/spin"
+    figure_folder = f"{output_folder}/figures"
 
-with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
-    hs_list_ii = pickle.load(f)
+    occupancy_goal = np.load(f"{temperature_data_folder}/occupancies.npy")
+    H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
+    z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 
-with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
-    hs_list_ij = pickle.load(f)
+    with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
+        hs_list_ii = pickle.load(f)
 
-os.makedirs(output_folder, exist_ok=True)
-os.makedirs(figure_folder, exist_ok=True)
+    with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
+        hs_list_ij = pickle.load(f)
 
-len_active = occupancy_goal.size
-hyb_mats = np.fromfile(
-    f"{temperature_data_folder}/matsubara_hybridization.bin", complex
-).reshape(
-    z_mats.size,
-    len_active,
-    len_active,
-)
-_HybMats = interp1d(z_mats.imag, hyb_mats, axis=0, bounds_error=False, fill_value=0.0)
-HybMats = lambda z: _HybMats(z.imag)
+    os.makedirs(output_folder, exist_ok=True)
+    os.makedirs(figure_folder, exist_ok=True)
 
-S_active = np.eye(len_active)
-idx_neq = np.arange(len_active)
-idx_inv = np.arange(len_active)
+    len_active = occupancy_goal.size
+    hyb_mats = np.fromfile(
+        f"{temperature_data_folder}/matsubara_hybridization.bin", complex
+    ).reshape(
+        z_mats.size,
+        len_active,
+        len_active,
+    )
+    _HybMats = interp1d(
+        z_mats.imag, hyb_mats, axis=0, bounds_error=False, fill_value=0.0
+    )
+    HybMats = lambda z: _HybMats(z.imag)
 
+    S_active = np.eye(len_active)
+    idx_neq = np.arange(len_active)
+    idx_inv = np.arange(len_active)
 
-V = np.loadtxt(f"{data_folder}/U_matrix.txt")
+    V = np.loadtxt(f"{data_folder}/U_matrix.txt")
 
-
-double_counting = (
-    np.diag(V.diagonal() * (occupancy_goal - 0.5))
-    if use_double_counting
-    else np.zeros((len_active, len_active))
-)
-gfloc = Gfloc(
-    H_active - double_counting,
-    S_active,
-    HybMats,
-    idx_neq,
-    idx_inv,
-    nmats=z_mats.size,
-    beta=beta,
-)
-
-nimp = gfloc.idx_neq.size
-gfimp = [SpinGfimp(nbaths, z_mats.size, V[i, i], beta) for i in range(nimp)]
-gfimp = nanoGfimp(gfimp)
-
-nspin = 2
-
-Sigma = lambda z: np.zeros((nimp, z.size), complex)
-
-gfloc0 = Gfloc(
-    H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
-)
-gfloc0.update(mu=mu)
-gfloc0.set_local(Sigma)
-
-
-def _Sigma(z):
-    return (
-        -double_counting.diagonal()[:, None, None]
-        - gfloc.mu
-        + gfloc.Sigma(z)[idx_inv, :]
+    double_counting = (
+        np.diag(V.diagonal() * (occupancy_goal - 0.5))
+        if use_double_counting
+        else np.zeros((len_active, len_active))
+    )
+    gfloc = Gfloc(
+        H_active - double_counting,
+        S_active,
+        HybMats,
+        idx_neq,
+        idx_inv,
+        nmats=z_mats.size,
+        beta=beta,
     )
 
+    nimp = gfloc.idx_neq.size
+    gfimp = [SpinGfimp(nbaths, z_mats.size, V[i, i], beta) for i in range(nimp)]
+    gfimp = nanoGfimp(gfimp)
 
-dmft = DMFT(
-    gfimp,
-    gfloc,
-    occupancy_goal,
-    max_iter=max_iter,
-    tol=tol,
-    adjust_mu=adjust_mu,
-    alpha=alpha,
-    DC=double_counting,
-)
+    nspin = 2
 
-field = 5
-signs = np.zeros(nimp, int)
-signs[::2] = 1  # antiferromagnetic ordering between the impurities
-signs[1::2] = -1
-delta = dmft.initialize_magnetic(V.diagonal().mean(), Sigma, signs, field, mu=mu)
-delta_prev = delta.copy()
-dmft.delta = delta
+    Sigma = lambda z: np.zeros((nimp, z.size), complex)
 
-try:
-    dmft.solve(dmft.delta, alpha=1.0, callback=callback)
-except:
-    pass
+    gfloc0 = Gfloc(
+        H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
+    )
+    gfloc0.update(mu=mu)
+    gfloc0.set_local(Sigma)
 
-save_sigma(_Sigma(z_ret), output_folder, nspin)
+    def _Sigma(z):
+        return (
+            -double_counting.diagonal()[:, None, None]
+            - gfloc.mu
+            + gfloc.Sigma(z)[idx_inv, :]
+        )
 
-gfloc_data = gfloc(z_ret)
-np.save(f"{output_folder}/dmft_gfloc.npy", gfloc_data)
+    dmft = DMFT(
+        gfimp,
+        gfloc,
+        occupancy_goal,
+        max_iter=max_iter,
+        tol=tol,
+        adjust_mu=adjust_mu,
+        alpha=alpha,
+        DC=double_counting,
+    )
 
-np.save(f"{output_folder}/opt_delta_dmft", delta_prev)
-np.save(f"{output_folder}/opt_mu_dmft", gfloc.mu)
+    field = 0.5
+    signs = np.zeros(nimp, int)
+    signs[::2] = 1  # antiferromagnetic ordering between the impurities
+    signs[1::2] = -1
+    delta = dmft.initialize_magnetic(V.diagonal().mean(), Sigma, signs, field, mu=mu)
+    delta_prev = delta.copy()
+    dmft.delta = delta
 
-print("Spin resolved DMFT calculation finished.", flush=True)
+    try:
+        dmft.solve(dmft.delta, alpha=1.0, callback=callback)
+    except:
+        pass
+
+    save_sigma(_Sigma(z_ret), output_folder, nspin)
+
+    gfloc_data = gfloc(z_ret)
+    np.save(f"{output_folder}/dmft_gfloc.npy", gfloc_data)
+
+    np.save(f"{output_folder}/opt_delta_dmft", delta_prev)
+    np.save(f"{output_folder}/opt_mu_dmft", gfloc.mu)
+
+    print("Spin resolved DMFT calculation finished.", flush=True)

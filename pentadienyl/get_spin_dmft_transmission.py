@@ -23,6 +23,7 @@ class DataSelfEnergy(BaseDataSelfEnergy):
 def load(filename):
     return DataSelfEnergy(energies, np.load(filename))
 
+
 def run(outputfile):
     gd = GridDesc(energies, 1, float)
     T = np.empty(gd.energies.size)
@@ -35,47 +36,48 @@ def run(outputfile):
         np.save(outputfile, (energies, T.real))
 
 
-data_folder = "./output/lowdin"
-dmft_data_folder = "./output/lowdin/beta_1000.0/dmft/spin"
-index_active_region = np.load(f"{data_folder}/index_active_region.npy")
-self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
-
 de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
 eta = 1e-3
-z_ret = energies + 1.0j * eta
+betas = [2000.0,2500.0]
 
-with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
-    hs_list_ii = pickle.load(f)
-with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
-    hs_list_ij = pickle.load(f)
+data_folder = "./output/lowdin"
+index_active_region = np.load(f"{data_folder}/index_active_region.npy")
+self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 
-nodes = [0, 810, 1116, 1252, 1558, 2368]
+for beta in betas:
+    dmft_data_folder = f"./output/lowdin/beta_{beta}/dmft/spin"
+    with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
+        hs_list_ii = pickle.load(f)
+    with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
+        hs_list_ij = pickle.load(f)
 
-gf = greenfunction.GreenFunction(
-    hs_list_ii,
-    hs_list_ij,
-    [(0, self_energy[0]), (len(hs_list_ii) - 1, self_energy[1])],
-    solver="dyson",
-    eta=eta,
-)
+    nodes = [0, 810, 1116, 1252, 1558, 2368]
 
-imb = 2
-S_molecule = hs_list_ii[imb][1]
-S_molecule_identity = np.eye(S_molecule.shape[0])
-idx_molecule = index_active_region - nodes[imb]
+    gf = greenfunction.GreenFunction(
+        hs_list_ii,
+        hs_list_ij,
+        [(0, self_energy[0]), (len(hs_list_ii) - 1, self_energy[1])],
+        solver="dyson",
+        eta=eta,
+    )
 
-for spin, spin_label in enumerate(["up", "dw"]):
-    dmft_sigma_file = f"{dmft_data_folder}/sigma_dmft_{spin_label}.npy"
-    if comm.rank == 0:
-        dmft_sigma = load(dmft_sigma_file)
-    else:
-        dmft_sigma = [None]
+    imb = 2
+    S_molecule = hs_list_ii[imb][1]
+    S_molecule_identity = np.eye(S_molecule.shape[0])
+    idx_molecule = index_active_region - nodes[imb]
 
-    dmft_sigma = comm.bcast(dmft_sigma, root=0)
-    self_energy[2] = dmft_sigma
-    gf.selfenergies.append((imb, self_energy[2]))
+    for spin, spin_label in enumerate(["up", "dw"]):
+        dmft_sigma_file = f"{dmft_data_folder}/sigma_dmft_{spin_label}.npy"
+        if comm.rank == 0:
+            dmft_sigma = load(dmft_sigma_file)
+        else:
+            dmft_sigma = [None]
 
-    outputfile = f"{dmft_data_folder}/dmft_transmission_{spin_label}.npy"
-    run(outputfile)
-    gf.selfenergies.pop()
+        dmft_sigma = comm.bcast(dmft_sigma, root=0)
+        self_energy[2] = dmft_sigma
+        gf.selfenergies.append((imb, self_energy[2]))
+
+        outputfile = f"{dmft_data_folder}/dmft_transmission_{spin_label}.npy"
+        run(outputfile)
+        gf.selfenergies.pop()
