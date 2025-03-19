@@ -39,7 +39,7 @@ def run(outputfile):
 de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
 eta = 1e-3
-betas = [2000.0,2500.0]
+betas = [1500]
 
 data_folder = "./output/lowdin"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")

@@ -21,7 +21,7 @@ class DataSelfEnergy(BaseDataSelfEnergy):
     """Wrapper"""
 
     def retarded(self, energy):
-        return expand(S_molecule_identity, super().retarded(energy), idx_molecule)
+        return expand(S_identity, super().retarded(energy), idx_molecule)
 
 
 def load(filename):
@@ -32,7 +32,7 @@ def run(outputfile):
     gd = GridDesc(energies, 1, float)
     T = np.empty(gd.energies.size)
     for e, energy in enumerate(gd.energies):
-        T[e] = gf.get_transmission(energy, ferretti=False)
+        T[e] = gf.get_transmission(energy, ferretti=True)
 
     T = gd.gather_energies(T)
 
@@ -56,9 +56,6 @@ H_subdiagonalized, S_subdiagonalized = map(
     lambda m: m.astype(complex), np.load(cc_path / "hs_cc_k.npy")
 )
 
-with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
-    hs_list_ii = pickle.load(f)
-
 basis_dict = {"Au": 9, "H": 5, "C": 13, "N": 13}
 
 leads_atom = read(pl_path / "leads.xyz")
@@ -70,6 +67,8 @@ device_basis = Basis.from_dictionary(device_atoms, basis_dict)
 de = 0.01
 energies = np.arange(-3.0, 3.0 + de / 2.0, de).round(7)
 eta = 1e-3
+
+# self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 
 Nr = (1, 5, 3)
 unit_cell_rep_in_leads = (5, 5, 3)
@@ -108,8 +107,6 @@ gf = GreenFunction(
     eta=eta,
 )
 
-nodes = [0, 810, 1116, 1252, 1558, 2368]
-
 # Add the DMFT self-energy for transmission
 if comm.rank == 0:
     dmft_sigma = load(dmft_sigma_file)
@@ -117,18 +114,23 @@ else:
     dmft_sigma = None
 
 # Transmission function calculation
-imb = 2  # index of molecule block from the nodes list
-S_molecule = hs_list_ii[imb][1]  # overlap of molecule
-S_molecule_identity = np.eye(S_molecule.shape[0])
-idx_molecule = (
-    index_active_region - nodes[imb]
-)  # indices of active region w.r.t molecule
+S_identity = np.eye(len(H_subdiagonalized[0]))
+idx_molecule = index_active_region
 
 dmft_sigma = comm.bcast(dmft_sigma, root=0)
+
+# # Create an expanded self-energy matrix of size H_subdiagonalized
+# expanded_dmft_sigma = np.zeros_like(H_subdiagonalized, dtype=complex)
+
+# # Place dmft_sigma into the active region
+# expanded_dmft_sigma[np.ix_(idx_molecule, idx_molecule)] = dmft_sigma
+
+# self_energy[2] = expanded_dmft_sigma
 self_energy[2] = dmft_sigma
-# expand_coupling(self_energy[2], len(H_subdiagonalized[0]))
+
+
 gf.selfenergies.append((slice(None), self_energy[2]))
 
-outputfile = f"{output_folder}/dmft_transmission_non_btm_no_correction.npy"
+outputfile = f"{output_folder}/dmft_transmission_non_btm_ferretti_correction.npy"
 run(outputfile)
 gf.selfenergies.pop()
