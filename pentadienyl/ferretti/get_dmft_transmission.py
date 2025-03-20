@@ -53,7 +53,8 @@ dmft_sigma_file = f"{dmft_data_folder}/dmft_sigma.npy"
 
 H_leads_lcao, S_leads_lcao = np.load(pl_path / "hs_pl_k.npy")
 H_subdiagonalized, S_subdiagonalized = map(
-    lambda m: m.astype(complex), np.load(cc_path / "hs_cc_k.npy")
+    lambda m: m.astype(complex),
+    np.load("../output/lowdin/hs_los_lowdin.npy"),
 )
 
 basis_dict = {"Au": 9, "H": 5, "C": 13, "N": 13}
