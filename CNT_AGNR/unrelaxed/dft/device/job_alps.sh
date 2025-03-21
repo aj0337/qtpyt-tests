@@ -1,9 +1,9 @@
 #!/bin/bash -l
 #SBATCH --job-name=gpaw-example
-#SBATCH --time=4:00:00
+#SBATCH --time=08:20:00
 #SBATCH --partition=normal
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
+#SBATCH --ntasks-per-node=96
 #SBATCH --cpus-per-task=1
 #SBATCH --constraint=gpu
 #SBATCH --hint=nomultithread
@@ -15,12 +15,13 @@
 # #SBATCH --error=_scheduler-stderr.txt
 
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
-ulimit -s unlimited
+export MPICH_GPU_SUPPORT_ENABLED=0
+export GPAW_SETUP_PATH=${HOME}/gpaw-setups-24.11.0
 
-MINICONDA_PATH=/users/ajayaraj/miniconda3
+# MINICONDA_PATH=/users/ajayaraj/miniconda3
 
-source $MINICONDA_PATH/etc/profile.d/conda.sh
-conda activate qtpyt
+# source $MINICONDA_PATH/etc/profile.d/conda.sh
+# conda activate qtpyt
 
-# mpirun -n 48 gpaw python scatt.py
-mpirun -n 1 gpaw python dump.py
+srun gpaw python scatt.py
+srun gpaw python dump.py

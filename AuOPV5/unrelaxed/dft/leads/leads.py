@@ -1,26 +1,26 @@
 import os
+
 import numpy as np
 from ase.io import read
 from gpaw import *
 from gpaw.lcao.tools import get_lcao_hamiltonian
 from gpaw.mpi import rank
 
-
 input_folder = "../../../structures/unrelaxed"
 output_folder = "./output"
 os.makedirs(output_folder, exist_ok=True)
 
 atoms = read(f"{input_folder}/leads.xyz")
-basis = {"H": "dzp", "C": "dzp"}
+basis = {"Au": "dzp"}
 
-temperature = 9
+temperature = 4.2
 kbt = temperature * 8.617343e-5
 calc = GPAW(
     h=0.2,
     xc="PBE",
     basis=basis,
     occupations=FermiDirac(width=kbt),
-    kpts={"size": (11, 1, 1), "gamma": True},
+    kpts={"size": (5, 3, 1), "gamma": True},
     mode="lcao",
     txt=f"{output_folder}/leads.txt",
     mixer=Mixer(0.02, 5, weight=100.0),
