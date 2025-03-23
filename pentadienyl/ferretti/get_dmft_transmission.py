@@ -120,18 +120,11 @@ idx_molecule = index_active_region
 
 dmft_sigma = comm.bcast(dmft_sigma, root=0)
 
-# # Create an expanded self-energy matrix of size H_subdiagonalized
-# expanded_dmft_sigma = np.zeros_like(H_subdiagonalized, dtype=complex)
-
-# # Place dmft_sigma into the active region
-# expanded_dmft_sigma[np.ix_(idx_molecule, idx_molecule)] = dmft_sigma
-
-# self_energy[2] = expanded_dmft_sigma
 self_energy[2] = dmft_sigma
 
 
 gf.selfenergies.append((slice(None), self_energy[2]))
 
-outputfile = f"{output_folder}/dmft_transmission_non_btm_ferretti_correction.npy"
+outputfile = f"{output_folder}/dmft_transmission_non_btm_no_correction.npy"
 run(outputfile)
 gf.selfenergies.pop()
