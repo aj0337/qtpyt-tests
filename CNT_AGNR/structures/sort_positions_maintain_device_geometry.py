@@ -34,16 +34,17 @@ x_positions = [atom[1] for atom in atoms]
 x_min, x_max = min(x_positions), max(x_positions)
 
 # Define thresholds based on geometry
-left_threshold = x_min + (x_max - x_min) * 0.25
-right_threshold = x_max - (x_max - x_min) * 0.25
+x_left_threshold = x_min + (x_max - x_min) * 0.25
+x_right_threshold = x_max - (x_max - x_min) * 0.25
+z_threshold = 30 # Threshold for separating layers in the device in Angstrom
 
 
 # Define sorting keys based on position in the device
 def sorting_key(atom):
     element, x, y, z = atom
-    if x < left_threshold:  # Left lead
+    if x < x_left_threshold and z < z_threshold:  # Left lead
         block = 0
-    elif x > right_threshold:  # Right lead
+    elif x > x_right_threshold and z < z_threshold:  # Right lead
         block = 2
     else:  # Bridge (molecule)
         block = 1
