@@ -25,8 +25,8 @@ data_folder = f"./output/lowdin" if lowdin else f"./output/no_lowdin"
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 
-GPWDEVICEDIR = f"./dft/device/"
-GPWLEADSDIR = "./dft/leads/"
+GPWDEVICEDIR = f"../dft/device/"
+GPWLEADSDIR = "../dft/leads/"
 SUBDIAG_SPECIES = ("C", "O")
 # Define the active region within the subdiagonalized species
 active = {"C": [0, 1, 2, 3], "O": [0, 1, 2, 3]}

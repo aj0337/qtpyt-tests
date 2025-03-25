@@ -10,8 +10,8 @@ from qtpyt.parallel.egrid import GridDesc
 from qtpyt.surface.tools import prepare_leads_matrices
 from qtpyt.tools import expand_coupling, remove_pbc
 
-pl_path = Path("./dft/leads/")
-cc_path = Path("./dft/device/")
+pl_path = Path("../dft/leads/")
+cc_path = Path("../dft/device/")
 
 output_folder = "./output/no_lowdin"
 h_pl_k, s_pl_k = np.load(pl_path / "hs_pl_k.npy")
@@ -39,6 +39,9 @@ se = [None, None]
 se[0] = LeadSelfEnergy((h_pl_ii, s_pl_ii), (h_pl_ij, s_pl_ij))  # left lead
 se[1] = LeadSelfEnergy((h_pl_ii, s_pl_ii), (h_pl_ij, s_pl_ij), id="right")  # right lead
 
+print(se[0].retarded(0).shape)
+print(se[1].retarded(0).shape)
+exit()
 # expand to dimension of scattering
 expand_coupling(se[0], len(h_cc_k[0]))
 expand_coupling(se[1], len(h_cc_k[0]), id="right")

@@ -24,19 +24,25 @@ def run(outputfile):
         np.save(outputfile, (energies, T.real))
 
 
-data_folder = "./output/lowdin"
+data_folder = "./output/no_lowdin"
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 
-de = 0.1
-energies = np.arange(-1, 1 + de, de)
-eta = 1e-3
+de = 0.01
+energies = np.arange(-3.0, 3.0 + de / 2.0, de)
+eta = 1e-5
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
 with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
     hs_list_ij = pickle.load(f)
 
-nodes = [0, 810, 1116, 1252, 1558, 2368]
+print(self_energy[0].retarded(0).shape)
+exit()
+# print(f"hs_list_ii shape: {np.array(hs_list_ii).shape}")
+# print(f"hs_list_ij shape: {np.array(hs_list_ij).shape}")
+
+print(f"hs_list_ii shapes: {[np.shape(x) for x in hs_list_ii]}")
+print(f"hs_list_ij shapes: {[np.shape(x) for x in hs_list_ij]}")
 
 # Initialize the Green's function solver with the tridiagonalized matrices and self-energies
 gf = greenfunction.GreenFunction(

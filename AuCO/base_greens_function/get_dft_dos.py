@@ -16,7 +16,6 @@ cc_path = Path("../dft/device/")
 output_folder = "../output/no_lowdin"
 h_pl_k, s_pl_k = np.load(pl_path / "hs_pl_k.npy")
 h_cc_k, s_cc_k = map(lambda m: m.astype(complex), np.load(cc_path / f"hs_cc_k.npy"))
-
 # No. basis functions per atom kind
 basis = {"Au": 6, "C": 4, "O": 4}
 
@@ -57,16 +56,10 @@ gf = GreenFunction(
 
 gd = GridDesc(energies, 1)
 dos = np.empty(gd.energies.size)
-pdos = np.empty(gd.energies.size)
 
 for e, energy in enumerate(gd.energies):
     dos[e] = gf.get_dos(energy)
-    print(gf.get_pdos(energy).shape)
-    exit()
-    # pdos[e] = gf.get_pdos(energy)
 
-# dos = gd.gather_energies(dos)
-# pdos = gd.gather_energies(pdos)
-# if comm.rank == 0:
-#     np.save(f"{output_folder}/Edos.npy", (energies, dos))
-#     np.save(f"{output_folder}/Epdos.npy", (energies, pdos))
+dos = gd.gather_energies(dos)
+if comm.rank == 0:
+    np.save(f"{output_folder}/Edos.npy", (energies, dos))

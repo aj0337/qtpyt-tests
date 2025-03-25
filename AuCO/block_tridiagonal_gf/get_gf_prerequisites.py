@@ -12,7 +12,7 @@ from qtpyt.surface.principallayer import PrincipalSelfEnergy
 from qtpyt.surface.tools import prepare_leads_matrices
 from qtpyt.tools import remove_pbc, rotate_couplings
 
-lowdin = True
+lowdin = False
 data_folder = f"./output/lowdin" if lowdin else f"./output/no_lowdin"
 
 if lowdin:
@@ -25,8 +25,8 @@ else:
 H_subdiagonalized = H_subdiagonalized.astype(np.complex128)
 S_subdiagonalized = S_subdiagonalized.astype(np.complex128)
 
-GPWDEVICEDIR = f"./dft/device"
-GPWLEADSDIR = "./dft/leads/"
+GPWDEVICEDIR = f"../dft/device"
+GPWLEADSDIR = "../dft/leads/"
 
 cc_path = Path(GPWDEVICEDIR)
 pl_path = Path(GPWLEADSDIR)
@@ -41,12 +41,12 @@ leads_basis = Basis.from_dictionary(leads_atoms, basis_dict)
 device_atoms = read(cc_path / "scatt.xyz")
 device_basis = Basis.from_dictionary(device_atoms, basis_dict)
 
-nodes = [0, 810, 1116, 1252, 1558, 2368]
+nodes = np.load(f"{data_folder}/nodes.npy")
 
 # Define energy range and broadening factor for the Green's function calculation
-de = 0.1
-energies = np.arange(-1, 1 + de, de)
-eta = 1e-3
+de = 0.01
+energies = np.arange(-3.0, 3.0 + de / 2.0, de)
+eta = 1e-5
 
 # Define the number of repetitions (Nr) and unit cell repetition in the leads
 Nr = (1, 1, 1)
@@ -72,6 +72,9 @@ self_energy[0] = PrincipalSelfEnergy(
 self_energy[1] = PrincipalSelfEnergy(
     kpts_t, (h_leads_kii, s_leads_kii), (h_leads_kij, s_leads_kij), Nr=Nr, id="right"
 )
+
+print(f"self_energy[0].retarded(0).shape: {self_energy[0].retarded(0).shape}")
+exit()
 
 # Rotate the couplings for the leads based on the specified basis and repetition Nr
 rotate_couplings(leads_basis, self_energy[0], Nr)
