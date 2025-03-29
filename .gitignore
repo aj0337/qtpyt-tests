@@ -12,6 +12,7 @@ core*
 *.pckl
 .vscode/
 !*/published_reference/**
+!*/reference/**
 */published_reference/Angelo_ase
 output/
 **/job_scripts/
