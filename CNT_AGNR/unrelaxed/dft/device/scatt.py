@@ -7,14 +7,15 @@ from ase.io import read
 from gpaw import *
 
 input_folder = "../../../structures/unrelaxed"
-output_folder = "./output"
+output_folder = "./"
 os.makedirs(output_folder, exist_ok=True)
 
 atoms = read(f"{input_folder}/scatt.xyz")
 basis = {"H": "dzp", "C": "dzp"}
 
-temperature = 9
-kbt = temperature * 8.617343e-5
+# temperature = 9
+# kbt = temperature * 8.617343e-5
+kbt = 0.01
 calc = GPAW(
     h=0.2,
     xc="PBE",

@@ -4,7 +4,7 @@ from gpaw import *
 from gpaw.lcao.tools import get_lcao_hamiltonian
 from gpaw.mpi import rank
 
-output_folder = "./output"
+output_folder = "./"
 
 atoms = read(f"{output_folder}/scatt.xyz")
 

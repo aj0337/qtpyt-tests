@@ -1,6 +1,6 @@
 #!/bin/bash -l
 #SBATCH --job-name=gpaw-example
-#SBATCH --time=08:20:00
+#SBATCH --time=04:00:00
 #SBATCH --partition=normal
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=96

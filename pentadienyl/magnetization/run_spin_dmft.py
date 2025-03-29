@@ -171,7 +171,6 @@ def callback(*args, **kwargs):
     fig1 = plot_dos_and_sigma(
         gf=gfloc,
         sigma_func=_Sigma,
-        reference_gf=gfloc0,
         label_ref="DFT",
         semilogy=kwargs.get("semilogy", False),
     )
@@ -206,37 +205,44 @@ de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
 eta = 1e-3
 z_ret = energies + 1.0j * eta
-# betas = list(range(1000, 99, -50))
-betas = list(range(950, 99, -50))
+# betas = list(np.arange(50, 175, 25)) + list(np.arange(200, 1550, 50)) # [30, 40]
+betas = [1000]
+field = 5e-3
+
 mu = 0.0
-adjust_mu = True
+adjust_mu = False
 use_double_counting = True
 
 data_folder = "../output/lowdin"
 
 staggered_spin_data = []
 consecutive_low_spin_count = 0
+H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
+with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
+    hs_list_ii = pickle.load(f)
+
+with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
+    hs_list_ij = pickle.load(f)
+
+len_active = H_active.shape[0]
+S_active = np.eye(len_active)
+idx_neq = np.arange(len_active)
+idx_inv = np.arange(len_active)
+
+V = np.loadtxt(f"{data_folder}/U_matrix.txt")
 
 for beta in betas:
     print(f"Starting spin resolved DMFT calculation for beta = {beta}", flush=True)
     temperature_data_folder = f"{data_folder}/beta_{beta}"
-    output_folder = f"{temperature_data_folder}/dmft/spin"
+    output_folder = f"{temperature_data_folder}/dmft/spin/field_{field}/adjust_mu_{adjust_mu}"
     figure_folder = f"{output_folder}/figures"
 
     occupancy_goal = np.load(f"{temperature_data_folder}/occupancies.npy")
-    H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
-    z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
-
-    with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
-        hs_list_ii = pickle.load(f)
-
-    with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
-        hs_list_ij = pickle.load(f)
+    z_mats = np.load(f"{temperature_data_folder}/matsubara_energies.npy")
 
     os.makedirs(output_folder, exist_ok=True)
     os.makedirs(figure_folder, exist_ok=True)
 
-    len_active = occupancy_goal.size
     hyb_mats = np.fromfile(
         f"{temperature_data_folder}/matsubara_hybridization.bin", complex
     ).reshape(
@@ -249,17 +255,12 @@ for beta in betas:
     )
     HybMats = lambda z: _HybMats(z.imag)
 
-    S_active = np.eye(len_active)
-    idx_neq = np.arange(len_active)
-    idx_inv = np.arange(len_active)
-
-    V = np.loadtxt(f"{data_folder}/U_matrix.txt")
-
     double_counting = (
         np.diag(V.diagonal() * (occupancy_goal - 0.5))
         if use_double_counting
         else np.zeros((len_active, len_active))
     )
+
     gfloc = Gfloc(
         H_active - double_counting,
         S_active,
@@ -277,12 +278,6 @@ for beta in betas:
     nspin = 2
 
     Sigma = lambda z: np.zeros((nimp, z.size), complex)
-
-    gfloc0 = Gfloc(
-        H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
-    )
-    gfloc0.update(mu=mu)
-    gfloc0.set_local(Sigma)
 
     def _Sigma(z):
         return (
@@ -302,7 +297,6 @@ for beta in betas:
         DC=double_counting,
     )
 
-    field = 0.5
     signs = np.zeros(nimp, int)
     signs[::2] = 1  # antiferromagnetic ordering between the impurities
     signs[1::2] = -1

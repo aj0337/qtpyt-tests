@@ -26,8 +26,7 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
 eta = 1e-3
-betas = list(range(1000, 99, -50))
-
+betas = list(range(1050, 2050, 50))
 
 for beta in betas:
     output_folder = f"../output/lowdin/beta_{beta}/"

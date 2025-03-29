@@ -15,7 +15,7 @@ os.makedirs(data_folder, exist_ok=True)
 
 # Parameters
 mu = 0.0
-betas = list(range(1000, 99, -50))
+betas = list(range(1300, 2050, 50))
 
 for beta in betas:
     output_folder = f"../output/lowdin/beta_{beta}/"
