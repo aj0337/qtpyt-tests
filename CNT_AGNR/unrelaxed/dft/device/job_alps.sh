@@ -11,8 +11,6 @@
 #SBATCH --account=s1276
 #SBATCH --uenv=gpaw/25.1:1639708786
 #SBATCH --view=gpaw
-# #SBATCH --output=_scheduler-stdout.txt
-# #SBATCH --error=_scheduler-stderr.txt
 
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 export MPICH_GPU_SUPPORT_ENABLED=0

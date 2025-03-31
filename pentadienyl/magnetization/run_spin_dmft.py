@@ -207,7 +207,7 @@ eta = 1e-3
 z_ret = energies + 1.0j * eta
 # betas = list(np.arange(50, 175, 25)) + list(np.arange(200, 1550, 50)) # [30, 40]
 betas = [1000]
-field = 5e-3
+field = 5e-1
 
 mu = 0.0
 adjust_mu = False
@@ -234,7 +234,9 @@ V = np.loadtxt(f"{data_folder}/U_matrix.txt")
 for beta in betas:
     print(f"Starting spin resolved DMFT calculation for beta = {beta}", flush=True)
     temperature_data_folder = f"{data_folder}/beta_{beta}"
-    output_folder = f"{temperature_data_folder}/dmft/spin/field_{field}/adjust_mu_{adjust_mu}"
+    output_folder = (
+        f"{temperature_data_folder}/dmft/spin/field_{field}/adjust_mu_{adjust_mu}"
+    )
     figure_folder = f"{output_folder}/figures"
 
     occupancy_goal = np.load(f"{temperature_data_folder}/occupancies.npy")
@@ -297,9 +299,10 @@ for beta in betas:
         DC=double_counting,
     )
 
-    signs = np.zeros(nimp, int)
-    signs[::2] = 1  # antiferromagnetic ordering between the impurities
-    signs[1::2] = -1
+    # signs = np.zeros(nimp, int)
+    # signs[::2] = 1  # antiferromagnetic ordering between the impurities
+    # signs[1::2] = -1
+    signs = np.array([+1, -1, +1, 0, -1, +1, -1])
     delta = dmft.initialize_magnetic(V.diagonal().mean(), Sigma, signs, field, mu=mu)
     delta_prev = delta.copy()
     dmft.delta = delta

@@ -142,7 +142,7 @@ def callback(*args, **kwargs):
     iteration_counter += 1
 
 
-nbaths_list = [4,6,8]
+nbaths_list = [8]
 # U = 4
 tol = 1e-4
 max_iter = 1000
@@ -171,7 +171,9 @@ occupancy_goal = np.load(f"{temperature_data_folder}/occupancies.npy")
 z_mats = np.load(f"{temperature_data_folder}/matsubara_energies.npy")
 
 len_active = occupancy_goal.size
-hyb_mats = np.fromfile(f"{temperature_data_folder}/matsubara_hybridization.bin", complex).reshape(
+hyb_mats = np.fromfile(
+    f"{temperature_data_folder}/matsubara_hybridization.bin", complex
+).reshape(
     z_mats.size,
     len_active,
     len_active,
@@ -189,8 +191,9 @@ double_counting = (
     else np.zeros((len_active, len_active))
 )
 for nbaths in nbaths_list:
-
-    print(f"Starting spin unresolved DMFT calculation with {nbaths} bath(s).", flush=True)
+    print(
+        f"Starting spin unresolved DMFT calculation with {nbaths} bath(s).", flush=True
+    )
 
     dmft_output_folder = f"{temperature_data_folder}/dmft/no_spin/nbaths_{nbaths}"
     figure_folder = f"{dmft_output_folder}/figures"
@@ -208,7 +211,7 @@ for nbaths in nbaths_list:
     )
 
     nimp = gfloc_with_dccorrection.idx_neq.size
-    gfimp = [Gfimp(nbaths_list, z_mats.size, V[i, i], beta) for i in range(nimp)]
+    gfimp = [Gfimp(nbaths, z_mats.size, V[i, i], beta) for i in range(nimp)]
     gfimp = nanoGfimp(gfimp)
 
     Sigma = lambda z: np.zeros((nimp, z.size), complex)

@@ -87,7 +87,7 @@ gf = greenfunction.GreenFunction(
 for beta in betas:
 
     print(f"Starting spin resolved transmission calculation for beta = {beta}", flush=True)
-    dmft_data_folder = f"../output/lowdin/beta_{beta}/dmft/spin/field_0.005/adjust_mu_False"
+    dmft_data_folder = f"../output/lowdin/beta_{beta}/dmft/spin/field_0.5/adjust_mu_False"
 
     for spin, spin_label in enumerate(["up", "dw"]):
         dmft_sigma_file = f"{dmft_data_folder}/sigma_dmft_{spin_label}.npy"

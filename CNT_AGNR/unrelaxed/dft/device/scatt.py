@@ -11,7 +11,7 @@ output_folder = "./"
 os.makedirs(output_folder, exist_ok=True)
 
 atoms = read(f"{input_folder}/scatt.xyz")
-basis = {"H": "dzp", "C": "dzp"}
+basis = {"H": "szp(dzp)", "C": "szp(dzp)"}
 
 # temperature = 9
 # kbt = temperature * 8.617343e-5
@@ -24,7 +24,7 @@ calc = GPAW(
     kpts=(1, 1, 1),
     mode="lcao",
     txt=f"{output_folder}/scatt.txt",
-    mixer=Mixer(0.02, 5, weight=100.0),
+    mixer=Mixer(0.1, 5, weight=100.0),
     symmetry={"point_group": False, "time_reversal": True},
 )
 
