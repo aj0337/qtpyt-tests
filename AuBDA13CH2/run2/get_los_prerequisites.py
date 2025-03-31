@@ -6,7 +6,6 @@ from gpaw import restart
 from gpaw.lcao.pwf2 import LCAOwrap
 from qtpyt.basis import Basis
 from qtpyt.lo.tools import rotate_matrix, subdiagonalize_atoms, lowdin_rotation
-from qtpyt.basis import Basis
 
 # Getting localized orbitals and other prerequisites calculation (runs serially)
 
