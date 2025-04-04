@@ -24,13 +24,12 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 
 # Parameters
 de = 0.01
-energies = np.arange(-3, 3 + de / 2.0, de).round(7)
+energies = np.arange(-20, 20 + de / 2.0, de).round(7)
 eta = 1e-3
-betas = [2000.0,2500.0]
-
+betas = [1000]
 
 for beta in betas:
-    output_folder = f"./output/lowdin/beta_{beta}/"
+    output_folder = f"./output/lowdin/beta_{beta}/for_Angelo"
     if comm.rank == 0:
         os.makedirs(output_folder, exist_ok=True)
 
@@ -58,7 +57,7 @@ for beta in betas:
     del HB
 
     # Define parameters for matsubara grid
-    ne = 3000
+    ne = 5000
     matsubara_energies = 1.0j * (2 * np.arange(ne) + 1) * np.pi / beta
 
     gfp.eta = 0.0

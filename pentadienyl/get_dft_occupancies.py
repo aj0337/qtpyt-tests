@@ -3,24 +3,23 @@ import numpy as np
 from scipy.interpolate import interp1d
 from edpyt.nano_dmft import Gfloc
 
-import numpy as np
 import os
 
 # Data paths
 data_folder = f"./output/lowdin"
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
-z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 
 os.makedirs(data_folder, exist_ok=True)
 
 # Parameters
 mu = 0.0
-betas = [2000.0,2500.0]
+betas = [1000]
 
 for beta in betas:
-    output_folder = f"./output/lowdin/beta_{beta}/"
+    output_folder = f"./output/lowdin/beta_{beta}/for_Angelo"
     os.makedirs(output_folder, exist_ok=True)
 
+    z_mats = np.load(f"{output_folder}/matsubara_energies.npy")
     len_active = H_active.shape[0]
     hyb_mats = np.fromfile(
         f"{output_folder}/matsubara_hybridization.bin", complex

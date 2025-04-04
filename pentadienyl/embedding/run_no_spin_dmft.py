@@ -178,7 +178,8 @@ hyb_mats = np.fromfile(
     len_active,
 )
 _HybMats = interp1d(z_mats.imag, hyb_mats, axis=0, bounds_error=False, fill_value=0.0)
-HybMats = lambda z: _HybMats(z.imag)
+# HybMats = lambda z: _HybMats(z.imag)
+HybMats = lambda z: 0.0
 
 S_active = np.eye(len_active)
 idx_neq = np.arange(len_active)
@@ -198,7 +199,7 @@ for relative_tol in relative_tols:
                 flush=True,
             )
 
-            dmft_output_folder = f"{temperature_data_folder}/dmft/eta_{eta}/rel_tol_{relative_tol}/no_spin/nsites_{nsites}/adjust_mu_{adjust_mu}"
+            dmft_output_folder = f"{temperature_data_folder}/no_embedding/dmft/eta_{eta}/rel_tol_{relative_tol}/no_spin/nsites_{nsites}/adjust_mu_{adjust_mu}"
             figure_folder = f"{dmft_output_folder}/figures"
             os.makedirs(dmft_output_folder, exist_ok=True)
             os.makedirs(figure_folder, exist_ok=True)
