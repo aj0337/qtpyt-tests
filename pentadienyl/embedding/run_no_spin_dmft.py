@@ -143,8 +143,8 @@ def callback(*args, **kwargs):
 
 nsites_list = [5, 6, 7, 8, 9]
 # U = 4
-relative_tols = [1e-4, 1e-5, 1e-6]
-max_iter = 1000
+relative_tols = [1.5e-1]
+max_iter = 100
 alpha = 0.0
 nspin = 1
 de = 0.01

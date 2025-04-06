@@ -11,7 +11,7 @@ data_folder = "./output/lowdin"
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 H_subdiagonalized, _ = np.load(f"{data_folder}/hs_los_lowdin.npy")
 de = 0.01
-energies = np.arange(-3, 3 + de / 2.0, de).round(7)
+energies = np.arange(-15, 15 + de / 2.0, de).round(7)
 eta = 1e-3
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
@@ -22,8 +22,9 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 gf = greenfunction.GreenFunction(
     hs_list_ii,
     hs_list_ij,
-    [(0, self_energy[0]), (len(hs_list_ii) - 1, self_energy[1])],
-    solver="spectral",
+    [],
+    # [(0, self_energy[0]), (len(hs_list_ii) - 1, self_energy[1])],
+    solver="dyson",
     eta=eta,
 )
 
@@ -56,4 +57,4 @@ else:
 comm.Gatherv(sendbuf=local_pdos, recvbuf=recvbuf, root=0)
 
 if rank == 0:
-    np.save(f"{data_folder}/pdos.npy", pdos)
+    np.save(f"{data_folder}/pdos_dyson_no_leads_se.npy", pdos)
