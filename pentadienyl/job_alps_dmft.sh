@@ -21,7 +21,7 @@ conda activate qtpyt
 
 # mpirun -n 1 python get_dft_states.py
 # mpirun -n 96 python get_active_embedding_hybridization.py
-mpirun -n 1 python get_dft_occupancies.py
+# mpirun -n 1 python get_dft_occupancies.py
 
 # mpirun -n 1 python run_no_spin_dmft.py
 # mpirun -n 1 python run_spin_dmft.py
@@ -31,3 +31,5 @@ mpirun -n 1 python get_dft_occupancies.py
 
 # mpirun -n 1 python restart_dmft.py
 # mpirun -n 24 python get_ed_transmission.py
+
+mpirun -n 1 python get_ed_dc_correction.py
