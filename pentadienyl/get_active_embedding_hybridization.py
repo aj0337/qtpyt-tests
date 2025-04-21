@@ -24,12 +24,12 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 
 # Parameters
 de = 0.01
-energies = np.arange(-20, 20 + de / 2.0, de).round(7)
+energies = np.arange(-3, 3 + de / 2.0, de).round(7)
 eta = 1e-3
-betas = [1000]
+betas = [1e6]
 
 for beta in betas:
-    output_folder = f"./output/lowdin/beta_{beta}/for_Angelo"
+    output_folder = f"./output/lowdin/beta_{beta}/"
     if comm.rank == 0:
         os.makedirs(output_folder, exist_ok=True)
 
@@ -47,17 +47,17 @@ for beta in betas:
 
     n_A = len(index_active_region)
     gd = GridDesc(energies, n_A, complex)
-    HB = gd.empty_aligned_orbs()
+    # HB = gd.empty_aligned_orbs()
 
-    for e, energy in enumerate(gd.energies):
-        HB[e] = hyb.retarded(energy)
+    # for e, energy in enumerate(gd.energies):
+    #     HB[e] = hyb.retarded(energy)
 
-    filename = os.path.join(output_folder, "hybridization.bin")
-    gd.write(HB, filename)
-    del HB
+    # filename = os.path.join(output_folder, "hybridization.bin")
+    # gd.write(HB, filename)
+    # del HB
 
     # Define parameters for matsubara grid
-    ne = 5000
+    ne = 3000
     matsubara_energies = 1.0j * (2 * np.arange(ne) + 1) * np.pi / beta
 
     gfp.eta = 0.0

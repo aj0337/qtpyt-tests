@@ -13,10 +13,10 @@ os.makedirs(data_folder, exist_ok=True)
 
 # Parameters
 mu = 0.0
-betas = [1000]
+betas = [1e6]
 
 for beta in betas:
-    output_folder = f"./output/lowdin/beta_{beta}/for_Angelo"
+    output_folder = f"./output/lowdin/beta_{beta}/"
     os.makedirs(output_folder, exist_ok=True)
 
     z_mats = np.load(f"{output_folder}/matsubara_energies.npy")

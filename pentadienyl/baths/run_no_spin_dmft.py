@@ -141,9 +141,8 @@ def callback(*args, **kwargs):
     iteration_counter += 1
 
 
-nsites_list = [5, 6, 7, 8, 9]
-# U = 4
-relative_tols = [1e-4, 1e-5, 1e-6]
+nsites_list = [4]
+relative_tols = [1e-4]
 max_iter = 1000
 alpha = 0.0
 nspin = 1
@@ -159,6 +158,7 @@ use_double_counting = True
 data_folder = "../output/lowdin"
 V = np.loadtxt(f"{data_folder}/U_matrix.txt")
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
+# H_active = np.load(f"{data_folder}/effective_hamiltonian.npy").real
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
 
@@ -179,6 +179,7 @@ hyb_mats = np.fromfile(
 )
 _HybMats = interp1d(z_mats.imag, hyb_mats, axis=0, bounds_error=False, fill_value=0.0)
 HybMats = lambda z: _HybMats(z.imag)
+# HybMats = lambda z: np.zeros((len_active, len_active), dtype=complex)
 
 S_active = np.eye(len_active)
 idx_neq = np.arange(len_active)
@@ -198,7 +199,7 @@ for relative_tol in relative_tols:
                 flush=True,
             )
 
-            dmft_output_folder = f"{temperature_data_folder}/dmft/eta_{eta}/rel_tol_{relative_tol}/no_spin/nsites_{nsites}/adjust_mu_{adjust_mu}"
+            dmft_output_folder = f"{temperature_data_folder}/dmft/no_embedding/eta_{eta}/rel_tol_{relative_tol}/no_spin/nsites_{nsites}/adjust_mu_{adjust_mu}"
             figure_folder = f"{dmft_output_folder}/figures"
             os.makedirs(dmft_output_folder, exist_ok=True)
             os.makedirs(figure_folder, exist_ok=True)
@@ -245,7 +246,7 @@ for relative_tol in relative_tols:
                 adjust_mu=adjust_mu,
                 alpha=alpha,
                 DC=double_counting,
-                store_iterations=False,
+                store_iterations=True,
                 store_last_n=1,
                 bath_filename=bath_filename,
                 iter_filename=iter_filename,

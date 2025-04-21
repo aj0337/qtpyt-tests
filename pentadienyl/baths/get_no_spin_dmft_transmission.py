@@ -59,8 +59,6 @@ data_folder = "../output/lowdin"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 
-nsites_list = [7]
-adjust_mus = [True, False]
 
 de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
@@ -90,9 +88,20 @@ idx_molecule = (
     index_active_region - nodes[imb]
 )  # indices of active region w.r.t molecule
 
-for nsites in nsites_list:
-    for adjust_mu in adjust_mus:
-        dmft_data_folder = f"../output/lowdin/beta_1000/dmft/eta_{eta}/no_spin/nsites_{nsites}/adjust_mu_{adjust_mu}"
+temperature_data_folder = "../output/lowdin/beta_1000"
+
+nsites_list = [4, 5, 6]
+relative_tols = [1e-4]
+adjust_mus = [True]
+
+for relative_tol in relative_tols:
+    for nsites in nsites_list:
+        for adjust_mu in adjust_mus:
+            print(
+                f"Starting transmission calculation with {nsites} site(s), relative tolerance {relative_tol},  and adjust mu {adjust_mu}.",
+                flush=True,
+            )
+        dmft_data_folder = f"{temperature_data_folder}/dmft/eta_{eta}/rel_tol_{relative_tol}/no_spin/nsites_{nsites}/adjust_mu_{adjust_mu}"
         dmft_sigma_file = f"{dmft_data_folder}/dmft_sigma.npy"
 
         # Add the DMFT self-energy for transmission
