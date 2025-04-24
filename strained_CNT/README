@@ -1,0 +1,3 @@
+Steps:
+
+Real space Hamiltonian need to be converted to k space. This is done using transform_R_kspace.ipynb.
