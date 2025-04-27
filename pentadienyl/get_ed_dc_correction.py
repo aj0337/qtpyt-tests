@@ -11,18 +11,18 @@ from scipy.optimize import minimize, Bounds
 
 
 class Sigma:
-    def __init__(self, gf, H_eff, mu=0.0, eta=1e-5):
+    def __init__(self, gf, H_eff, DC0, eta=1e-5):
         self.gf = gf
         self.eta = eta
         self.H_eff = H_eff
-        self.mu = mu
+        self.DC0 = DC0
 
     def retarded(self, energy):
         energies = np.atleast_1d(energy)
         g = self.gf(energies, self.eta)
         sigma = np.empty((energies.size, self.gf.n, self.gf.n), complex)
         for e, energy in enumerate(energies):
-            sigma[e] = energy + self.mu - self.H_eff - np.linalg.inv(g[..., e])
+            sigma[e] = energy - (self.H_eff + self.DC0) - np.linalg.inv(g[..., e])
         return sigma
 
 
@@ -32,7 +32,7 @@ def objective(x):
     espace, egs = build_espace(H_eff - DC, V, neig_sector=neig)
     screen_espace(espace, egs, beta)
     gf = build_gf2_lanczos(H_eff - DC, V, espace, beta, egs)
-    sigma = Sigma(gf, H_eff, eta=eta)
+    sigma = Sigma(gf, H_eff, DC, eta=eta)
 
     # High-frequency residual
     energies = np.array([-1000])
@@ -149,14 +149,14 @@ dcc_optimized = res.x
 print("\nOptimized DCC:", dcc_optimized)
 
 
-# === Save result ===
-DC_optimized = np.diag(res.x)
-espace, egs = build_espace(H_eff - DC_optimized, V, neig_sector=neig)
-screen_espace(espace, egs, beta)
-gf = build_gf2_lanczos(H_eff - DC_optimized, V, espace, beta, egs)
-sigma = Sigma(gf, H_eff, eta=eta)
+# # === Save result ===
+# DC_optimized = np.diag(res.x)
+# espace, egs = build_espace(H_eff - DC_optimized, V, neig_sector=neig)
+# screen_espace(espace, egs, beta)
+# gf = build_gf2_lanczos(H_eff - DC_optimized, V, espace, beta, egs)
+# sigma = Sigma(gf, H_eff, DC0, eta=eta)
 
-extended_energies = np.arange(-20, 20.1, 0.1)
-sig = sigma.retarded(extended_energies)
-np.save(f"{output_folder}/sigma_ed.npy", sig)
-np.save(f"{output_folder}/DC_optimized.npy", DC_optimized)
+# extended_energies = np.arange(-20, 20.1, 0.1)
+# sig = sigma.retarded(extended_energies)
+# np.save(f"{output_folder}/sigma_ed.npy", sig)
+# np.save(f"{output_folder}/DC_optimized.npy", DC_optimized)
