@@ -6,7 +6,6 @@ from edpyt.nano_dmft import Gfimp as nanoGfimp
 from scipy.interpolate import interp1d
 from edpyt.nano_dmft import Gfloc
 
-import numpy as np
 import matplotlib.pyplot as plt
 import os
 
