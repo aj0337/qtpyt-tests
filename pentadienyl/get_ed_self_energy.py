@@ -35,7 +35,7 @@ eta = 1e-3
 beta = 1000
 
 # === Initial double counting ===
-DC = np.load(f"{output_folder}/ed_dcc_diag.npy")
+DC = np.load(f"{output_folder}/ed_dcc_diag_test.npy")
 DC = np.diag(DC)
 neig = np.ones((nimp + 1) * (nimp + 1), int) * 6
 
@@ -52,4 +52,4 @@ de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
 z_ret = energies + 1.0j * eta
 sigma_ret = sigma.retarded(z_ret)
-np.save(f"{output_folder}/ed_sigma.npy", sigma_ret)
+np.save(f"{output_folder}/ed_sigma_test.npy", sigma_ret)
