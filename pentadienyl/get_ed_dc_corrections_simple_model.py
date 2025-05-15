@@ -9,17 +9,19 @@ from edpyt.gf2_lanczos import build_gf2_lanczos
 
 
 class Sigma:
-    def __init__(self, gf, H_eff, eta=1e-5):
+    def __init__(self, gf0, gf, H_eff, eta=1e-5):
+        self.gf0 = gf0
         self.gf = gf
         self.eta = eta
         self.H_eff = H_eff
 
     def retarded(self, energy):
         energies = np.atleast_1d(energy)
+        g0 = self.gf0(energies, self.eta)
         g = self.gf(energies, self.eta)
         sigma = np.empty((energies.size, self.gf.n, self.gf.n), complex)
         for e, energy in enumerate(energies):
-            sigma[e] = energy - (self.H_eff) - np.linalg.inv(g[..., e])
+            sigma[e] = np.linalg.inv(g0[..., e]) - np.linalg.inv(g[..., e])
         return sigma
 
 
@@ -52,6 +54,10 @@ dc0_diag = DC0.diagonal()
 target_ratios = dc0_diag / np.max(dc0_diag)
 
 
+espace0, egs0 = build_espace(H_eff, np.zeros_like(H_eff), neig_sector=neig)
+screen_espace(espace0, egs0, beta)
+gf0 = build_gf2_lanczos(H_eff, np.zeros_like(H_eff), espace0, beta, egs0)
+
 def residual_function(dc_diag):
     # Clip only the lower bound
     dc_diag = np.clip(dc_diag, 0.0, np.inf)
@@ -60,10 +66,10 @@ def residual_function(dc_diag):
     espace, egs = build_espace(H_eff - DC, V, neig_sector=neig)
     screen_espace(espace, egs, beta)
     gf = build_gf2_lanczos(H_eff - DC, V, espace, beta, egs)
-    sigma = Sigma(gf, H_eff, eta=eta)
+    sigma = Sigma(gf0, gf, H_eff, eta=eta)
 
     # Get physical residual from Σ at large negative frequency
-    energies = np.array([-1000.0])
+    energies = np.array([-1.0])
     sig_cost = sigma.retarded(energies)
     sig_real_diag = sig_cost.real.diagonal(axis1=1, axis2=2)
     residual = np.mean(sig_real_diag, axis=0)
@@ -87,4 +93,4 @@ dc_diag_optimized = broyden1(
 )
 
 # Save the optimized double counting
-np.save(f"{output_folder}/ed_dcc_diag_test.npy", dc_diag_optimized)
+np.save(f"{output_folder}/ed_dcc_diag_-1ev.npy", dc_diag_optimized)
