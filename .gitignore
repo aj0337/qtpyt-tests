@@ -20,3 +20,4 @@ output/
 *.pkl
 *.tar.gz
 *.png
+*.tar
