@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=gpaw-example
-#SBATCH --time=04:00:00
-#SBATCH --partition=normal
+#SBATCH --time=00:30:00
+#SBATCH --partition=debug
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=192
 #SBATCH --cpus-per-task=1

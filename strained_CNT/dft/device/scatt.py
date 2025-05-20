@@ -4,7 +4,7 @@ from ase import *
 from ase.io import read
 from gpaw import *
 
-atoms = read("initial.xyz")
+atoms = read("initial.vasp", format="vasp")
 basis = {"C": "szp(dzp)"}
 
 kbt = 0.01
@@ -20,7 +20,7 @@ calc = GPAW(
     symmetry={"point_group": False, "time_reversal": True},
 )
 
-atoms.set_calculator(calc)
+atoms.calc = calc
 atoms.get_potential_energy()
 calc.write("initial.gpw", mode="all")
 
