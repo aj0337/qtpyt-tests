@@ -10,14 +10,15 @@ core*
 *.txt
 *.dat
 *.pckl
+*.png
 .vscode/
 !*/published_reference/**
 !*/reference/**
+!**/notes/**
 */published_reference/Angelo_ase
 output/
 **/job_scripts/
 *.bin
 *.pkl
 *.tar.gz
-*.png
 *.tar
