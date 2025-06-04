@@ -15,7 +15,7 @@ basis = {"H": "szp(dzp)", "C": "szp(dzp)"}
 
 # temperature = 9
 # kbt = temperature * 8.617343e-5
-kbt = 0.01
+kbt = 0.1
 calc = GPAW(
     h=0.2,
     xc="PBE",
