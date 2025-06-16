@@ -6,33 +6,33 @@ from gpaw import restart
 from gpaw.lcao.pwf2 import LCAOwrap
 from qtpyt.basis import Basis
 from qtpyt.lo.tools import rotate_matrix, subdiagonalize_atoms, lowdin_rotation
-from qtpyt.basis import Basis
 
 # Getting localized orbitals and other prerequisites calculation (runs serially)
 
-def get_species_indices(atoms,species):
+
+def get_species_indices(atoms, species):
     indices = []
     for element in species:
         element_indices = atoms.symbols.search(element)
         indices.extend(element_indices)
     return sorted(indices)
 
+
 lowdin = True
-data_folder = f'./output/lowdin' if lowdin else f'./output/no_lowdin'
+data_folder = f"./output/lowdin" if lowdin else f"./output/no_lowdin"
 # Create the folder if it doesn't exist
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 
-GPWDEVICEDIR = f'./dft/device/'
-GPWLEADSDIR = './dft/leads/'
+GPWDEVICEDIR = f"./dft/device/"
+GPWLEADSDIR = "./dft/leads/"
 SUBDIAG_SPECIES = ("C", "N", "H")
 # Define the active region within the subdiagonalized species
-active = {'C': [3],'N': [3]}
-lowdin = True
+active = {"C": [3], "N": [3]}
 
 cc_path = Path(GPWDEVICEDIR)
 pl_path = Path(GPWLEADSDIR)
-gpwfile = f'{cc_path}/scatt.gpw'
+gpwfile = f"{cc_path}/scatt.gpw"
 
 atoms, calc = restart(gpwfile, txt=None)
 fermi = calc.get_fermi_level()
@@ -53,7 +53,7 @@ index_subdiag_region = basis_subdiag_region.get_indices()
 extract_active_region = basis_subdiag_region.extract().take(active)
 index_active_region = index_subdiag_region[extract_active_region]
 
-np.save(f"{data_folder}/index_active_region.npy",index_active_region)
+np.save(f"{data_folder}/index_active_region.npy", index_active_region)
 
 Usub, eig = subdiagonalize_atoms(basis, H_lcao, S_lcao, a=subdiag_indices)
 H_subdiagonalized = rotate_matrix(H_lcao, Usub)
@@ -69,10 +69,12 @@ if lowdin:
     H_subdiagonalized = H_subdiagonalized[None, ...]
     S_subdiagonalized = S_subdiagonalized[None, ...]
 
-    np.save(f"{data_folder}/hs_los_lowdin.npy", (H_subdiagonalized,S_subdiagonalized))
+    np.save(f"{data_folder}/hs_los_lowdin.npy", (H_subdiagonalized, S_subdiagonalized))
 
 else:
     H_subdiagonalized = H_subdiagonalized[None, ...]
     S_subdiagonalized = S_subdiagonalized[None, ...]
 
-    np.save(f"{data_folder}/hs_los_no_lowdin.npy", (H_subdiagonalized,S_subdiagonalized))
+    np.save(
+        f"{data_folder}/hs_los_no_lowdin.npy", (H_subdiagonalized, S_subdiagonalized)
+    )

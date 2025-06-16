@@ -38,15 +38,14 @@ def run(outputfile):
 
 
 data_folder = "output/lowdin"
-ed_data_folder = "output/lowdin/ed"
+ed_data_folder = "output/lowdin/beta_1000/ed"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
-ed_sigma_file = f"{ed_data_folder}/ed_sigma_test.npy"
+ed_sigma_file = f"{ed_data_folder}/ed_sigma_test_-1ev.npy"
 
 de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
 eta = 1e-3
-z_ret = energies + 1.0j * eta
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
@@ -82,6 +81,6 @@ ed_sigma = comm.bcast(ed_sigma, root=0)
 self_energy[2] = ed_sigma
 gf.selfenergies.append((imb, self_energy[2]))
 
-outputfile = f"{ed_data_folder}/ed_transmission_test.npy"
+outputfile = f"{ed_data_folder}/transmission_test_-1ev.npy"
 run(outputfile)
 gf.selfenergies.pop()

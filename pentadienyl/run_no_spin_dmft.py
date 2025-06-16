@@ -6,7 +6,6 @@ from edpyt.nano_dmft import Gfimp as nanoGfimp
 from scipy.interpolate import interp1d
 from edpyt.nano_dmft import Gfloc
 
-import numpy as np
 import matplotlib.pyplot as plt
 import os
 
@@ -152,7 +151,7 @@ de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
 eta = 1e-3
 z_ret = energies + 1.0j * eta
-beta = 38.68
+betas = [2000.0,2500.0]
 mu = 0.0
 adjust_mu = True
 use_double_counting = True
