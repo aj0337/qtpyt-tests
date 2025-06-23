@@ -1,4 +1,4 @@
-from __future__ import annotations
+sfrom __future__ import annotations
 import pickle
 import numpy as np
 from edpyt.dmft import DMFT, Gfimp

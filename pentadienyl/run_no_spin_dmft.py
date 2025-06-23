@@ -141,28 +141,24 @@ def callback(*args, **kwargs):
     iteration_counter += 1
 
 
-nbaths = 4
-# U = 4
-tol = 1e-4
+nsites_list = [4, 6]
+U_list = [1]
+tol = 5e-4
 max_iter = 1000
 alpha = 0.0
 nspin = 1
 de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
-eta = 1e-3
+eta = 1e-1
 z_ret = energies + 1.0j * eta
-betas = [2000.0,2500.0]
+beta = 1000
 mu = 0.0
-adjust_mu = True
+adjust_mu = False
 use_double_counting = True
 
 data_folder = "output/lowdin"
-output_folder = f"{data_folder}/dmft/no_spin"
-figure_folder = f"{output_folder}/figures"
-
-occupancy_goal = np.load(f"{data_folder}/occupancies.npy")
+temperature_data_folder = f"{data_folder}/beta_{beta}"
 H_active = np.load(f"{data_folder}/bare_hamiltonian.npy").real
-z_mats = np.load(f"{data_folder}/matsubara_energies.npy")
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
@@ -170,86 +166,102 @@ with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
 with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
     hs_list_ij = pickle.load(f)
 
-os.makedirs(output_folder, exist_ok=True)
-os.makedirs(figure_folder, exist_ok=True)
-
+occupancy_goal = np.load(f"{temperature_data_folder}/occupancies.npy")
+z_mats = np.load(f"{temperature_data_folder}/matsubara_energies.npy")
 len_active = occupancy_goal.size
-hyb_mats = np.fromfile(f"{data_folder}/matsubara_hybridization.bin", complex).reshape(
-    z_mats.size,
-    len_active,
-    len_active,
-)
-_HybMats = interp1d(z_mats.imag, hyb_mats, axis=0, bounds_error=False, fill_value=0.0)
-HybMats = lambda z: _HybMats(z.imag)
 
 S_active = np.eye(len_active)
 idx_neq = np.arange(len_active)
 idx_inv = np.arange(len_active)
 
-# V = np.eye(len_active) * U
-V = np.loadtxt(f"{data_folder}/U_matrix.txt")
-# Apply double counting correction if specified
-double_counting = (
-    np.diag(V.diagonal() * (occupancy_goal - 0.5))
-    if use_double_counting
-    else np.zeros((len_active, len_active))
-)
-gfloc_with_dccorrection = Gfloc(
-    H_active - double_counting,
-    S_active,
-    HybMats,
-    idx_neq,
-    idx_inv,
-    nmats=z_mats.size,
-    beta=beta,
-)
+for nsites in nsites_list:
+    for U in U_list:
+        print(f"Running DMFT for nsites={nsites}, U={U}", flush=True)
+        output_folder = f"{temperature_data_folder}/dmft/no_spin/fix_mu_{mu}/eta_{eta}/nsites_{nsites}/U_{U}"
+        figure_folder = f"{output_folder}/figures"
 
-nimp = gfloc_with_dccorrection.idx_neq.size
-gfimp = [Gfimp(nbaths, z_mats.size, V[i, i], beta) for i in range(nimp)]
-gfimp = nanoGfimp(gfimp)
+        os.makedirs(output_folder, exist_ok=True)
+        os.makedirs(figure_folder, exist_ok=True)
 
-Sigma = lambda z: np.zeros((nimp, z.size), complex)
+        hyb_mats = np.fromfile(
+            f"{temperature_data_folder}/matsubara_hybridization.bin", complex
+        ).reshape(
+            z_mats.size,
+            len_active,
+            len_active,
+        )
+        _HybMats = interp1d(
+            z_mats.imag, hyb_mats, axis=0, bounds_error=False, fill_value=0.0
+        )
+        HybMats = lambda z: _HybMats(z.imag)
+        # HybMats = lambda z: np.zeros_like(_HybMats(z.imag))
 
-gfloc_no_dccorrection = Gfloc(
-    H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
-)
-gfloc_no_dccorrection.update(mu=mu)
-gfloc_no_dccorrection.set_local(Sigma)
+        V = np.eye(len_active) * U
+        # V = np.loadtxt(f"{data_folder}/U_matrix.txt")
+        # Apply double counting correction if specified
+        double_counting = (
+            np.diag(V.diagonal() * (occupancy_goal - 0.5))
+            if use_double_counting
+            else np.zeros((len_active, len_active))
+        )
+        gfloc_with_dccorrection = Gfloc(
+            H_active - double_counting,
+            S_active,
+            HybMats,
+            idx_neq,
+            idx_inv,
+            nmats=z_mats.size,
+            beta=beta,
+        )
 
-# Initialize DMFT with adjust_mu parameter
-dmft = DMFT(
-    gfimp,
-    gfloc_with_dccorrection,
-    occupancy_goal,
-    max_iter=max_iter,
-    tol=tol,
-    adjust_mu=adjust_mu,
-    alpha=alpha,
-    DC=double_counting,
-)
+        nimp = gfloc_with_dccorrection.idx_neq.size
+        gfimp = [Gfimp(nsites, z_mats.size, V[i, i], beta) for i in range(nimp)]
+        gfimp = nanoGfimp(gfimp)
 
-delta = dmft.initialize(V.diagonal().mean(), Sigma, mu=mu)
-delta_prev = delta.copy()
-dmft.delta = delta
+        Sigma = lambda z: np.zeros((nimp, z.size), complex)
 
-try:
-    dmft.solve(dmft.delta, alpha=1.0, callback=callback)
-except:
-    pass
+        gfloc_no_dccorrection = Gfloc(
+            H_active, S_active, HybMats, idx_neq, idx_inv, nmats=z_mats.size, beta=beta
+        )
+        gfloc_no_dccorrection.update(mu=mu)
+        gfloc_no_dccorrection.set_local(Sigma)
 
+        # Initialize DMFT with adjust_mu parameter
+        dmft = DMFT(
+            gfimp,
+            gfloc_with_dccorrection,
+            occupancy_goal,
+            max_iter=max_iter,
+            tol=tol,
+            adjust_mu=adjust_mu,
+            alpha=alpha,
+            DC=double_counting,
+        )
 
-_Sigma = (
-    lambda z: -double_counting.diagonal()[:, None]
-    - gfloc_with_dccorrection.mu
-    + gfloc_with_dccorrection.Sigma(z)[idx_inv]
-)
-dmft_sigma_file = f"{output_folder}/dmft_sigma.npy"
-save_sigma(_Sigma(z_ret), dmft_sigma_file, nspin)
+        delta = dmft.initialize(V.diagonal().mean(), Sigma, mu=mu)
+        delta_prev = delta.copy()
+        dmft.delta = delta
 
-gfloc_data = gfloc_with_dccorrection(z_ret)
-np.save(f"{output_folder}/dmft_gfloc.npy", gfloc_data)
+        try:
+            dmft.solve(dmft.delta, alpha=1.0, callback=callback)
+        except:
+            pass
 
-np.save(f"{output_folder}/opt_delta_dmft", delta_prev)
-np.save(f"{output_folder}/opt_mu_dmft", gfloc_with_dccorrection.mu)
+        _Sigma = (
+            lambda z: -double_counting.diagonal()[:, None]
+            - gfloc_with_dccorrection.mu
+            + gfloc_with_dccorrection.Sigma(z)[idx_inv]
+        )
+        dmft_sigma_file = f"{output_folder}/dmft_sigma.npy"
+        save_sigma(_Sigma(z_ret), dmft_sigma_file, nspin)
 
-print("Spin unresolved DMFT calculation finished.", flush=True)
+        gfloc_data = gfloc_with_dccorrection(z_ret)
+        np.save(f"{output_folder}/dmft_gfloc.npy", gfloc_data)
+
+        np.save(f"{output_folder}/opt_delta_dmft", delta_prev)
+        np.save(f"{output_folder}/opt_mu_dmft", gfloc_with_dccorrection.mu)
+
+        print(
+            f"Spin unresolved DMFT calculation for nsites = {nsites}, U = {U} finished.",
+            flush=True,
+        )
