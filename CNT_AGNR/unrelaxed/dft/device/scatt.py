@@ -21,10 +21,12 @@ calc = GPAW(
     xc="PBE",
     basis=basis,
     occupations=FermiDirac(width=kbt),
+    convergence = {"energy": 1e-3},
     kpts=(1, 1, 1),
     mode="lcao",
     txt=f"{output_folder}/scatt.txt",
-    mixer=Mixer(0.1, 5, weight=100.0),
+    # mixer=Mixer(0.1, 5, weight=100.0),
+    mixer=MixerSum(beta=0.1, nmaxold=3, weight=50.0),
     symmetry={"point_group": False, "time_reversal": True},
 )
 

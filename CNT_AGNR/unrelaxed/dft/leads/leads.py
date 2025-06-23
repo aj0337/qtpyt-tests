@@ -10,17 +10,18 @@ input_folder = "../../../structures/unrelaxed"
 output_folder = "./output"
 os.makedirs(output_folder, exist_ok=True)
 
-atoms = read(f"{input_folder}/leads.xyz")
-basis = {"H": "dzp", "C": "dzp"}
+atoms = read(f"{input_folder}/leads_sorted.xyz")
+basis = {"H": "szp(dzp)", "C": "szp(dzp)"}
 
-temperature = 9
-kbt = temperature * 8.617343e-5
+# temperature = 9
+# kbt = temperature * 8.617343e-5
+kbt = 0.1
 calc = GPAW(
     h=0.2,
     xc="PBE",
     basis=basis,
     occupations=FermiDirac(width=kbt),
-    kpts={"size": (11, 1, 1), "gamma": True},
+    kpts={"size": (6, 1, 1), "gamma": True},
     mode="lcao",
     txt=f"{output_folder}/leads.txt",
     mixer=Mixer(0.02, 5, weight=100.0),
