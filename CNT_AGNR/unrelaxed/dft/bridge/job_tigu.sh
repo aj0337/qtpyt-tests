@@ -3,7 +3,7 @@
 #SBATCH --job-name="defs1"
 #SBATCH --get-user-env
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
+#SBATCH --ntasks-per-node=20
 #SBATCH --cpus-per-task=1
 #SBATCH --time=4-12:00:00
 #SBATCH --mem=62500
@@ -18,5 +18,5 @@ MINICONDA_PATH=/home/jayn/miniconda3
 source $MINICONDA_PATH/etc/profile.d/conda.sh
 conda activate qtpyt
 
-# mpirun -n 20 gpaw python scatt_restart.py
-mpirun -n 1 gpaw python dump.py
+mpirun -n 20 gpaw python scatt_restart.py
+# srun gpaw python dump.py
