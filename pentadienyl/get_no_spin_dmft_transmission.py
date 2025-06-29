@@ -9,6 +9,7 @@ from qtpyt.block_tridiag import greenfunction
 from qtpyt.parallel import comm
 from qtpyt.parallel.egrid import GridDesc
 from qtpyt.projector import expand
+import matplotlib.pyplot as plt
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -35,17 +36,27 @@ def run(outputfile):
 
     if comm.rank == 0:
         np.save(outputfile, (energies, T.real))
+        plt.plot(energies, T.real, label="DMFT")
+        plt.yscale("log")
+        plt.xlabel("Energy (eV)")
+        plt.ylabel("Transmission")
+        plt.xlim(-3, 3)
+        plt.legend()
+        plt.savefig(outputfile.replace(".npy", ".png"))
 
 
 data_folder = "./output/lowdin"
-dmft_data_folder = "./output/lowdin/dmft/no_spin"
+dmft_data_folder = "./Angelo_dmft"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
-dmft_sigma_file = f"{dmft_data_folder}/dmft_sigma.npy"
+dmft_sigma_file = f"{dmft_data_folder}/subsampled_self_energy_mu_removed.npy"
+energies = np.load(f"{dmft_data_folder}/subsampled_energies.npy")
+sigma_dmft = np.load(f"{dmft_sigma_file}")
 
-de = 0.01
-energies = np.arange(-3, 3 + de / 2.0, de).round(7)
-eta = 1e-3
+mu = 2.79
+# de = 0.01
+# energies = np.arange(-3, 3 + de / 2.0, de).round(7)
+eta = 1e-1
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
@@ -81,6 +92,6 @@ dmft_sigma = comm.bcast(dmft_sigma, root=0)
 self_energy[2] = dmft_sigma
 gf.selfenergies.append((imb, self_energy[2]))
 
-outputfile = f"{dmft_data_folder}/dmft_transmission.npy"
+outputfile = f"{dmft_data_folder}/dmft_transmission_mu_removed.npy"
 run(outputfile)
 gf.selfenergies.pop()
