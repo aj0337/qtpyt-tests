@@ -20,21 +20,19 @@ def get_species_indices(atoms, species):
 
 
 lowdin = True
-data_folder = f"./output/lowdin" if lowdin else f"./output/no_lowdin"
+data_folder = f"./output/lowdin/device" if lowdin else f"./output/no_lowdin/device"
 # Create the folder if it doesn't exist
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 
 GPWDEVICEDIR = f"./dft/device/"
-GPWLEADSDIR = "./dft/leads/"
 SUBDIAG_SPECIES = ("C", "H")
 
 # Define the active region within the subdiagonalized species
 active = {"C": [3]}
 
 cc_path = Path(GPWDEVICEDIR)
-pl_path = Path(GPWLEADSDIR)
-gpwfile = f"{cc_path}/scatt.gpw"
+gpwfile = f"{cc_path}/scatt_restart3.gpw"
 
 atoms, calc = restart(gpwfile, txt=None)
 fermi = calc.get_fermi_level()

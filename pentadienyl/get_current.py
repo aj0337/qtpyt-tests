@@ -21,7 +21,7 @@ def fermidistribution(energy, kt):
 
 
 def current(bias, energy, transmission, temperature=300, unit='uA'):
-    """Get the current in nA."""
+    """Get the current in uA."""
     if not isinstance(bias, (int, float)):
         bias = bias[np.newaxis]
         energy = energy[:, np.newaxis]
