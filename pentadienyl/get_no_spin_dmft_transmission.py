@@ -46,17 +46,16 @@ def run(outputfile):
 
 
 data_folder = "./output/lowdin"
-dmft_data_folder = "./Angelo_dmft"
+dmft_data_folder = "./Angelo_dmft/eta_1e-3/nbath7"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
-dmft_sigma_file = f"{dmft_data_folder}/subsampled_self_energy_mu_removed.npy"
+dmft_sigma_file = f"{dmft_data_folder}/subsampled_self_energy_with_dcc.npy"
 energies = np.load(f"{dmft_data_folder}/subsampled_energies.npy")
 sigma_dmft = np.load(f"{dmft_sigma_file}")
 
-mu = 2.79
 # de = 0.01
 # energies = np.arange(-3, 3 + de / 2.0, de).round(7)
-eta = 1e-1
+eta = 1e-2
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
@@ -92,6 +91,6 @@ dmft_sigma = comm.bcast(dmft_sigma, root=0)
 self_energy[2] = dmft_sigma
 gf.selfenergies.append((imb, self_energy[2]))
 
-outputfile = f"{dmft_data_folder}/dmft_transmission_mu_removed.npy"
+outputfile = f"{dmft_data_folder}/dmft_transmission_with_dcc.npy"
 run(outputfile)
 gf.selfenergies.pop()
