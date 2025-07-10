@@ -33,7 +33,7 @@ V = np.loadtxt(f"{input_folder}/U_matrix.txt")
 
 # === Parameters ===
 nimp = H_eff.shape[0]
-eta = 1e-3
+eta = 1e-2
 beta = 1000
 
 DC = np.load(f"{output_folder}/ed_dcc_diag_-1ev.npy")
@@ -57,4 +57,4 @@ de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
 z_ret = energies + 1.0j * eta
 sigma_ret = sigma.retarded(z_ret)
-np.save(f"{output_folder}/ed_sigma_test_-1ev.npy", sigma_ret)
+np.save(f"{output_folder}/ed_sigma.npy", sigma_ret)
