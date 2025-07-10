@@ -12,7 +12,7 @@ from qtpyt.projector import ProjectedGreenFunction
 
 
 # Data paths
-data_folder = f"./output/lowdin/"
+data_folder = f"./output/lowdin"
 
 # Load data
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
@@ -24,10 +24,9 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 
 # Parameters
 de = 0.01
-energies = np.arange(-3, 3 + de / 2.0, de).round(7)
+energies = np.arange(-20, 20 + de / 2.0, de).round(7)
 eta = 1e-3
-z_ret = energies + 1.0j * eta
-beta = 38.68
+beta = 1000
 
 # Green's Function Setup
 gf = greenfunction.GreenFunction(
@@ -53,8 +52,8 @@ gd.write(HB, filename)
 del HB
 
 # Define parameters for matsubara grid
-ne = 3000
-matsubara_energies = 1.0j * (2 * np.arange(ne) + 1) * np.pi / beta
+nmats = 5000
+matsubara_energies = 1.0j * (2 * np.arange(nmats) + 1) * np.pi / beta
 
 gfp.eta = 0.0
 assert self_energy[0].eta == 0.0
@@ -72,4 +71,7 @@ mat_gd.write(HB_mat, filename)
 del HB_mat
 
 if comm.rank == 0:
-    np.save(os.path.join(data_folder, "matsubara_energies.npy"), matsubara_energies)
+    np.save(
+        os.path.join(data_folder, "matsubara_energies.npy"), matsubara_energies
+    )
+    np.save(os.path.join(data_folder, 'retarded_energies.npy'), energies + 1.j * eta)

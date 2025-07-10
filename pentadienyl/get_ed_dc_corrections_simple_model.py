@@ -45,14 +45,9 @@ neig = np.ones((nimp + 1) * (nimp + 1), int) * 6
 
 params["z"] = occupancy_goal
 
-penalty_weight = 1.0
-delta_order = 0.01  # Minimum margin for ordering (eV)
-dc_diag_clip_bounds = (0.0, 10.0)  # Prevent unphysical values
-
 # Precompute reference ratio structure
 dc0_diag = DC0.diagonal()
 target_ratios = dc0_diag / np.max(dc0_diag)
-
 
 espace0, egs0 = build_espace(H_eff, np.zeros_like(H_eff), neig_sector=neig)
 screen_espace(espace0, egs0, beta)
