@@ -9,17 +9,19 @@ from edpyt.gf2_lanczos import build_gf2_lanczos
 
 
 class Sigma:
-    def __init__(self, gf, H_eff, eta=1e-5):
+    def __init__(self, gf0, gf, H_eff, eta=1e-5):
+        self.gf0 = gf0
         self.gf = gf
         self.eta = eta
         self.H_eff = H_eff
 
     def retarded(self, energy):
         energies = np.atleast_1d(energy)
+        g0 = self.gf0(energies, self.eta)
         g = self.gf(energies, self.eta)
-        sigma = np.empty((energies.size,self.gf.n,self.gf.n), complex)
+        sigma = np.empty((energies.size, self.gf.n, self.gf.n), complex)
         for e, energy in enumerate(energies):
-            sigma[e] = energy - self.H_eff - np.linalg.inv(g[...,e])
+            sigma[e] = np.linalg.inv(g0[..., e]) - np.linalg.inv(g[..., e])
         return sigma
 
 
@@ -29,8 +31,9 @@ output_folder = "output_production_run/lowdin/ed"
 os.makedirs(output_folder, exist_ok=True)
 
 H_eff = np.load(f"{input_folder}/effective_hamiltonian.npy")
-occupancy_goal = np.load(f"{input_folder}/beta_1000/occupancies.npy")
+occupancy_goal = np.load(f"{input_folder}/occupancies.npy")
 V = np.loadtxt(f"{input_folder}/U_matrix.txt")
+V_diag = np.diag(V.diagonal())
 
 # === Parameters ===
 nimp = H_eff.shape[0]
@@ -39,21 +42,29 @@ beta = 1000
 
 # === Initial double counting ===
 DC0 = np.diag(V.diagonal() * (occupancy_goal - 0.5))
+dc0_diag = DC0.diagonal()
+# dc0_diag = (V @ (occupancy_goal - 0.5))/ nimp
+# DC0 = np.diag(dc0_diag)
+
 neig = np.ones((nimp + 1) * (nimp + 1), int) * 6
 
 params["z"] = occupancy_goal
 
-# Precompute reference ratio structure
-dc0_diag = DC0.diagonal()
+
+# Non-interacting Green's function
+
+espace, egs = build_espace(H_eff, np.zeros_like(H_eff), neig_sector=neig)
+screen_espace(espace, egs, beta)
+gf0 = build_gf2_lanczos(H_eff, np.zeros_like(H_eff), espace, beta, egs)
 
 def residual_function(dc_diag):
     dc_diag = np.clip(dc_diag, 0.0, np.inf)
     DC = np.diag(dc_diag)
 
-    espace, egs = build_espace(H_eff - DC, V, neig_sector=neig)
+    espace, egs = build_espace(H_eff - DC, V_diag, neig_sector=neig)
     screen_espace(espace, egs, beta)
-    gf = build_gf2_lanczos(H_eff - DC, V, espace, beta, egs)
-    sigma = Sigma(gf, H_eff, eta=eta)
+    gf = build_gf2_lanczos(H_eff - DC, V_diag, espace, beta, egs)
+    sigma = Sigma(gf0, gf, H_eff, eta=eta)
 
     energies = np.array([-100.0, 100.0])
     sig = sigma.retarded(energies)
@@ -80,4 +91,4 @@ dc_diag_optimized = broyden1(
 )
 
 # Save the optimized double counting
-np.save(f"{output_folder}/ed_dcc_diag.npy", dc_diag_optimized)
+np.save(f"{output_folder}/ed_dcc_diag_V_diag.npy", dc_diag_optimized)
