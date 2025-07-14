@@ -41,7 +41,7 @@ leads_basis = Basis.from_dictionary(leads_atoms, basis_dict)
 device_atoms = read(cc_path / "scatt.xyz")
 device_basis = Basis.from_dictionary(device_atoms, basis_dict)
 
-nodes = [0, 810, 1116, 1278, 1584, 2394]
+nodes = np.load(f"{data_folder}/nodes.npy")
 
 # Define energy range and broadening factor for the Green's function calculation
 
