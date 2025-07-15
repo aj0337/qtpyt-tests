@@ -49,8 +49,6 @@ with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
 with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
     hs_list_ij = pickle.load(f)
 
-nodes = np.load(f"{data_folder}/nodes.npy")
-
 # Initialize the Green's function solver with the tridiagonalized matrices and self-energies
 gf = greenfunction.GreenFunction(
     hs_list_ii,
