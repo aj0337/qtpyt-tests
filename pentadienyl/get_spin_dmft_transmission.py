@@ -52,7 +52,7 @@ for beta in betas:
     with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
         hs_list_ij = pickle.load(f)
 
-    nodes = [0, 810, 1116, 1252, 1558, 2368]
+    nodes = np.load("output/lowdin/nodes.npy")
 
     gf = greenfunction.GreenFunction(
         hs_list_ii,
