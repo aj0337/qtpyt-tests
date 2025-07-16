@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=aubda13ch2-los
 #SBATCH --time=00:30:00
-#SBATCH --partition=debug
+#SBATCH --partition=normal
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=96
 #SBATCH --cpus-per-task=1
@@ -27,8 +27,8 @@ conda activate qtpyt
 # mpirun -n 1 python run_spin_dmft.py
 
 # mpirun -n 96 python get_dft_transmission.py
-# mpirun -n 96 python get_no_spin_dmft_transmission.py
-# mpirun -n 96 python get_spin_dmft_transmission.py
+mpirun -n 96 python get_no_spin_dmft_transmission.py
+mpirun -n 96 python get_spin_dmft_transmission.py
 
 # mpirun -n 1 python restart_dmft.py
 

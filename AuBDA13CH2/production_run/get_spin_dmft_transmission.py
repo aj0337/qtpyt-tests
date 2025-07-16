@@ -28,7 +28,7 @@ def run(outputfile):
     gd = GridDesc(energies, 1, float)
     T = np.empty(gd.energies.size)
     for e, energy in enumerate(gd.energies):
-        T[e] = gf.get_transmission(energy)
+        T[e] = gf.get_transmission(energy, ferretti=True)
 
     T = gd.gather_energies(T)
 
@@ -77,6 +77,6 @@ for spin, spin_label in enumerate(["up", "dw"]):
     self_energy[2] = dmft_sigma
     gf.selfenergies.append((imb, self_energy[2]))
 
-    outputfile = f"{dmft_data_folder}/ET_{spin_label}.npy"
+    outputfile = f"{dmft_data_folder}/ET_vertex_{spin_label}.npy"
     run(outputfile)
     gf.selfenergies.pop()
