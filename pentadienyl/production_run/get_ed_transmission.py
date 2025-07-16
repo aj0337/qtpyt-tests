@@ -38,21 +38,21 @@ def run(outputfile):
 
 
 data_folder = "output/lowdin"
-ed_data_folder = "output/lowdin/beta_1000/ed"
+ed_data_folder = "output/lowdin/ed"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
-ed_sigma_file = f"{ed_data_folder}/ed_sigma_test_-1ev.npy"
+ed_self_energy_file = f"{ed_data_folder}/self_energy.npy"
 
 de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
-eta = 1e-3
+eta = 1e-2
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
 with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
     hs_list_ij = pickle.load(f)
 
-nodes = np.load("output/lowdin/nodes.npy")
+nodes = np.load(f"{data_folder}/nodes.npy")
 
 # Initialize the Green's function solver with the tridiagonalized matrices and self-energies
 gf = greenfunction.GreenFunction(
@@ -65,7 +65,7 @@ gf = greenfunction.GreenFunction(
 
 # Add the DMFT self-energy for transmission
 if comm.rank == 0:
-    ed_sigma = load(ed_sigma_file)
+    ed_sigma = load(ed_self_energy_file)
 else:
     ed_sigma = None
 
@@ -81,6 +81,6 @@ ed_sigma = comm.bcast(ed_sigma, root=0)
 self_energy[2] = ed_sigma
 gf.selfenergies.append((imb, self_energy[2]))
 
-outputfile = f"{ed_data_folder}/transmission_test_-1ev.npy"
+outputfile = f"{ed_data_folder}/ET.npy"
 run(outputfile)
 gf.selfenergies.pop()

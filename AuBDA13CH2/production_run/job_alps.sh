@@ -31,7 +31,6 @@ conda activate qtpyt
 # mpirun -n 96 python get_spin_dmft_transmission.py
 
 # mpirun -n 1 python restart_dmft.py
-# mpirun -n 24 python get_ed_transmission.py
 
 # mpirun -n 1 python get_ed_dc_corrections.py
 # mpirun -n 1 python get_ed_self_energy.py
