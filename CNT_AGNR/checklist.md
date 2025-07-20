@@ -11,5 +11,7 @@ Use this list to ensure all necessary tasks are completed in the correct order.
   - [ ] Perform DFT calculations on the device, leads and bridge structure to obtain the ground state electronic properties.
   - [ ] Check bandgap of the bridge structure
 
+- [ ] If the leads are reduced in dimensionality due to picking of the active space, the computed leads self-energy needs to be expanded to the original leads dimensions.
+
 - [ ] Compare and contrast DOS or orbitals or energies with and without lowdin orthogonalization
   - [ ] Analyze if Lowdin orthogonalization changes the DOS or orbitals significantly.
