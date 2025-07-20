@@ -9,7 +9,7 @@ rank = comm.Get_rank()
 size = comm.Get_size()
 
 data_folder = "./output/no_lowdin/device"
-self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
+self_energy = np.load(f"{data_folder}/self_energy_expanded.npy", allow_pickle=True)
 H_subdiagonalized, _ = np.load(f"{data_folder}/hs_los_no_lowdin.npy")
 de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
@@ -19,10 +19,6 @@ with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
 with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
     hs_list_ij = pickle.load(f)
-
-# expand dimension of C 2pz lead self energy to dimensions of the lead region
-expand_coupling(self_energy[0], len(H_device[0]))
-expand_coupling(self_energy[1], len(H_device[0]), id="right")
 
 gf = greenfunction.GreenFunction(
     hs_list_ii,
