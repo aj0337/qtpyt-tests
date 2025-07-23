@@ -26,9 +26,9 @@ def run(outputfile):
         np.save(outputfile, (energies, T.real))
         plt.figure()
         plt.plot(energies, T)
-        plt.yscale("log")
-        plt.xlim(-3.0, 3.0)
-        plt.ylim(1e-5, 1)
+        # plt.yscale("log")
+        # plt.xlim(-3.0, 3.0)
+        # plt.ylim(1e-5, 1)
         plt.xlabel("Energy (eV)")
         plt.ylabel("Transmission")
         plt.tight_layout()
@@ -42,8 +42,8 @@ os.makedirs(dft_data_folder, exist_ok=True)
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 
 de = 0.01
-energies = np.arange(-1, 1 + de / 2.0, de).round(7)
-eta = 1e-2
+energies = np.arange(-3, 3 + de / 2.0, de).round(7)
+eta = 1e-4
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)

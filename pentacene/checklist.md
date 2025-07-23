@@ -21,6 +21,7 @@ Use this list to ensure all necessary tasks are completed in the correct order.
   - [ ] Get subdiagonalized Hamiltonian and overlap matrices (transform to localized orbital basis set)
   - [ ] If performing DMFT or ED calculations, ensure that the Hamiltonian and overlap matrices are Lowdin orthogonalized.
 
+
 - Step 4: Nodes and Regions
 
   - Refer to `compute_tridiagonal_nodes.ipynb`

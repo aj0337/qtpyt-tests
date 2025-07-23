@@ -48,15 +48,23 @@ H_lcao -= fermi * S_lcao
 # Perform subdiagonalization
 subdiag_indices = get_species_indices(atoms, SUBDIAG_SPECIES)
 
+# z = basis.atoms.positions[:,2]
+# subdiag_indices = np.where(z>(z.min()+(z.max()-z.min())/2))[0]
+
 basis_subdiag_region = basis[subdiag_indices]
 index_subdiag_region = basis_subdiag_region.get_indices()
 
 extract_active_region = basis_subdiag_region.extract().take(active)
 index_active_region = index_subdiag_region[extract_active_region]
 
-np.save(f"{data_folder}/index_active_region.npy", index_active_region)
 
 Usub, eig = subdiagonalize_atoms(basis, H_lcao, S_lcao, a=subdiag_indices)
+
+# Positive projection onto p-z AOs
+for idx_lo in index_active_region:
+    if Usub[idx_lo-1,idx_lo] < 0.: # change sign
+        Usub[:,idx_lo] *= -1
+
 H_subdiagonalized = rotate_matrix(H_lcao, Usub)
 S_subdiagonalized = rotate_matrix(S_lcao, Usub)
 
@@ -75,3 +83,4 @@ else:
     S_subdiagonalized = S_subdiagonalized[None, ...]
 
 np.save(f"{data_folder}/hs_los.npy", (H_subdiagonalized, S_subdiagonalized))
+np.save(f"{data_folder}/index_active_region.npy", index_active_region)

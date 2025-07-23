@@ -1,0 +1,2 @@
+  - Refer to `get_los_prerequisites.py`
+    - [ ] Note that in this case, the flipping of the sign to create a positive projection onto the p-z AOs is the difference between getting the right and wrong transmission function. This needs to be examined as the reason and rationale for this is unclear to me.
