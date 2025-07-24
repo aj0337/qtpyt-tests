@@ -8,6 +8,7 @@ from qtpyt.base.selfenergy import DataSelfEnergy as BaseDataSelfEnergy
 from qtpyt.block_tridiag import greenfunction
 from qtpyt.parallel import comm
 from qtpyt.parallel.egrid import GridDesc
+import matplotlib.pyplot as plt
 from qtpyt.projector import expand
 
 comm = MPI.COMM_WORLD
@@ -29,19 +30,29 @@ def run(outputfile):
     gd = GridDesc(energies, 1, float)
     T = np.empty(gd.energies.size)
     for e, energy in enumerate(gd.energies):
-        T[e] = gf.get_transmission(energy, ferretti=True)
+        T[e] = gf.get_transmission(energy, ferretti=False)
 
     T = gd.gather_energies(T)
 
     if comm.rank == 0:
         np.save(outputfile, (energies, T.real))
+        plt.figure()
+        plt.plot(energies, T)
+        plt.yscale("log")
+        plt.xlim(-3.0, 3.0)
+        plt.ylim(1e-5, 1)
+        plt.xlabel("Energy (eV)")
+        plt.ylabel("Transmission")
+        plt.tight_layout()
+        plt.savefig(f"{ed_data_folder}/ET_Uii.png", dpi=300)
+        plt.close()
 
 
 data_folder = "output/lowdin"
 ed_data_folder = "output/lowdin/ed"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
-ed_self_energy_file = f"{ed_data_folder}/self_energy.npy"
+ed_self_energy_file = f"{ed_data_folder}/self_energy_with_dcc_Uii.npy"
 
 de = 0.01
 energies = np.arange(-3, 3 + de / 2.0, de).round(7)
@@ -81,6 +92,6 @@ ed_sigma = comm.bcast(ed_sigma, root=0)
 self_energy[2] = ed_sigma
 gf.selfenergies.append((imb, self_energy[2]))
 
-outputfile = f"{ed_data_folder}/ET_vertex.npy"
+outputfile = f"{ed_data_folder}/ET_Uii.npy"
 run(outputfile)
 gf.selfenergies.pop()

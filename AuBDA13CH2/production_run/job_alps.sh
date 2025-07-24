@@ -27,8 +27,8 @@ conda activate qtpyt
 # mpirun -n 1 python run_spin_dmft.py
 
 # mpirun -n 96 python get_dft_transmission.py
-mpirun -n 96 python get_no_spin_dmft_transmission.py
-mpirun -n 96 python get_spin_dmft_transmission.py
+# mpirun -n 96 python get_no_spin_dmft_transmission.py
+# mpirun -n 96 python get_spin_dmft_transmission.py
 
 # mpirun -n 1 python restart_dmft.py
 
