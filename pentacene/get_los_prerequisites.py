@@ -46,10 +46,10 @@ S_lcao = lcao.get_overlap()
 H_lcao -= fermi * S_lcao
 
 # Perform subdiagonalization
-subdiag_indices = get_species_indices(atoms, SUBDIAG_SPECIES)
+# subdiag_indices = get_species_indices(atoms, SUBDIAG_SPECIES)
 
-# z = basis.atoms.positions[:,2]
-# subdiag_indices = np.where(z>(z.min()+(z.max()-z.min())/2))[0]
+z = basis.atoms.positions[:, 2]
+subdiag_indices = np.where(z > (z.min() + (z.max() - z.min()) / 2))[0]
 
 basis_subdiag_region = basis[subdiag_indices]
 index_subdiag_region = basis_subdiag_region.get_indices()
@@ -62,8 +62,8 @@ Usub, eig = subdiagonalize_atoms(basis, H_lcao, S_lcao, a=subdiag_indices)
 
 # Positive projection onto p-z AOs
 for idx_lo in index_active_region:
-    if Usub[idx_lo-1,idx_lo] < 0.: # change sign
-        Usub[:,idx_lo] *= -1
+    if Usub[idx_lo - 1, idx_lo] < 0.0:  # change sign
+        Usub[:, idx_lo] *= -1
 
 H_subdiagonalized = rotate_matrix(H_lcao, Usub)
 S_subdiagonalized = rotate_matrix(S_lcao, Usub)
