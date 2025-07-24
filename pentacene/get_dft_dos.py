@@ -9,6 +9,8 @@ from qtpyt.block_tridiag import greenfunction
 from qtpyt.parallel import comm
 import matplotlib.pyplot as plt
 from qtpyt.parallel.egrid import GridDesc
+from qtpyt.projector import ProjectedGreenFunction
+from qtpyt.hybridization import Hybridization
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -18,7 +20,7 @@ def run(outputfile):
     gd = GridDesc(energies, 1, float)
     T = np.empty(gd.energies.size)
     for e, energy in enumerate(gd.energies):
-        T[e] = gf.get_dos(energy)
+        T[e] = gfp.get_dos(energy)
 
     T = gd.gather_energies(T)
 
@@ -32,11 +34,12 @@ def run(outputfile):
         plt.xlabel("Energy (eV)")
         plt.ylabel("dos")
         plt.tight_layout()
-        plt.savefig(f"{dft_data_folder}/Evdos.png", dpi=300)
+        plt.savefig(f"{dft_data_folder}/Evdos_pz.png", dpi=300)
         plt.close()
 
 
 data_folder = "./output/lowdin"
+index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 dft_data_folder = "./output/lowdin/dft"
 os.makedirs(dft_data_folder, exist_ok=True)
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
@@ -59,6 +62,8 @@ gf = greenfunction.GreenFunction(
     eta=eta,
 )
 
+gfp = ProjectedGreenFunction(gf, index_active_region)
+
 # dos function for DFT
-outputfile = f"{dft_data_folder}/Evdos.npy"
+outputfile = f"{dft_data_folder}/Evdos_pz.npy"
 run(outputfile)
