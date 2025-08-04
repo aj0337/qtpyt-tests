@@ -10,38 +10,34 @@ from qtpyt.parallel import comm
 import matplotlib.pyplot as plt
 from qtpyt.parallel.egrid import GridDesc
 from qtpyt.projector import ProjectedGreenFunction
-from qtpyt.hybridization import Hybridization
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 
-
-def run(outputfile):
+def run(outputfile, gf_object):
     gd = GridDesc(energies, 1, float)
-    T = np.empty(gd.energies.size)
+    dos = np.empty(gd.energies.size)
     for e, energy in enumerate(gd.energies):
-        T[e] = gfp.get_dos(energy)
+        dos[e] = gf_object.get_dos(energy)
 
-    T = gd.gather_energies(T)
+    dos = gd.gather_energies(dos)
 
     if comm.rank == 0:
-        np.save(outputfile, (energies, T.real))
+        np.save(outputfile, (energies, dos.real))
         plt.figure()
-        plt.plot(energies, T)
-        # plt.yscale("log")
-        # plt.xlim(-3.0, 3.0)
-        # plt.ylim(1e-5, 1)
+        plt.plot(energies, dos)
         plt.xlabel("Energy (eV)")
-        plt.ylabel("dos")
+        plt.ylabel("DOS")
         plt.tight_layout()
-        plt.savefig(f"{dft_data_folder}/Evdos_pz.png", dpi=300)
+        plt.savefig(outputfile.replace(".npy", ".png"), dpi=300)
         plt.close()
 
-
+# === Setup ===
 data_folder = "./output/lowdin"
-index_active_region = np.load(f"{data_folder}/index_active_region.npy")
-dft_data_folder = "./output/lowdin/dft"
+dft_data_folder = f"{data_folder}/dft"
 os.makedirs(dft_data_folder, exist_ok=True)
+
+index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 
 de = 0.01
@@ -53,7 +49,7 @@ with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
 with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
     hs_list_ij = pickle.load(f)
 
-# Initialize the Green's function solver with the tridiagonalized matrices and self-energies
+# === Green's Function Setup ===
 gf = greenfunction.GreenFunction(
     hs_list_ii,
     hs_list_ij,
@@ -62,8 +58,11 @@ gf = greenfunction.GreenFunction(
     eta=eta,
 )
 
-gfp = ProjectedGreenFunction(gf, index_active_region)
+# === Choose full or projected DOS ===
+use_projected_dos = True  # Set to False for total DOS
 
-# dos function for DFT
-outputfile = f"{dft_data_folder}/Evdos_pz.npy"
-run(outputfile)
+gf_object = ProjectedGreenFunction(gf, index_active_region) if use_projected_dos else gf
+filename = "Evdos_pz.npy" if use_projected_dos else "Evdos_total.npy"
+outputfile = os.path.join(dft_data_folder, filename)
+
+run(outputfile, gf_object)
