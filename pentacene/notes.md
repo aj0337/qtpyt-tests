@@ -13,4 +13,6 @@
     - `PrincipalSelfEnergy`: Use when your lead is periodic in directions perpendicular to transport and you want to treat that periodicity explicitly via k-point sampling.
 
 - Normalization of the transmission function
-  - The transmission function is normalized in some cases, but not in others. My suspicion is that the normalization occurs when the leads self-energies are computed using the `PrincipalSelfEnergy` method, but not when using the `LeadSelfEnergy`method.
+  - The transmission function is normalized in some cases, but not in others. ~~My suspicion is that the normalization occurs when the leads self-energies are computed using the `PrincipalSelfEnergy` method, but not when using the `LeadSelfEnergy`method.~~ The above suspicion was tested and found to be false. It wasn't normalized in either cases. This raises the question why it is normalized automatically in the case of the pentadienyl and benzyl radical on Au leads. I have included a function that normalizes the transmission function using the number of open channels. There is a possibility that the number of open channels in the pentadienyl and benzyl case was 1 across all energies. (Something that needs to be verified)
+
+- DOS plots suggest that one of the peaks around the Fermi energy can't be described by the C 2 pz of the the bridge molecule. This peak seems to have largest contributions from the C 2 pz of the leads.
