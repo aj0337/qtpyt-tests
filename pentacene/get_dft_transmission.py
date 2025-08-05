@@ -18,7 +18,7 @@ def run(outputfile):
     gd = GridDesc(energies, 1, float)
     T = np.empty(gd.energies.size)
     for e, energy in enumerate(gd.energies):
-        T[e] = gf.get_transmission(energy)
+        T[e] = gf.get_transmission(energy, normalize=True)
 
     T = gd.gather_energies(T)
 
