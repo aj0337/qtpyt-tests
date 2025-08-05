@@ -69,12 +69,10 @@ if lowdin:
     H_subdiagonalized = H_subdiagonalized[None, ...]
     S_subdiagonalized = S_subdiagonalized[None, ...]
 
-    np.save(f"{data_folder}/hs_los_lowdin.npy", (H_subdiagonalized, S_subdiagonalized))
-
 else:
     H_subdiagonalized = H_subdiagonalized[None, ...]
     S_subdiagonalized = S_subdiagonalized[None, ...]
 
-    np.save(
-        f"{data_folder}/hs_los_no_lowdin.npy", (H_subdiagonalized, S_subdiagonalized)
-    )
+np.save(
+    f"{data_folder}/hs_los.npy", (H_subdiagonalized, S_subdiagonalized)
+)
