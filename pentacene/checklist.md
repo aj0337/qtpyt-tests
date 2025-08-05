@@ -27,7 +27,7 @@ Use this list to ensure all necessary tasks are completed in the correct order.
   - Refer to `compute_tridiagonal_nodes.ipynb`
   - [ ] Compute the nodes of the tridiagonal matrix
   - [ ] Identify the regions in the subdiagonalized Hamiltonian matrix that correspond to the left lead, bridge, and right lead.
-  <!-- - [ ] If the leads are reduced in dimensionality due to picking of the active space, the computed leads self-energy needs to be expanded to the original leads dimensions. -->
+  - [ ] ~~If the leads are reduced in dimensionality due to picking of the active space, the computed leads self-energy needs to be expanded to the original leads dimensions.~~ The current implementation of qtpyt doesn't allow the active space to be in the leads region.
 
 - Step 5: Green's Function Prerequisites
 
