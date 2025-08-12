@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 import pickle
 from pathlib import Path
-from re import L
 
 import numpy as np
 from ase.io import read

@@ -32,7 +32,6 @@ SUBDIAG_SPECIES = ("C", "H")
 active = {"C": [3]}
 
 cc_path = Path(GPWDEVICEDIR)
-pl_path = Path(GPWLEADSDIR)
 gpwfile = f"{cc_path}/scatt.gpw"
 
 atoms, calc = restart(gpwfile, txt=None)
@@ -56,7 +55,6 @@ index_subdiag_region = basis_subdiag_region.get_indices()
 
 extract_active_region = basis_subdiag_region.extract().take(active)
 index_active_region = index_subdiag_region[extract_active_region]
-
 
 Usub, eig = subdiagonalize_atoms(basis, H_lcao, S_lcao, a=subdiag_indices)
 
