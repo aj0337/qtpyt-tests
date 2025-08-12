@@ -19,19 +19,22 @@ output_dir = "unrelaxed/output/cube_files"
 os.makedirs(output_dir, exist_ok=True)
 
 input_dir = "unrelaxed/dft/device"
+struct_dir = "structures/unrelaxed/sorted"
 
 # Load atomic structure and calculator
-atoms = read(f'{input_dir}/scatt.xyz')
-calc = GPAW(f'{input_dir}/scatt.gpw', txt=None)
+atoms = read(f'{struct_dir}/scatt.xyz')
+calc = GPAW(f'{input_dir}/scatt_restart3.gpw', txt=None)
 lcao = LCAOwrap(calc)
 
 # Flags to control output generation
-los_cube = False
-lowdin_cube = True
+los_cube = True
+lowdin_cube = False
 lcao_cube = False
 ao_cube = False
 
 active = {"C": [3]}
+orbital_indices = np.load("unrelaxed/output/lowdin/index_active_region.npy")
+orbital_indices = orbital_indices[90:100]
 
 # Common data for los and lowdin_cube
 if los_cube or lowdin_cube:
@@ -53,11 +56,14 @@ if los_cube:
     Usub, eig = subdiagonalize_atoms(basis, H_lcao, S_lcao, a=subdiag_indices)
     los = LOs(Usub[:, index_subdiag_region].T, lcao)
 
-    # Generate cube files for specified orbitals in orbital_map
-    for key, values in active.items():
-        orbital_indices = basis_subdiag_region.extract().take({key: values})
-        for w, w_G in enumerate(los.get_orbitals(orbital_indices)):
-            write(f"{folder_path}/los_{key}{w}_orbital{values}.cube", atoms, data=w_G)
+    for i, w_G in enumerate(los.get_orbitals(indices=orbital_indices)):
+        write(f"{folder_path}/C{i}_orbital_3.cube", atoms, data=w_G)
+
+    # # Generate cube files for specified orbitals in orbital_map
+    # for key, values in active.items():
+    #     orbital_indices = basis_subdiag_region.extract().take({key: values})
+    #     for w, w_G in enumerate(los.get_orbitals(orbital_indices)):
+    #         write(f"{folder_path}/{key}{w}_orbital{values}.cube", atoms, data=w_G)
 
 # Generate lowdin cube files
 if lowdin_cube:
@@ -66,15 +72,21 @@ if lowdin_cube:
     Usub, eig = subdiagonalize_atoms(basis, H_lcao, S_lcao, a=subdiag_indices)
     active_indices = basis_subdiag_region.extract().take(active)
     index_active_region = index_subdiag_region[active_indices]
-    Ulow = lowdin_rotation(rotate_matrix(H_lcao, Usub), rotate_matrix(S_lcao, Usub), index_active_region)
+    Ulow = lowdin_rotation(rotate_matrix(H_lcao, Usub),
+                           rotate_matrix(S_lcao, Usub), index_active_region)
     U = Usub.dot(Ulow)
     los = LOs(U.T, lcao)
 
-    # Generate cube files for specified orbitals in orbital_map
-    for key, values in active.items():
-        orbital_indices = basis_subdiag_region.extract().take({key: values})
-        for w, w_G in enumerate(los.get_orbitals(orbital_indices)):
-            write(f"{folder_path}/lowdin_{key}{w}_orbital{values}.cube", atoms, data=w_G)
+    for i, w_G in enumerate(los.get_orbitals(indices=orbital_indices)):
+        write(f"{folder_path}/C{i}_orbital_3.cube", atoms, data=w_G)
+
+    # # Generate cube files for specified orbitals in orbital_map
+    # for key, values in active.items():
+    #     orbital_indices = basis_subdiag_region.extract().take({key: values})
+    #     for w, w_G in enumerate(los.get_orbitals(orbital_indices)):
+    #         write(f"{folder_path}/{key}{w}_orbital{values}.cube",
+    #               atoms,
+    #               data=w_G)
 
 # Generate lcao cube files for orbitals around Fermi level
 if lcao_cube:
@@ -115,6 +127,6 @@ if ao_cube:
     orbital_indices = range(4)
     w_wG = lcao.get_orbitals(indices=orbital_indices)
     for w, w_G in enumerate(w_wG):
-        write(f"{folder_path}/ao_orbital{w}.cube", atoms, data=w_G)
+        write(f"{folder_path}/orbital{w}.cube", atoms, data=w_G)
 
 print("Cube files generated successfully in the output directory.")
