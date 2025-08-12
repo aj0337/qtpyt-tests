@@ -16,7 +16,6 @@ Use this list to ensure all necessary tasks are completed in the correct order.
 
   - Checks:
     - Visualize energy levels for device and bridge
-    - Look at occupancies and Fermi energy
 
 - Step 3:
 
@@ -28,6 +27,7 @@ Use this list to ensure all necessary tasks are completed in the correct order.
   - Checks:
     - Refer to `get_cubefiles.py`
     - Visualize LOs in Vesta
+    - Compare Lowdin orthogonalized and non-orthogonalized orbitals
 
 - Step 4: Nodes and Regions
 
