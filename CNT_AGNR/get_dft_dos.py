@@ -1,19 +1,26 @@
+from __future__ import annotations
+import os
 import pickle
 import numpy as np
 from mpi4py import MPI
-from qtpyt.tools import expand_coupling
 from qtpyt.block_tridiag import greenfunction
+from qtpyt.projector import ProjectedGreenFunction
+import matplotlib.pyplot as plt
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-data_folder = "./output/no_lowdin/device"
-self_energy = np.load(f"{data_folder}/self_energy_expanded.npy", allow_pickle=True)
-H_subdiagonalized, _ = np.load(f"{data_folder}/hs_los_no_lowdin.npy")
+data_folder = "./unrelaxed/output/lowdin"
+dft_data_folder = f"{data_folder}/dft"
+os.makedirs(dft_data_folder, exist_ok=True)
+
+index_active_region = np.load(f"{data_folder}/index_active_region.npy")
+self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
+
 de = 0.01
-energies = np.arange(-3, 3 + de / 2.0, de).round(7)
-eta = 1e-3
+energies = np.arange(-1, 1 + de / 2.0, de).round(7)
+eta = 1e-4
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
@@ -23,39 +30,37 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 gf = greenfunction.GreenFunction(
     hs_list_ii,
     hs_list_ij,
-    # [],
     [(0, self_energy[0]), (len(hs_list_ii) - 1, self_energy[1])],
     solver="dyson",
     eta=eta,
 )
 
+use_projected_dos = True
+gf_object = ProjectedGreenFunction(gf, index_active_region) if use_projected_dos else gf
+filename = "Evdos_pz.npy" if use_projected_dos else "Evdos_total.npy"
+outputfile = os.path.join(dft_data_folder, filename)
+
 local_energies = np.array_split(energies, size)[rank]
-local_pdos = np.zeros((len(local_energies), H_subdiagonalized.shape[-1]))
-
+local_dos = np.empty(local_energies.size, dtype=np.float64)
 for i, energy in enumerate(local_energies):
-    local_pdos[i] = gf.get_pdos(energy)
+    local_dos[i] = np.real(gf_object.get_dos(energy))
 
-pdos = None
+sendcounts = np.array(comm.gather(local_dos.size, root=0))
 if rank == 0:
-    pdos = np.empty(
-        (len(energies), H_subdiagonalized.shape[-1]), dtype=local_pdos.dtype
-    )
-
-sendcounts = np.array(comm.gather(local_pdos.shape[0], root=0))
-if rank == 0:
+    dos = np.empty(energies.size, dtype=np.float64)
     displs = np.insert(np.cumsum(sendcounts[:-1]), 0, 0)
-    recvbuf = [
-        pdos,
-        (
-            sendcounts * H_subdiagonalized.shape[-1],
-            displs * H_subdiagonalized.shape[-1],
-        ),
-        MPI.DOUBLE,
-    ]
+    recvbuf = [dos, (sendcounts, displs), MPI.DOUBLE]
 else:
     recvbuf = None
 
-comm.Gatherv(sendbuf=local_pdos, recvbuf=recvbuf, root=0)
+comm.Gatherv(sendbuf=local_dos, recvbuf=recvbuf, root=0)
 
 if rank == 0:
-    np.save(f"{data_folder}/pdos.npy", pdos)
+    np.save(outputfile, (energies, dos))
+    plt.figure()
+    plt.plot(energies, dos)
+    plt.xlabel("Energy (eV)")
+    plt.ylabel("DOS")
+    plt.tight_layout()
+    plt.savefig(outputfile.replace(".npy", ".png"), dpi=300)
+    plt.close()
