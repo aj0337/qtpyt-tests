@@ -23,4 +23,5 @@ conda activate qtpyt
 # mpirun -n 1 python get_dft_transmission.py
 # mpirun -n 1 python get_dft_states.py
 # mpirun -n 1 python get_active_embedding_hybridization.py
-mpirun -n 1 python get_dft_pdos.py
+# mpirun -n 1 python get_dft_pdos.py
+mpirun -n 1 python makeU.py
