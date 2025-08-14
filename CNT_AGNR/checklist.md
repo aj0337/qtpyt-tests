@@ -51,11 +51,17 @@ Use this list to ensure all necessary tasks are completed in the correct order.
 
   - Refer to `get_leads_self_energy.py`
 
+  Checks:
+  - Is there an effect of the number of repetitions of a unit cell considered when computing leads self-energy?
+  - Is there an effect on how big the leads need to be in the device (a.k.a scattering region)?
+
 - Step 7: Compute DOS
 
   - Refer to `get_dos.py`
-  - Check if the dos from the active region describes the states around Fermi energy in the total dos.
-  - If not, this may indicate the need to expand the orbitals being considered in the active region.
+  Checks:
+    - Check if the dos from the active region describes the states around Fermi energy in the total dos.
+    - If not, this may indicate the need to expand the orbitals being considered in the active region.
+    - Can we get the dos of just the bridge and compare it to the one in the paper?
 
 
 - Step 8: DFT Transmission
