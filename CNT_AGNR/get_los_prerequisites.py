@@ -84,3 +84,4 @@ np.save(
     f"{data_folder}/hs_los.npy", (H_subdiagonalized, S_subdiagonalized)
 )
 np.save(f"{data_folder}/index_active_region.npy", index_active_region)
+np.save(f"{data_folder}/index_bridge.npy", index_subdiag_region)

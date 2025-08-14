@@ -15,7 +15,7 @@ data_folder = "./unrelaxed/output/lowdin"
 dft_data_folder = f"{data_folder}/dft"
 os.makedirs(dft_data_folder, exist_ok=True)
 
-index_active_region = np.load(f"{data_folder}/index_active_region.npy")
+index_bridge = np.load(f"{data_folder}/index_bridge.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 
 de = 0.01
@@ -35,15 +35,14 @@ gf = greenfunction.GreenFunction(
     eta=eta,
 )
 
-use_projected_dos = True
-gf_object = ProjectedGreenFunction(gf, index_active_region) if use_projected_dos else gf
-filename = "Evdos_pz.npy" if use_projected_dos else "Evdos_total.npy"
+gfp = ProjectedGreenFunction(gf, index_bridge)
+filename = "Evdos_total.npy"
 outputfile = os.path.join(dft_data_folder, filename)
 
 local_energies = np.array_split(energies, size)[rank]
 local_dos = np.empty(local_energies.size, dtype=np.float64)
 for i, energy in enumerate(local_energies):
-    local_dos[i] = np.real(gf_object.get_dos(energy))
+    local_dos[i] = np.real(gfp.get_dos(energy))
 
 sendcounts = np.array(comm.gather(local_dos.size, root=0))
 if rank == 0:
