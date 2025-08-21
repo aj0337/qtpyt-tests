@@ -5,8 +5,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=4
 #SBATCH --cpus-per-task=1
-#SBATCH --time=4-12:00:00
-#SBATCH --mem=62500
+#SBATCH --time=12:10:00
+#SBATCH --mem=2500
 
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 export MPICH_GPU_SUPPORT_ENABLED=0

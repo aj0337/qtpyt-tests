@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=4-12:00:00
-#SBATCH --mem=62500
+#SBATCH --mem=2500
 
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 ulimit -s unlimited
