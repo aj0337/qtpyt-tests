@@ -3,10 +3,10 @@
 #SBATCH --job-name="defs1"
 #SBATCH --get-user-env
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=4
+#SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=12:10:00
-#SBATCH --mem=2500
+#SBATCH --mem=1000
 
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 export MPICH_GPU_SUPPORT_ENABLED=0
@@ -18,5 +18,6 @@ MINICONDA_PATH=/home/jayn/miniconda3
 source $MINICONDA_PATH/etc/profile.d/conda.sh
 conda activate qtpyt
 
-mpirun -n 4 gpaw python scatt.py
+# mpirun -n 4 gpaw python scatt.py
 # srun gpaw python dump.py
+mpirun -n 1 gpaw python get_gpaw_dos.py
