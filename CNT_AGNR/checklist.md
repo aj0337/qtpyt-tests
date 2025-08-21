@@ -59,6 +59,7 @@ Use this list to ensure all necessary tasks are completed in the correct order.
 
   - Refer to `get_dos.py`
   Checks:
+    - Compare dos for lowdin orthogonalized vs non-orthogonalized orbitals.
     - Check if the dos from the active region describes the states around Fermi energy in the total dos.
     - If not, this may indicate the need to expand the orbitals being considered in the active region.
     - Can we get the dos of just the bridge and compare it to the one in the paper?
@@ -67,5 +68,6 @@ Use this list to ensure all necessary tasks are completed in the correct order.
 - Step 8: DFT Transmission
   - Refer to `get_dft_transmission.py`
 
+- Step 9: CRPA to obtain U values ab-initio?
 <!-- - [ ] Compare and contrast DOS or orbitals or energies with and without lowdin orthogonalization
   - [ ] Analyze if Lowdin orthogonalization changes the DOS or orbitals significantly. -->

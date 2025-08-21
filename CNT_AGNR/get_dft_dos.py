@@ -11,7 +11,8 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-data_folder = "./unrelaxed/output/lowdin"
+lowdin = False
+data_folder = f"./unrelaxed/output/lowdin" if lowdin else f"./unrelaxed/output/no_lowdin"
 dft_data_folder = f"{data_folder}/dft"
 os.makedirs(dft_data_folder, exist_ok=True)
 

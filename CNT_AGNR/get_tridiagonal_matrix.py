@@ -8,7 +8,7 @@ from qtpyt.basis import Basis
 from qtpyt.block_tridiag import graph_partition
 from qtpyt.tools import remove_pbc
 
-lowdin = True
+lowdin = False
 data_folder = f"./unrelaxed/output/lowdin" if lowdin else f"./unrelaxed/output/no_lowdin"
 
 # Load matrices

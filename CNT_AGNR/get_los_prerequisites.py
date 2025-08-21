@@ -19,7 +19,7 @@ def get_species_indices(atoms, species):
     return sorted(indices)
 
 
-lowdin = True
+lowdin = False
 data_folder = f"./unrelaxed/output/lowdin" if lowdin else f"./unrelaxed/output/no_lowdin"
 # Create the folder if it doesn't exist
 if not os.path.exists(data_folder):
