@@ -15,7 +15,7 @@ Use this list to ensure all necessary tasks are completed in the correct order.
   - [ ] Perform DFT calculations on the device, leads and bridge structure to obtain the ground state electronic properties.
 
   - Checks:
-    - Visualize energy levels for device and bridge
+    - Visualize energy levels and DOS for device and bridge. Compare to Cp2K
 
 - Step 3:
 
