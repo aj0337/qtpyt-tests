@@ -15,26 +15,26 @@ def get_species_indices(atoms, species):
     return sorted(indices)
 
 # Define output directory
-output_dir = "unrelaxed/output/cube_files"
+output_dir = "unrelaxed/output/cube_files/bridge"
 os.makedirs(output_dir, exist_ok=True)
 
-input_dir = "unrelaxed/dft/device"
+input_dir = "unrelaxed/dft/bridge"
 struct_dir = "structures/unrelaxed/sorted"
 
 # Load atomic structure and calculator
-atoms = read(f'{struct_dir}/scatt.xyz')
-calc = GPAW(f'{input_dir}/scatt_restart3.gpw', txt=None)
+atoms = read(f'{struct_dir}/bridge.xyz')
+calc = GPAW(f'{input_dir}/bridge.gpw', txt=None)
 lcao = LCAOwrap(calc)
 
 # Flags to control output generation
 los_cube = True
-lowdin_cube = False
+lowdin_cube = True
 lcao_cube = False
 ao_cube = False
 
 active = {"C": [3]}
-orbital_indices = np.load("unrelaxed/output/lowdin/index_active_region.npy")
-orbital_indices = orbital_indices[90:100]
+orbital_indices = np.load("unrelaxed/output/lowdin/bridge/index_active_region.npy")
+orbital_indices = orbital_indices[93:94]
 
 # Common data for los and lowdin_cube
 if los_cube or lowdin_cube:
@@ -44,16 +44,23 @@ if los_cube or lowdin_cube:
     H_lcao -= E_fermi * S_lcao
     nao_a = np.array([setup.nao for setup in calc.wfs.setups])
     basis = Basis(atoms, nao_a)
-    SUBDIAG_SPECIES = ("C", "H", "N")
+    SUBDIAG_SPECIES = ("C", "H")
     subdiag_indices = get_species_indices(atoms, SUBDIAG_SPECIES)
     basis_subdiag_region = basis[subdiag_indices]
     index_subdiag_region = basis_subdiag_region.get_indices()
+    Usub, eig = subdiagonalize_atoms(basis, H_lcao, S_lcao, a=subdiag_indices)
+
+    active_indices = basis_subdiag_region.extract().take(active)
+    index_active_region = index_subdiag_region[active_indices]
+    # Positive projection onto p-z AOs
+    for idx_lo in index_active_region:
+        if Usub[idx_lo - 1, idx_lo] < 0.0:  # change sign
+            Usub[:, idx_lo] *= -1
 
 # Generate los cube files
 if los_cube:
     folder_path = os.path.join(output_dir, 'los')
     os.makedirs(folder_path, exist_ok=True)
-    Usub, eig = subdiagonalize_atoms(basis, H_lcao, S_lcao, a=subdiag_indices)
     los = LOs(Usub[:, index_subdiag_region].T, lcao)
 
     for i, w_G in enumerate(los.get_orbitals(indices=orbital_indices)):
@@ -69,13 +76,14 @@ if los_cube:
 if lowdin_cube:
     folder_path = os.path.join(output_dir, 'lowdin')
     os.makedirs(folder_path, exist_ok=True)
-    Usub, eig = subdiagonalize_atoms(basis, H_lcao, S_lcao, a=subdiag_indices)
-    active_indices = basis_subdiag_region.extract().take(active)
-    index_active_region = index_subdiag_region[active_indices]
+
+    # H_subdiagonalized = rotate_matrix(H_lcao, Usub)
+    # S_subdiagonalized = rotate_matrix(S_lcao, Usub)
+
     Ulow = lowdin_rotation(rotate_matrix(H_lcao, Usub),
                            rotate_matrix(S_lcao, Usub), index_active_region)
     U = Usub.dot(Ulow)
-    los = LOs(U.T, lcao)
+    los = LOs(U[:, index_subdiag_region].T, lcao)
 
     for i, w_G in enumerate(los.get_orbitals(indices=orbital_indices)):
         write(f"{folder_path}/C{i}_orbital_3.cube", atoms, data=w_G)

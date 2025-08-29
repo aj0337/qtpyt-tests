@@ -1,20 +1,20 @@
 #!/bin/bash -l
 #SBATCH --job-name=gpaw-example
-#SBATCH --time=10:30:00
+#SBATCH --time=12:00:00
 #SBATCH --partition=normal
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=192
+#SBATCH --ntasks-per-node=32
 #SBATCH --cpus-per-task=1
-#SBATCH --constraint=gpu
 #SBATCH --hint=nomultithread
 #SBATCH --no-requeue
-#SBATCH --account=lp86
-#SBATCH --uenv=gpaw/25.1:1639708786
+#SBATCH --account=mr34
+#SBATCH --uenv=gpaw/25.1.0:1632782471
 #SBATCH --view=gpaw
 
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 export MPICH_GPU_SUPPORT_ENABLED=0
 export GPAW_SETUP_PATH=${HOME}/gpaw-setups-24.11.0
 
-srun gpaw python scatt.py
+# srun gpaw python scatt.py
+srun gpaw python scatt_restart2.py
 # srun gpaw python dump.py

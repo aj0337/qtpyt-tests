@@ -4,14 +4,14 @@ import os
 from ase.io import read
 from gpaw import GPAW, FermiDirac, Mixer
 
-input_folder = "../../../structures/unrelaxed"
+input_folder = "../../../structures/unrelaxed/sorted"
 output_folder = "./"
 os.makedirs(output_folder, exist_ok=True)
 
 atoms = read(f"{input_folder}/scatt.xyz")
 basis = {"H": "szp(dzp)", "C": "szp(dzp)"}
 
-kbt = 0.1
+kbt = 1e-3
 calc = GPAW(
     h=0.2,
     xc="PBE",
@@ -22,7 +22,7 @@ calc = GPAW(
     mode="lcao",
     txt=f"{output_folder}/scatt.txt",
     mixer=Mixer(0.05, 5, weight=100.0),
-    maxiter=2,
+    maxiter=20,
     symmetry={"point_group": False, "time_reversal": True},
 )
 

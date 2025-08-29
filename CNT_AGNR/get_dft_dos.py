@@ -11,17 +11,17 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-lowdin = False
+lowdin = True
 data_folder = f"./unrelaxed/output/lowdin" if lowdin else f"./unrelaxed/output/no_lowdin"
 dft_data_folder = f"{data_folder}/dft"
 os.makedirs(dft_data_folder, exist_ok=True)
 
-index_bridge = np.load(f"{data_folder}/index_bridge.npy")
-self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
+index_active_region = np.load(f"{data_folder}/index_active_region.npy")
+# self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 
 de = 0.01
-energies = np.arange(-1, 1 + de / 2.0, de).round(7)
-eta = 1e-4
+energies = np.arange(-1.5, 1.5 + de / 2.0, de).round(7)
+eta = 1e-2
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
@@ -31,13 +31,13 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 gf = greenfunction.GreenFunction(
     hs_list_ii,
     hs_list_ij,
-    [(0, self_energy[0]), (len(hs_list_ii) - 1, self_energy[1])],
+    # [(0, self_energy[0]), (len(hs_list_ii) - 1, self_energy[1])],
     solver="dyson",
     eta=eta,
 )
 
-gfp = ProjectedGreenFunction(gf, index_bridge)
-filename = "Evdos_total.npy"
+gfp = ProjectedGreenFunction(gf, index_active_region)
+filename = "Evdos_C2pz.npy"
 outputfile = os.path.join(dft_data_folder, filename)
 
 local_energies = np.array_split(energies, size)[rank]

@@ -19,20 +19,20 @@ def get_species_indices(atoms, species):
     return sorted(indices)
 
 
-lowdin = False
+lowdin = True
 data_folder = f"./unrelaxed/output/lowdin" if lowdin else f"./unrelaxed/output/no_lowdin"
 # Create the folder if it doesn't exist
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 
-GPWDEVICEDIR = "./unrelaxed/dft/device/"
+GPWDEVICEDIR = "./unrelaxed/dft/bridge_hydrogenated/"
 SUBDIAG_SPECIES = ("C", "H")
 
 # Define the active region within the subdiagonalized species
 active = {"C": [3]}
 
 cc_path = Path(GPWDEVICEDIR)
-gpwfile = f"{cc_path}/scatt_restart3.gpw"
+gpwfile = f"{cc_path}/bridge.gpw"
 
 atoms, calc = restart(gpwfile, txt=None)
 fermi = calc.get_fermi_level()
@@ -44,14 +44,16 @@ H_lcao = lcao.get_hamiltonian()
 S_lcao = lcao.get_overlap()
 H_lcao -= fermi * S_lcao
 
-# Perform subdiagonalization
-# subdiag_indices = get_species_indices(atoms, SUBDIAG_SPECIES)
 
-z = basis.atoms.positions[:, 2]
-subdiag_indices = np.where(z > 29.0)[0]
+# Perform subdiagonalization
+subdiag_indices = get_species_indices(atoms, SUBDIAG_SPECIES)
+
+# z = basis.atoms.positions[:, 2]
+# subdiag_indices = np.where(z > 29.0)[0]
 
 basis_subdiag_region = basis[subdiag_indices]
 index_subdiag_region = basis_subdiag_region.get_indices()
+
 
 extract_active_region = basis_subdiag_region.extract().take(active)
 index_active_region = index_subdiag_region[extract_active_region]
@@ -79,6 +81,10 @@ if lowdin:
 else:
     H_subdiagonalized = H_subdiagonalized[None, ...]
     S_subdiagonalized = S_subdiagonalized[None, ...]
+
+# np.save(
+#     f"{data_folder}/hs_lcao.npy", (H_lcao[None, ...], S_lcao[None, ...])
+# )
 
 np.save(
     f"{data_folder}/hs_los.npy", (H_subdiagonalized, S_subdiagonalized)
