@@ -3,10 +3,10 @@ import os
 
 # === Settings ===
 output_folder = "./"
-gpw_in = f"{output_folder}/scatt_restart4.gpw"
-gpw_out = f"{output_folder}/scatt_restart5.gpw"
-txt_out = f"{output_folder}/scatt_restart5.txt"
-fermi_out = f"{output_folder}/fermi_restart5.txt"
+gpw_in = f"{output_folder}/scatt.gpw"
+gpw_out = f"{output_folder}/scatt_restart.gpw"
+txt_out = f"{output_folder}/scatt_restart.txt"
+fermi_out = f"{output_folder}/fermi_restart.txt"
 kbt = 8e-3          # Desired new Fermi-Dirac smearing
 force_scf = True    # Always rerun SCF with updated smearing
 
@@ -21,7 +21,7 @@ calc = GPAW(
     xc=calc_old.parameters.xc,
     mixer=Mixer(0.02, 5, weight=100.0),
     occupations=FermiDirac(width=kbt),
-    maxiter=500,
+    maxiter=1000,
     convergence={
         "energy": 1e-4,
         "density": 1e-4,

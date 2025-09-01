@@ -12,12 +12,12 @@ rank = comm.Get_rank()
 size = comm.Get_size()
 
 lowdin = True
-data_folder = f"./unrelaxed/output/lowdin" if lowdin else f"./unrelaxed/output/no_lowdin"
+data_folder = f"./unrelaxed/output/lowdin/device" if lowdin else f"./unrelaxed/output/no_lowdin/device"
 dft_data_folder = f"{data_folder}/dft"
 os.makedirs(dft_data_folder, exist_ok=True)
 
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
-# self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
+self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 
 de = 0.01
 energies = np.arange(-1.5, 1.5 + de / 2.0, de).round(7)
@@ -31,7 +31,7 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 gf = greenfunction.GreenFunction(
     hs_list_ii,
     hs_list_ij,
-    # [(0, self_energy[0]), (len(hs_list_ii) - 1, self_energy[1])],
+    [(0, self_energy[0]), (len(hs_list_ii) - 1, self_energy[1])],
     solver="dyson",
     eta=eta,
 )

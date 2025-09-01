@@ -11,7 +11,7 @@ os.makedirs(output_folder, exist_ok=True)
 atoms = read(f"{input_folder}/scatt.xyz")
 basis = {"H": "szp(dzp)", "C": "szp(dzp)"}
 
-kbt = 1e-3
+kbt = 1e-1
 calc = GPAW(
     h=0.2,
     xc="PBE",
@@ -22,7 +22,7 @@ calc = GPAW(
     mode="lcao",
     txt=f"{output_folder}/scatt.txt",
     mixer=Mixer(0.05, 5, weight=100.0),
-    maxiter=20,
+    maxiter=500,
     symmetry={"point_group": False, "time_reversal": True},
 )
 

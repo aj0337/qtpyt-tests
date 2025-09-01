@@ -17,7 +17,7 @@ def run(outputfile):
     gd = GridDesc(energies, 1, float)
     T = np.empty(gd.energies.size)
     for e, energy in enumerate(gd.energies):
-        T[e] = gf.get_transmission(energy, normalize=True)
+        T[e] = gf.get_transmission(energy, normalize=False)
 
     T = gd.gather_energies(T)
 
@@ -34,9 +34,9 @@ def run(outputfile):
         plt.savefig(f"{dft_data_folder}/ET.png", dpi=300)
         plt.close()
 
-
-data_folder = "./unrelaxed/output/lowdin"
-dft_data_folder = "./unrelaxed/output/lowdin/dft"
+lowdin = True
+data_folder = "./unrelaxed/output/lowdin/device" if lowdin else "./unrelaxed/output/no_lowdin/device"
+dft_data_folder = "./unrelaxed/output/lowdin/device/dft" if lowdin else "./unrelaxed/output/no_lowdin/device/dft"
 os.makedirs(dft_data_folder, exist_ok=True)
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 

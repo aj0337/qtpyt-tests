@@ -9,7 +9,7 @@ from qtpyt.block_tridiag import graph_partition
 from qtpyt.tools import remove_pbc
 
 lowdin = True
-data_folder = f"./unrelaxed/output/lowdin" if lowdin else f"./unrelaxed/output/no_lowdin"
+data_folder = f"./unrelaxed/output/lowdin/device" if lowdin else f"./unrelaxed/output/no_lowdin/device"
 
 # Load matrices
 H_subdiagonalized, S_subdiagonalized = np.load(f"{data_folder}/hs_los.npy")
@@ -21,7 +21,7 @@ nodes = np.load(f"{data_folder}/nodes.npy")
 
 # Load device basis
 basis_dict = {"C": 9, "H": 4}
-device_atoms = read("./structures/unrelaxed/sorted/bridge.xyz")
+device_atoms = read("./structures/unrelaxed/sorted/scatt.xyz")
 device_basis = Basis.from_dictionary(device_atoms, basis_dict)
 
 # Remove PBC

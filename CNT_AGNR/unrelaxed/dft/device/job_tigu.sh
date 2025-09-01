@@ -18,4 +18,5 @@ MINICONDA_PATH=/home/jayn/miniconda3
 source $MINICONDA_PATH/etc/profile.d/conda.sh
 conda activate qtpyt
 
+# mpirun -n 8 gpaw python scatt.py
 mpirun -n 8 gpaw python scatt_restart.py

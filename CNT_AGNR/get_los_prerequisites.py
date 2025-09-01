@@ -20,23 +20,24 @@ def get_species_indices(atoms, species):
 
 
 lowdin = True
-data_folder = f"./unrelaxed/output/lowdin" if lowdin else f"./unrelaxed/output/no_lowdin"
+data_folder = f"./unrelaxed/output/lowdin/device" if lowdin else f"./unrelaxed/output/no_lowdin/device"
 # Create the folder if it doesn't exist
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 
-GPWDEVICEDIR = "./unrelaxed/dft/bridge_hydrogenated/"
+GPWDEVICEDIR = "./unrelaxed/dft/device/"
 SUBDIAG_SPECIES = ("C", "H")
 
 # Define the active region within the subdiagonalized species
 active = {"C": [3]}
 
 cc_path = Path(GPWDEVICEDIR)
-gpwfile = f"{cc_path}/bridge.gpw"
+gpwfile = f"{cc_path}/scatt.gpw"
 
 atoms, calc = restart(gpwfile, txt=None)
 fermi = calc.get_fermi_level()
 nao_a = np.array([setup.nao for setup in calc.wfs.setups])
+
 basis = Basis(atoms, nao_a)
 
 lcao = LCAOwrap(calc)
@@ -46,10 +47,10 @@ H_lcao -= fermi * S_lcao
 
 
 # Perform subdiagonalization
-subdiag_indices = get_species_indices(atoms, SUBDIAG_SPECIES)
+# subdiag_indices = get_species_indices(atoms, SUBDIAG_SPECIES) # This is when studying the isolated bridge molecule
 
-# z = basis.atoms.positions[:, 2]
-# subdiag_indices = np.where(z > 29.0)[0]
+z = basis.atoms.positions[:, 2]
+subdiag_indices = np.where(z > 30.0)[0]
 
 basis_subdiag_region = basis[subdiag_indices]
 index_subdiag_region = basis_subdiag_region.get_indices()
@@ -82,9 +83,9 @@ else:
     H_subdiagonalized = H_subdiagonalized[None, ...]
     S_subdiagonalized = S_subdiagonalized[None, ...]
 
-# np.save(
-#     f"{data_folder}/hs_lcao.npy", (H_lcao[None, ...], S_lcao[None, ...])
-# )
+np.save(
+    f"{data_folder}/hs_lcao.npy", (H_lcao[None, ...], S_lcao[None, ...])
+)
 
 np.save(
     f"{data_folder}/hs_los.npy", (H_subdiagonalized, S_subdiagonalized)
