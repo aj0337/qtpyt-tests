@@ -14,35 +14,16 @@ from qtpyt.tools import remove_pbc, rotate_couplings, expand_coupling
 from qtpyt.projector import expand
 
 
-# class DataSelfEnergy(BaseDataSelfEnergy):
-#     def __init__(self, energies, sigma, idx_active, ndim_device):
-#         super().__init__(energies, sigma)
-#         self.idx_active = idx_active
-#         self.ndim_device = ndim_device
-
-#     def retarded(self, energy):
-#         sigma_active = super().retarded(energy)
-#         print("energy.shape",energy.shape)
-#         print("sigma_active.shape",sigma_active.shape)
-#         print("self.idx_active",self.idx_active)
-#         sigma_full = np.zeros((self.ndim_device, self.ndim_device), dtype=complex)
-#         ia = self.idx_active
-#         sigma_full[np.ix_(ia, ia)] = sigma_active
-#         return sigma_full
-
-
-# def load(filename, idx_active, ndim_device):
-#     sigma = np.load(filename)  # shape: (len(energies), n_active, n_active)
-#     return DataSelfEnergy(energies, sigma, idx_active, ndim_device)
-
 class DataSelfEnergy(BaseDataSelfEnergy):
     """Wrapper"""
 
     def retarded(self, energy):
         return expand(S_device, super().retarded(energy), index_active_region)
 
+
 def load(filename):
     return DataSelfEnergy(energies, np.load(filename))
+
 
 pl_path = Path("../dft/leads/")
 cc_path = Path("../dft/device/")
@@ -55,9 +36,9 @@ os.makedirs(output_folder, exist_ok=True)
 
 H_leads_lcao, S_leads_lcao = np.load(pl_path / "hs_pl_k.npy")
 H_subdiagonalized, S_subdiagonalized = map(
-    lambda m: m.astype(complex), np.load(cc_path / "hs_cc_k.npy")
+    lambda m: m.astype(complex),
+    np.load("../output/lowdin/hs_los_lowdin.npy"),
 )
-S_device = np.eye(len(S_subdiagonalized[0]))
 
 basis_dict = {"Au": 9, "H": 5, "C": 13, "N": 13}
 
@@ -84,7 +65,8 @@ kpts_t, h_leads_kii, s_leads_kii, h_leads_kij, s_leads_kij = prepare_leads_matri
 remove_pbc(device_basis, H_subdiagonalized)
 remove_pbc(device_basis, S_subdiagonalized)
 
-# Initialize self-energy list for left and right leads
+S_device = S_subdiagonalized[0].copy()
+
 self_energy = [None, None, None]
 self_energy[0] = PrincipalSelfEnergy(
     kpts_t, (h_leads_kii, s_leads_kii), (h_leads_kij, s_leads_kij), Nr=Nr
@@ -122,12 +104,12 @@ gd = GridDesc(energies, 1)
 T = np.empty(gd.energies.size)
 
 for e, energy in enumerate(gd.energies):
-    T[e] = gf.get_transmission(energy, ferretti=False)
+    T[e] = gf.get_transmission(energy, ferretti=True)
 
 T = gd.gather_energies(T)
 if comm.rank == 0:
     np.save(
-        f"{output_folder}/ET_non_btm_no_correction.npy",
+        f"{output_folder}/ET_non_btm_with_correction.npy",
         (energies, T.real),
     )
 gf.selfenergies.pop()
