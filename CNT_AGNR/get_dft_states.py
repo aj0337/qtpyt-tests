@@ -10,7 +10,7 @@ from qtpyt.projector import ProjectedGreenFunction
 from scipy.linalg import eigvalsh
 
 # Data paths
-data_folder = f"./output/lowdin/device"
+data_folder = f"./unrelaxed/output/lowdin/device"
 
 # Load data
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
@@ -21,7 +21,7 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
     hs_list_ij = pickle.load(f)
 
 # Parameters
-eta = 1e-3
+eta = 1e-2
 
 # Green's Function Setup
 gf = greenfunction.GreenFunction(
