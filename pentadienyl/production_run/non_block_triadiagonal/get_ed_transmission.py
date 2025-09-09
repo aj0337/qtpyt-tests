@@ -6,13 +6,18 @@ from ase.io import read
 from qtpyt.base.greenfunction import GreenFunction
 from qtpyt.basis import Basis
 
-# from qtpyt.parallel import comm
-# from qtpyt.parallel.egrid import GridDesc
+from qtpyt.parallel import comm
+from mpi4py import MPI
+
+from qtpyt.parallel.egrid import GridDesc
 from qtpyt.base.selfenergy import DataSelfEnergy as BaseDataSelfEnergy
 from qtpyt.surface.principallayer import PrincipalSelfEnergy
 from qtpyt.surface.tools import prepare_leads_matrices
 from qtpyt.tools import remove_pbc, rotate_couplings, expand_coupling
 from qtpyt.projector import expand
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
 
 
 class DataSelfEnergy(BaseDataSelfEnergy):
@@ -87,39 +92,65 @@ gf = GreenFunction(
 # === Add Correlated Self-Energy ===
 ndim_device = len(H_subdiagonalized[0])
 ed_self_energy_file = f"{ed_data_folder}/self_energy_with_dcc.npy"
-ed_sigma = load(ed_self_energy_file)
+
+if comm.rank == 0:
+    ed_sigma = load(ed_self_energy_file)
+else:
+    ed_sigma = None
+
+ed_sigma = comm.bcast(ed_sigma, root=0)
 self_energy[2] = ed_sigma
 gf.selfenergies.append((slice(None), self_energy[2]))
 
-# === Allocate Outputs ===
-T = np.empty(energies.size)
-gamma_L_list = []
-gamma_R_list = []
-delta_list = []
+gd = GridDesc(energies, 1, float)
+T_total = np.empty(gd.energies.size)
+T_elastic = np.empty(gd.energies.size)
+T_inelastic = np.empty(gd.energies.size)
 
-# === Main Loop ===
-for e, energy in enumerate(energies):
-    T[e] = gf.get_transmission(energy, ferretti=True)
-    gamma_L_list.append(gf.gammas[0])
-    gamma_R_list.append(gf.gammas[1])
-    delta_list.append(gf.delta)
+for e, energy in enumerate(gd.energies):
+    T_total[e], T_elastic[e], T_inelastic[e] = gf.get_transmission(
+        energy, ferretti=False, brazilian=True
+    )
 
-np.save(f"{output_folder}/ET_non_btm_with_correction.npy", (energies, T.real))
-np.savez_compressed(
-    f"{output_folder}/gamma_L_vs_energy.npz",
-    energies=energies,
-    gamma_L=gamma_L_list,
-)
-np.savez_compressed(
-    f"{output_folder}/gamma_R_vs_energy.npz",
-    energies=energies,
-    gamma_R=gamma_R_list,
-)
-np.savez_compressed(
-    f"{output_folder}/delta_vs_energy.npz",
-    energies=energies,
-    delta=delta_list,
-)
+T_total = gd.gather_energies(T_total)
+T_elastic = gd.gather_energies(T_elastic)
+T_inelastic = gd.gather_energies(T_inelastic)
+
+if comm.rank == 0:
+    np.save(
+        f"{output_folder}/transmission_data_brazilian.npy",
+        (energies, T_total.real, T_elastic.real, T_inelastic.real),
+    )
+
+# # === Allocate Outputs ===
+# T = np.empty(energies.size)
+# gamma_L_list = []
+# gamma_R_list = []
+# delta_list = []
+
+# # === Main Loop ===
+# for e, energy in enumerate(energies):
+#     T[e] = gf.get_transmission(energy, ferretti=True)
+#     gamma_L_list.append(gf.gammas[0])
+#     gamma_R_list.append(gf.gammas[1])
+#     delta_list.append(gf.delta)
+
+# np.save(f"{output_folder}/ET_non_btm_with_correction.npy", (energies, T.real))
+# np.savez_compressed(
+#     f"{output_folder}/gamma_L_vs_energy.npz",
+#     energies=energies,
+#     gamma_L=gamma_L_list,
+# )
+# np.savez_compressed(
+#     f"{output_folder}/gamma_R_vs_energy.npz",
+#     energies=energies,
+#     gamma_R=gamma_R_list,
+# )
+# np.savez_compressed(
+#     f"{output_folder}/delta_vs_energy.npz",
+#     energies=energies,
+#     delta=delta_list,
+# )
 
 # === Cleanup ===
 gf.selfenergies.pop()

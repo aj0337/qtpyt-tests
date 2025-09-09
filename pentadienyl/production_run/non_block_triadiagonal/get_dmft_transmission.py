@@ -30,19 +30,25 @@ def load(filename):
 
 def run(outputfile):
     gd = GridDesc(energies, 1, float)
-    T = np.empty(gd.energies.size)
+    T_total = np.empty(gd.energies.size)
+    T_elastic = np.empty(gd.energies.size)
+    T_inelastic = np.empty(gd.energies.size)
     for e, energy in enumerate(gd.energies):
-        T[e] = gf.get_transmission(energy, ferretti=True)
+        T_total[e], T_elastic[e], T_inelastic[e] = gf.get_transmission(
+            energy, ferretti=False, brazilian=True
+        )
 
-    T = gd.gather_energies(T)
+    T_total = gd.gather_energies(T_total)
+    T_elastic = gd.gather_energies(T_elastic)
+    T_inelastic = gd.gather_energies(T_inelastic)
 
     if comm.rank == 0:
-        np.save(outputfile, (energies, T.real))
+        np.save(outputfile, (energies, T_total.real, T_elastic.real, T_inelastic.real))
 
 
 pl_path = Path("../dft/leads/")
 cc_path = Path("../dft/device/")
-output_folder = "../output/lowdin/dmft/vertex_tests"
+output_folder = "../output/lowdin/dmft/non_spin/vertex_tests"
 os.makedirs(output_folder, exist_ok=True)
 
 data_folder = "../output/lowdin"
@@ -124,6 +130,6 @@ self_energy[2] = dmft_sigma
 
 gf.selfenergies.append((slice(None), self_energy[2]))
 
-outputfile = f"{output_folder}/ET_non_btm_with_correction.npy"
+outputfile = f"{output_folder}/transmission_data_brazilian.npy"
 run(outputfile)
 gf.selfenergies.pop()

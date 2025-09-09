@@ -19,18 +19,5 @@ MINICONDA_PATH=/users/ajayaraj/miniconda3
 source $MINICONDA_PATH/etc/profile.d/conda.sh
 conda activate qtpyt
 
-# mpirun -n 1 python get_dft_states.py
-# mpirun -n 96 python get_active_embedding_hybridization.py
-# mpirun -n 1 python get_dft_occupancies.py
-
-# mpirun -n 1 python run_no_spin_dmft.py
-# mpirun -n 1 python run_spin_dmft.py
-# mpirun -n 1 python restart_dmft.py
-
 mpirun -n 96 python get_dmft_transmission.py
-# mpirun -n 96 python get_spin_dmft_transmission.py
-# mpirun -n 96 python get_ed_transmission_btm.py
-
-# mpirun -n 1 python get_ed_dc_corrections_simple_model.py
-# mpirun -n 1 python get_ed_self_energy.py
 # mpirun -n 96 python get_ed_transmission.py
