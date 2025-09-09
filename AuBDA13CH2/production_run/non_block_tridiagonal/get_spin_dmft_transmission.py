@@ -48,14 +48,13 @@ def run(outputfile):
 
 pl_path = Path("../dft/leads/")
 cc_path = Path("../dft/device/")
-output_folder = "../output/lowdin/dmft/non_spin/vertex_tests"
+output_folder = "../output/lowdin/dmft/spin/vertex_tests"
 os.makedirs(output_folder, exist_ok=True)
 
 data_folder = "../output/lowdin"
-dmft_data_folder = "../output/lowdin/dmft/non_spin"
+dmft_data_folder = "../output/lowdin/dmft/spin"
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
-dmft_sigma_file = f"{dmft_data_folder}/self_energy.npy"
 
 H_leads_lcao, S_leads_lcao = np.load(pl_path / "hs_pl_k.npy")
 H_subdiagonalized, S_subdiagonalized = map(
@@ -117,20 +116,17 @@ S_device = S_subdiagonalized[0]
 idx_molecule = index_active_region
 
 # Add the DMFT self-energy for transmission
-if comm.rank == 0:
-    dmft_sigma = load(dmft_sigma_file)
-else:
-    dmft_sigma = None
+for spin, spin_label in enumerate(["up", "dw"]):
+    dmft_sigma_file = f"{dmft_data_folder}/self_energy_{spin_label}.npy"
+    if comm.rank == 0:
+        dmft_sigma = load(dmft_sigma_file)
+    else:
+        dmft_sigma = [None]
 
-# Transmission function calculation
-# S_device = np.eye(len(H_subdiagonalized[0]))
+    dmft_sigma = comm.bcast(dmft_sigma, root=0)
+    self_energy[2] = dmft_sigma
+    gf.selfenergies.append((slice(None), self_energy[2]))
 
-dmft_sigma = comm.bcast(dmft_sigma, root=0)
-
-self_energy[2] = dmft_sigma
-
-gf.selfenergies.append((slice(None), self_energy[2]))
-
-outputfile = f"{output_folder}/transmission_data_brazilian.npy"
-run(outputfile)
-gf.selfenergies.pop()
+    outputfile = f"{dmft_data_folder}/transmission_data_brazilian_{spin_label}.npy"
+    run(outputfile)
+    gf.selfenergies.pop()
