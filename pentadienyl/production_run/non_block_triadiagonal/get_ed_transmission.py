@@ -109,7 +109,7 @@ T_inelastic = np.empty(gd.energies.size)
 
 for e, energy in enumerate(gd.energies):
     T_total[e], T_elastic[e], T_inelastic[e] = gf.get_transmission(
-        energy, ferretti=False, brazilian=True
+        energy, ferretti=True, brazilian=False
     )
 
 T_total = gd.gather_energies(T_total)
@@ -118,7 +118,7 @@ T_inelastic = gd.gather_energies(T_inelastic)
 
 if comm.rank == 0:
     np.save(
-        f"{output_folder}/transmission_data_brazilian.npy",
+        f"{output_folder}/transmission_data_ferretti_test.npy",
         (energies, T_total.real, T_elastic.real, T_inelastic.real),
     )
 
