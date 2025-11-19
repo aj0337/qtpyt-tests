@@ -16,18 +16,21 @@ mu = 0.0
 temperature = 9
 beta = 1/(kB*temperature)
 
-output_folder = f".unrelaxed/output/lowdin/device/beta_{beta}/"
+output_folder = f"./unrelaxed/output/lowdin/device/T_{temperature}K/"
 os.makedirs(output_folder, exist_ok=True)
 
 z_mats = np.load(f"{output_folder}/matsubara_energies.npy")
 len_active = H_active.shape[0]
-hyb_mats = np.fromfile(
-    f"{output_folder}/matsubara_hybridization.bin", complex
-).reshape(
-    z_mats.size,
-    len_active,
-    len_active,
-)
+# hyb_mats = np.fromfile(
+#     f"{output_folder}/matsubara_hybridization.bin", complex
+# ).reshape(
+#     z_mats.size,
+#     len_active,
+#     len_active,
+# )
+
+hyb_mats = np.load(f"{output_folder}/matsubara_hybridization.npy")
+
 _HybMats = interp1d(
     z_mats.imag, hyb_mats, axis=0, bounds_error=False, fill_value=0.0
 )
