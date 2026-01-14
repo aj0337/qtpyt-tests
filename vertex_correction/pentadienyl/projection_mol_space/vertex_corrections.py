@@ -23,7 +23,9 @@ def compute_gamma_from_sigma(sigma: np.ndarray) -> np.ndarray:
     return 1j * (sigma - sigma.conj().T)
 
 
-def compute_transmission(sigma_L: np.ndarray, sigma_R: np.ndarray, G_r: np.ndarray) -> float:
+def compute_transmission(
+    sigma_L: np.ndarray, sigma_R: np.ndarray, G_r: np.ndarray
+) -> float:
     """T(E) = Tr[ Γ_L G^r Γ_R G^a ]."""
     G_a = G_r.conj().T
     gamma_L = compute_gamma_from_sigma(sigma_L)
@@ -64,7 +66,9 @@ def combine_HS_leads_tip_blocks(hs_list_ii, hs_list_ij, side: str):
     raise ValueError("side must be 'left' or 'right'")
 
 
-def pad_self_energy_to_full_space(sigma_lead: np.ndarray, n_full: int, direction: str) -> np.ndarray:
+def pad_self_energy_to_full_space(
+    sigma_lead: np.ndarray, n_full: int, direction: str
+) -> np.ndarray:
     """Pad Σ_lead into Σ_full (lead+tip space)."""
     n_lead = sigma_lead.shape[0]
     sigma_padded = np.zeros((n_full, n_full), dtype=sigma_lead.dtype)
@@ -86,7 +90,8 @@ def compute_projected_self_energy(
     direction: str,
 ) -> np.ndarray:
     """Projected Σ̃ onto molecule: A [zS_l - H_l - Σ_l]^{-1} C."""
-    z = energy + eta
+
+    z = energy  # + eta
 
     if direction == "left":
         H_l, S_l = hs_list_ii[0]
@@ -131,7 +136,6 @@ def split_indices(n: int, size: int, rank: int):
     start = int(displs[rank])
     end = int(start + counts[rank])
     return start, end, counts, displs
-
 
 
 GPWDEVICEDIR = "./dft/device"
@@ -184,7 +188,9 @@ remove_pbc(device_basis, H_sub)
 remove_pbc(device_basis, S_sub)
 
 se_left = PrincipalSelfEnergy(kpts_t, (h_kii, s_kii), (h_kij, s_kij), Nr=Nr)
-se_right = PrincipalSelfEnergy(kpts_t, (h_kii, s_kii), (h_kij, s_kij), Nr=Nr, id="right")
+se_right = PrincipalSelfEnergy(
+    kpts_t, (h_kii, s_kii), (h_kij, s_kij), Nr=Nr, id="right"
+)
 
 rotate_couplings(leads_basis, se_left, Nr)
 rotate_couplings(leads_basis, se_right, Nr)
@@ -196,11 +202,10 @@ hs_ii_right, hs_ij_right = combine_HS_leads_tip_blocks(hs_list_ii, hs_list_ij, "
 H_mol, S_mol = hs_list_ii[2]
 
 
-eta_list = [1e-1, 1e-2, 1e-3]
+eta_list = [0.0]
 
 for eta_val in eta_list:
     eta = 1j * eta_val
-
 
     T_local = np.zeros(len(E_local), dtype=float)
 
@@ -241,8 +246,9 @@ for eta_val in eta_list:
             eta=eta,
         )
 
-        T_local[i] = compute_transmission(sigma_L=sigma_L_proj, sigma_R=sigma_R_proj, G_r=G_mol)
-
+        T_local[i] = compute_transmission(
+            sigma_L=sigma_L_proj, sigma_R=sigma_R_proj, G_r=G_mol
+        )
 
     T_energy = None
     if rank == 0:
@@ -253,7 +259,6 @@ for eta_val in eta_list:
         recvbuf=(T_energy, counts, displs, MPI.DOUBLE),
         root=0,
     )
-
 
     if rank == 0:
         plt.figure()
