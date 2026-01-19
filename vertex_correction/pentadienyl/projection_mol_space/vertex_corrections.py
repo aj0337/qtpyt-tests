@@ -44,8 +44,8 @@ def combine_HS_leads_tip_blocks(hs_list_ii, hs_list_ij, side: str):
         S_merge = np.block([[S_bulk, S_coup], [S_coup.T.conj(), S_tip]])
 
         H_lm, S_lm = hs_list_ij[1]
-        H_lm_merge = np.vstack([H_lm, np.zeros((810, 136))])
-        S_lm_merge = np.vstack([S_lm, np.zeros((810, 136))])
+        H_lm_merge = np.vstack([np.zeros((810, 136)), H_lm])
+        S_lm_merge = np.vstack([np.zeros((810, 136)), S_lm])
 
         return [(H_merge, S_merge)], [(H_lm_merge, S_lm_merge)]
 
