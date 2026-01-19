@@ -89,16 +89,16 @@ def compute_projected_self_energy(
     eta: complex,
     direction: str,
 ) -> np.ndarray:
-    """Projected Σ̃ onto molecule: A [zS_l - H_l - Σ_l]^{-1} C."""
+    """Projected Σ̃ onto molecule: (zS_ml - H_ml) [zS_l - H_l - Σ_l]^{-1} (zS_lm - H_lm). Reference: Eqn. 7 of http://dx.doi.org/10.1063/1.4897448"""
 
-    z = energy  # + eta
+    z = energy + eta * 1j
 
     if direction == "left":
         H_l, S_l = hs_list_ii[0]
         H_lm, S_lm = hs_list_ij[0]
         H_ml = H_lm.T.conj()
         S_ml = S_lm.T.conj()
-        S_lm_use, H_lm_use = S_lm, H_lm
+        H_lm_use, S_lm_use = H_lm, S_lm
 
     elif direction == "right":
         H_l, S_l = hs_list_ii[-1]
@@ -109,10 +109,12 @@ def compute_projected_self_energy(
     else:
         raise ValueError("direction must be 'left' or 'right'")
 
-    A = z * S_ml - H_ml
-    B_inv = np.linalg.inv(z * S_l - H_l - sigma_lead)
-    C = z * S_lm_use - H_lm_use
-    return A @ B_inv @ C
+    A = z * S_ml - H_ml  # (mol <- lead)
+    C = z * S_lm_use - H_lm_use  # (lead -> mol)
+    M = z * S_l - H_l - sigma_lead  # lead block resolvent
+
+    X = np.linalg.solve(M, C)  # X = M^{-1} C
+    return A @ X
 
 
 def compute_greens_function_mol(
@@ -123,9 +125,11 @@ def compute_greens_function_mol(
     energy: float,
     eta: complex,
 ) -> np.ndarray:
-    """G_mol(E) = [z S - H - Σ_L - Σ_R]^{-1}."""
-    z = energy + eta
-    return np.linalg.inv(z * S_mol - H_mol - sigma_L - sigma_R)
+    """G_mol(E) = [z S - H - Σ_L - Σ_R]^{-1}. Reference: Eqn. 6 of http://dx.doi.org/10.1063/1.4897448"""
+    z = energy + eta * 1j
+    M = z * S_mol - H_mol - sigma_L - sigma_R
+    I = np.eye(M.shape[0], dtype=M.dtype)
+    return np.linalg.solve(M, I)
 
 
 def split_indices(n: int, size: int, rank: int):
