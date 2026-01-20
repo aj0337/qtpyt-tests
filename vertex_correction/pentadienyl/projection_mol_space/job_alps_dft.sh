@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=aubda13ch2-los
-#SBATCH --time=00:10:00
-#SBATCH --partition=normal
+#SBATCH --time=00:30:00
+#SBATCH --partition=debug
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=48
 #SBATCH --cpus-per-task=1
