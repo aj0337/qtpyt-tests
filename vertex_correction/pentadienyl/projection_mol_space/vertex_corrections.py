@@ -206,73 +206,131 @@ hs_ii_right, hs_ij_right = combine_HS_leads_tip_blocks(hs_list_ii, hs_list_ij, "
 H_mol, S_mol = hs_list_ii[2]
 
 
-eta_list = [0.0]
+eta_se_list = [1e-2]
+eta_gf_list = [1e-2]
 
-for eta_val in eta_list:
-    eta = 1j * eta_val
+for eta_gf in eta_gf_list:
+    for eta_se in eta_se_list:
+        T_local = np.zeros(len(E_local), dtype=float)
 
-    T_local = np.zeros(len(E_local), dtype=float)
+        tr_gamma_L_proj_local = np.zeros(len(E_local), dtype=float)
+        tr_gamma_R_proj_local = np.zeros(len(E_local), dtype=float)
 
-    for i, energy in enumerate(E_local):
-        sigma_L_lead = se_left.retarded(energy)
-        sigma_R_lead = se_right.retarded(energy)
+        tr_gamma_L_lead_local = np.zeros(len(E_local), dtype=float)
+        tr_gamma_R_lead_local = np.zeros(len(E_local), dtype=float)
 
-        sigma_L_pad = pad_self_energy_to_full_space(
-            sigma_L_lead, n_full=hs_ii_left[0][0].shape[0], direction="left"
+        for i, energy in enumerate(E_local):
+            sigma_L_lead = se_left.retarded(energy)
+            sigma_R_lead = se_right.retarded(energy)
+
+            sigma_L_pad = pad_self_energy_to_full_space(
+                sigma_L_lead, n_full=hs_ii_left[0][0].shape[0], direction="left"
+            )
+            sigma_R_pad = pad_self_energy_to_full_space(
+                sigma_R_lead, n_full=hs_ii_right[0][0].shape[0], direction="right"
+            )
+
+            sigma_L_proj = compute_projected_self_energy(
+                hs_list_ii=hs_ii_left,
+                hs_list_ij=hs_ij_left,
+                sigma_lead=sigma_L_pad,
+                energy=energy,
+                eta=eta_se,
+                direction="left",
+            )
+            sigma_R_proj = compute_projected_self_energy(
+                hs_list_ii=hs_ii_right,
+                hs_list_ij=hs_ij_right,
+                sigma_lead=sigma_R_pad,
+                energy=energy,
+                eta=eta_se,
+                direction="right",
+            )
+
+            G_mol = compute_greens_function_mol(
+                H_mol=H_mol,
+                S_mol=S_mol,
+                sigma_L=sigma_L_proj,
+                sigma_R=sigma_R_proj,
+                energy=energy,
+                eta=eta_gf,
+            )
+
+            T_local[i] = compute_transmission(
+                sigma_L=sigma_L_proj, sigma_R=sigma_R_proj, G_r=G_mol
+            )
+
+            gamma_L_proj = compute_gamma_from_sigma(sigma_L_proj)
+            gamma_R_proj = compute_gamma_from_sigma(sigma_R_proj)
+
+            tr_gamma_L_proj_local[i] = float(np.real(np.trace(gamma_L_proj)))
+            tr_gamma_R_proj_local[i] = float(np.real(np.trace(gamma_R_proj)))
+
+            gamma_L_lead = compute_gamma_from_sigma(sigma_L_lead)
+            gamma_R_lead = compute_gamma_from_sigma(sigma_R_lead)
+            tr_gamma_L_lead_local[i] = float(np.real(np.trace(gamma_L_lead)))
+            tr_gamma_R_lead_local[i] = float(np.real(np.trace(gamma_R_lead)))
+
+        T_energy = None
+        if rank == 0:
+            T_energy = np.zeros(nE, dtype=float)
+
+        comm.Gatherv(
+            sendbuf=T_local,
+            recvbuf=(T_energy, counts, displs, MPI.DOUBLE),
+            root=0,
         )
-        sigma_R_pad = pad_self_energy_to_full_space(
-            sigma_R_lead, n_full=hs_ii_right[0][0].shape[0], direction="right"
+
+        tr_gamma_L_proj = None
+        tr_gamma_R_proj = None
+        tr_gamma_L_lead = None
+        tr_gamma_R_lead = None
+        if rank == 0:
+            tr_gamma_L_proj = np.zeros(nE, dtype=float)
+            tr_gamma_R_proj = np.zeros(nE, dtype=float)
+            tr_gamma_L_lead = np.zeros(nE, dtype=float)
+            tr_gamma_R_lead = np.zeros(nE, dtype=float)
+
+        comm.Gatherv(
+            sendbuf=tr_gamma_L_proj_local,
+            recvbuf=(tr_gamma_L_proj, counts, displs, MPI.DOUBLE),
+            root=0,
+        )
+        comm.Gatherv(
+            sendbuf=tr_gamma_R_proj_local,
+            recvbuf=(tr_gamma_R_proj, counts, displs, MPI.DOUBLE),
+            root=0,
+        )
+        comm.Gatherv(
+            sendbuf=tr_gamma_L_lead_local,
+            recvbuf=(tr_gamma_L_lead, counts, displs, MPI.DOUBLE),
+            root=0,
+        )
+        comm.Gatherv(
+            sendbuf=tr_gamma_R_lead_local,
+            recvbuf=(tr_gamma_R_lead, counts, displs, MPI.DOUBLE),
+            root=0,
         )
 
-        sigma_L_proj = compute_projected_self_energy(
-            hs_list_ii=hs_ii_left,
-            hs_list_ij=hs_ij_left,
-            sigma_lead=sigma_L_pad,
-            energy=energy,
-            eta=eta,
-            direction="left",
-        )
-        sigma_R_proj = compute_projected_self_energy(
-            hs_list_ii=hs_ii_right,
-            hs_list_ij=hs_ij_right,
-            sigma_lead=sigma_R_pad,
-            energy=energy,
-            eta=eta,
-            direction="right",
-        )
+        if rank == 0:
+            plt.figure()
+            plt.plot(E_ref, T_dft_ref, label="DFT reference")
+            plt.plot(
+                E_sampler,
+                T_energy,
+                "-.",
+                label=f"Projected SE (η_gf={eta_gf:.0e}, η_se={eta_se:.0e})",
+            )
+            plt.ylabel("T (E)")
+            plt.xlabel("E (eV)")
+            plt.yscale("log")
+            plt.legend()
 
-        G_mol = compute_greens_function_mol(
-            H_mol=H_mol,
-            S_mol=S_mol,
-            sigma_L=sigma_L_proj,
-            sigma_R=sigma_R_proj,
-            energy=energy,
-            eta=eta,
-        )
+            np.save(f"{data_folder}/dft/Gamma_L_proj.npy", (E_sampler, tr_gamma_L_proj))
+            np.save(f"{data_folder}/dft/Gamma_R_proj.npy", (E_sampler, tr_gamma_R_proj))
+            np.save(f"{data_folder}/dft/Gamma_L_lead.npy", (E_sampler, tr_gamma_L_lead))
+            np.save(f"{data_folder}/dft/Gamma_R_lead.npy", (E_sampler, tr_gamma_R_lead))
 
-        T_local[i] = compute_transmission(
-            sigma_L=sigma_L_proj, sigma_R=sigma_R_proj, G_r=G_mol
-        )
-
-    T_energy = None
-    if rank == 0:
-        T_energy = np.zeros(nE, dtype=float)
-
-    comm.Gatherv(
-        sendbuf=T_local,
-        recvbuf=(T_energy, counts, displs, MPI.DOUBLE),
-        root=0,
-    )
-
-    if rank == 0:
-        plt.figure()
-        plt.plot(E_ref, T_dft_ref, label="DFT reference")
-        plt.plot(E_sampler, T_energy, "-.", label=f"Projected SE (η={eta_val:.0e})")
-        plt.ylabel("T (E)")
-        plt.xlabel("E (eV)")
-        plt.yscale("log")
-        plt.legend()
-
-        out_png = f"{data_folder}/dft/projected_ET_eta_{eta_val:.0e}.png"
-        plt.savefig(out_png)
-        plt.close()
+            out_png = f"{data_folder}/dft/projected_ET_eta_gf_{eta_gf:.0e}_eta_se_{eta_se:.0e}.png"
+            plt.savefig(out_png)
+            plt.close()
