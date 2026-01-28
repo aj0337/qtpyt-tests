@@ -385,6 +385,7 @@ def compute_greens_function_mol(
     S_mol: np.ndarray,
     sigma_L: np.ndarray,
     sigma_R: np.ndarray,
+    sigma_dmft: np.ndarray,
     energy: float,
     eta: complex,
 ) -> np.ndarray:
@@ -401,6 +402,8 @@ def compute_greens_function_mol(
         Projected left self-energy Σ_L(E) on the molecular subspace, shape (N_mol, N_mol).
     sigma_R : np.ndarray
         Projected right self-energy Σ_R(E) on the molecular subspace, shape (N_mol, N_mol).
+    sigma_dmft : np.ndarray
+        DMFT self-energy Σ_dmft(E) on the molecular subspace, shape (N_mol, N_mol).
     energy : float
         Energy E at which to evaluate the Green's function.
     eta : complex
@@ -422,17 +425,17 @@ def compute_greens_function_mol(
 
     The retarded Green's function is
 
-        G_mol(E) = [ z S_mol - H_mol - Σ_L(E) - Σ_R(E) ]^{-1}.
+        G_mol(E) = [ z S_mol - H_mol - Σ_L(E) - Σ_R(E) - Σ_dmft(E)]^{-1}.
 
     Matrix operations performed
     ---------------------------
-    1) Form M = z S_mol - H_mol - Σ_L - Σ_R
+    1) Form M = z S_mol - H_mol - Σ_L - Σ_R - Σ_dmft
     2) Solve M G = I for G using `np.linalg.solve` (avoids explicit inversion)
 
     This returns the full inverse of M.
     """
     z = energy + eta * 1j
-    M = z * S_mol - H_mol - sigma_L - sigma_R
+    M = z * S_mol - H_mol - sigma_L - sigma_R - sigma_dmft
     I = np.eye(M.shape[0], dtype=M.dtype)
     return np.linalg.solve(M, I)
 
@@ -592,11 +595,13 @@ for eta_gf in eta_gf_list:
                 direction="right",
             )
 
+
             G_mol = compute_greens_function_mol(
                 H_mol=H_mol,
                 S_mol=S_mol,
                 sigma_L=sigma_L_proj,
                 sigma_R=sigma_R_proj,
+                sigma_dmft=sigma_dmft,
                 energy=energy,
                 eta=eta_gf,
             )
