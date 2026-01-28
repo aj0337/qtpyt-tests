@@ -25,65 +25,95 @@ class Sigma:
         return sigma
 
 
-def residual_function(dc_diag):
-    dc_diag = np.clip(dc_diag, 0.0, np.inf)
-    DC = np.diag(dc_diag)
-
-    espace, egs = build_espace(H_eff - DC, V, neig_sector=neig)
-    screen_espace(espace, egs, beta)
-    gf = build_gf2_lanczos(H_eff - DC, V, espace, beta, egs)
-    sigma = Sigma(gf0, gf, H_eff, eta=eta)
-
-    energies = np.array([-100.0])
-    sig = sigma.retarded(energies)  # shape (1, nimp, nimp)
-    sig_real_diag = sig.real.diagonal(axis1=1, axis2=2)  # shape (1, nimp)
-
-    # Use -100 eV only
-    residual = sig_real_diag[0]
-
-    residual_norm = np.linalg.norm(residual)
-    print(f"[Broyden] Residual norm: {residual_norm:.6e}, DC_diag: {dc_diag}")
-
-    return residual
-
-
-# === Load inputs ===
+# === User controls ===
+U_list = [0.1]         # eV
 input_folder = "../output/lowdin"
-output_folder = "../output/lowdin/ed/referee_response"
-os.makedirs(output_folder, exist_ok=True)
+base_output_folder = "../output/lowdin/ed/referee_response"
 
-H_eff = np.load(f"{input_folder}/effective_hamiltonian.npy")
-occupancy_goal = np.load(f"{input_folder}/occupancies.npy")
-V = np.loadtxt(f"{input_folder}/U_matrix_ppp.txt")
+# === Load U-independent inputs once ===
+H_eff_master = np.load(f"{input_folder}/effective_hamiltonian.npy")
+occupancy_goal_master = np.load(f"{input_folder}/occupancies.npy")
 
-# === Parameters ===
-nimp = H_eff.shape[0]
+# === Parameters (shared) ===
 eta = 1e-2
 beta = 1000
 
-# === Initial double counting ===
-DC0 = np.diag(V.diagonal() * (occupancy_goal - 0.5))
-dc0_diag = DC0.diagonal()
 
-neig = np.ones((nimp + 1) * (nimp + 1), int) * 6
+for U_val in U_list:
+    print("\n" + "=" * 72)
+    print(f"Running ED double counting for U_onsite = {U_val:.1f} eV")
+    print("=" * 72)
 
-params["z"] = occupancy_goal
-# Non-interacting Green's function
+    # --- Per-U working copies (avoid accidental mutation across loop iterations) ---
+    H_eff = H_eff_master.copy()
+    occupancy_goal = occupancy_goal_master.copy()
 
-espace, egs = build_espace(H_eff, np.zeros_like(H_eff), neig_sector=neig)
-screen_espace(espace, egs, beta)
-gf0 = build_gf2_lanczos(H_eff, np.zeros_like(H_eff), espace, beta, egs)
+    nimp = H_eff.shape[0]
 
+    # --- Load PPP matrix for this U ---
+    # Must match your generator naming: U_matrix_PPP_U_{U_onsite:.3f}.txt
+    ppp_path = f"{input_folder}/U_matrix_PPP_U_{U_val:.1f}.txt"
+    if not os.path.isfile(ppp_path):
+        raise FileNotFoundError(f"PPP matrix not found for U = {U_val:.1f} eV:\n  {ppp_path}")
 
-# Initial guess
-x0 = dc0_diag.copy()
+    V = np.loadtxt(ppp_path)
+    if V.shape != (nimp, nimp):
+        raise ValueError(
+            f"PPP matrix shape {V.shape} does not match H_eff shape {(nimp, nimp)} "
+            f"for file:\n  {ppp_path}"
+        )
 
-dc_diag_optimized = broyden1(
-    residual_function,
-    x0,
-    f_tol=1e-3,
-    maxiter=50,
-    verbose=True,
-)
-# Save the optimized double counting
-np.save(f"{output_folder}/ed_dcc_diag_Uppp.npy", dc_diag_optimized)
+    # --- Output folder tagged by U ---
+    output_folder = f"{base_output_folder}/Uppp_{U_val:.1f}"
+    os.makedirs(output_folder, exist_ok=True)
+
+    # --- Initial double counting (per-U, since it uses V.diagonal()) ---
+    DC0 = np.diag(V.diagonal() * (occupancy_goal - 0.5))
+    dc0_diag = DC0.diagonal().copy()
+
+    # --- ED configuration ---
+    neig = np.ones((nimp + 1) * (nimp + 1), int) * 6
+    params["z"] = occupancy_goal
+
+    # --- Non-interacting Green's function gf0 (per-U identical here, but built inside loop for safety) ---
+    espace0, egs0 = build_espace(H_eff, np.zeros_like(H_eff), neig_sector=neig)
+    screen_espace(espace0, egs0, beta)
+    gf0 = build_gf2_lanczos(H_eff, np.zeros_like(H_eff), espace0, beta, egs0)
+
+    # --- Residual function bound to THIS loop's H_eff, V, gf0, etc. ---
+    def residual_function(dc_diag):
+        dc_diag = np.clip(dc_diag, 0.0, np.inf)
+        DC = np.diag(dc_diag)
+
+        espace, egs = build_espace(H_eff - DC, V, neig_sector=neig)
+        screen_espace(espace, egs, beta)
+        gf = build_gf2_lanczos(H_eff - DC, V, espace, beta, egs)
+
+        sigma = Sigma(gf0, gf, H_eff, eta=eta)
+
+        energies = np.array([-100.0])
+        sig = sigma.retarded(energies)  # shape (1, nimp, nimp)
+        sig_real_diag = sig.real.diagonal(axis1=1, axis2=2)  # shape (1, nimp)
+
+        residual = sig_real_diag[0]  # use -100 eV only
+
+        residual_norm = np.linalg.norm(residual)
+        print(f"[Broyden][U={U_val:.1f}] Residual norm: {residual_norm:.6e}, DC_diag: {dc_diag}")
+
+        return residual
+
+    # --- Solve ---
+    x0 = dc0_diag.copy()
+
+    dc_diag_optimized = broyden1(
+        residual_function,
+        x0,
+        f_tol=1e-3,
+        maxiter=50,
+        verbose=True,
+    )
+
+    # --- Save results with correct U tag ---
+    out_name = f"{output_folder}/ed_dc_diag_Uppp_{U_val:.1f}.npy"
+    np.save(out_name, dc_diag_optimized)
+    print(f"[Done] Saved optimized DC diag to:\n  {out_name}")

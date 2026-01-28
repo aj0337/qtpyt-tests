@@ -20,6 +20,7 @@ source $MINICONDA_PATH/etc/profile.d/conda.sh
 conda activate qtpyt
 
 
+mpirun -n 1 python get_Uppp.py
 mpirun -n 1 python get_ed_dcc_Uppp.py
 mpirun -n 1 python get_ed_self_energy.py
 mpirun -n 96 python get_ed_transmission.py
