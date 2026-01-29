@@ -521,29 +521,9 @@ nE = len(E_sampler)
 i_start, i_end, counts, displs = split_indices(nE, size, rank)
 E_local = E_sampler[i_start:i_end]
 
-
-H_sub, S_sub = np.load(f"{data_folder}/hs_los_lowdin.npy")
-H_sub = H_sub.astype(np.complex128)
-S_sub = S_sub.astype(np.complex128)
-
-kpts_t, h_kii, s_kii, h_kij, s_kij = prepare_leads_matrices(
-    H_leads_lcao,
-    S_leads_lcao,
-    unit_cell_rep_in_leads,
-    align=(0, H_sub[0, 0, 0]),
-)
-
-remove_pbc(device_basis, H_sub)
-remove_pbc(device_basis, S_sub)
-
-se_left = PrincipalSelfEnergy(kpts_t, (h_kii, s_kii), (h_kij, s_kij), Nr=Nr)
-se_right = PrincipalSelfEnergy(
-    kpts_t, (h_kii, s_kii), (h_kij, s_kij), Nr=Nr, id="right"
-)
-
-rotate_couplings(leads_basis, se_left, Nr)
-rotate_couplings(leads_basis, se_right, Nr)
-
+leads_self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
+se_left = leads_self_energy[0]
+se_right = leads_self_energy[1]
 
 hs_ii_left, hs_ij_left = combine_HS_leads_tip_blocks(hs_list_ii, hs_list_ij, "left")
 hs_ii_right, hs_ij_right = combine_HS_leads_tip_blocks(hs_list_ii, hs_list_ij, "right")

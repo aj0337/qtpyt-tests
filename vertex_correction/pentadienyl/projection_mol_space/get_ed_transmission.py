@@ -8,14 +8,25 @@ import numpy as np
 from ase.io import read
 from mpi4py import MPI
 from qtpyt.basis import Basis
-from qtpyt.surface.principallayer import PrincipalSelfEnergy
-from qtpyt.surface.tools import prepare_leads_matrices
-from qtpyt.tools import remove_pbc, rotate_couplings
+
+from qtpyt.base.selfenergy import DataSelfEnergy as BaseDataSelfEnergy
+from qtpyt.projector import expand
 
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
+
+
+class DataSelfEnergy(BaseDataSelfEnergy):
+    """Wrapper"""
+
+    def retarded(self, energy):
+        return expand(S_molecule_identity, super().retarded(energy), idx_molecule)
+
+
+def load(filename):
+    return DataSelfEnergy(energies, np.load(filename))
 
 
 def compute_gamma_from_sigma(sigma: np.ndarray) -> np.ndarray:
@@ -385,7 +396,7 @@ def compute_greens_function_mol(
     S_mol: np.ndarray,
     sigma_L: np.ndarray,
     sigma_R: np.ndarray,
-    sigma_dmft: np.ndarray,
+    sigma_corr: np.ndarray,
     energy: float,
     eta: complex,
 ) -> np.ndarray:
@@ -402,8 +413,8 @@ def compute_greens_function_mol(
         Projected left self-energy Σ_L(E) on the molecular subspace, shape (N_mol, N_mol).
     sigma_R : np.ndarray
         Projected right self-energy Σ_R(E) on the molecular subspace, shape (N_mol, N_mol).
-    sigma_dmft : np.ndarray
-        DMFT self-energy Σ_dmft(E) on the molecular subspace, shape (N_mol, N_mol).
+    sigma_corr : np.ndarray
+        corr self-energy Σ_corr(E) on the molecular subspace, shape (N_mol, N_mol).
     energy : float
         Energy E at which to evaluate the Green's function.
     eta : complex
@@ -425,17 +436,17 @@ def compute_greens_function_mol(
 
     The retarded Green's function is
 
-        G_mol(E) = [ z S_mol - H_mol - Σ_L(E) - Σ_R(E) - Σ_dmft(E)]^{-1}.
+        G_mol(E) = [ z S_mol - H_mol - Σ_L(E) - Σ_R(E) - Σ_corr(E)]^{-1}.
 
     Matrix operations performed
     ---------------------------
-    1) Form M = z S_mol - H_mol - Σ_L - Σ_R - Σ_dmft
+    1) Form M = z S_mol - H_mol - Σ_L - Σ_R - Σ_corr
     2) Solve M G = I for G using `np.linalg.solve` (avoids explicit inversion)
 
     This returns the full inverse of M.
     """
     z = energy + eta * 1j
-    M = z * S_mol - H_mol - sigma_L - sigma_R - sigma_dmft
+    M = z * S_mol - H_mol - sigma_L - sigma_R - sigma_corr
     I = np.eye(M.shape[0], dtype=M.dtype)
     return np.linalg.solve(M, I)
 
@@ -496,6 +507,7 @@ cc_path = Path(GPWDEVICEDIR)
 pl_path = Path(GPWLEADSDIR)
 
 data_folder = "./output/lowdin"
+ed_data_folder = "../output/lowdin/ed"
 
 
 H_leads_lcao, S_leads_lcao = np.load(pl_path / "hs_pl_k.npy")
@@ -525,28 +537,20 @@ i_start, i_end, counts, displs = split_indices(nE, size, rank)
 E_local = E_sampler[i_start:i_end]
 
 
-H_sub, S_sub = np.load(f"{data_folder}/hs_los_lowdin.npy")
-H_sub = H_sub.astype(np.complex128)
-S_sub = S_sub.astype(np.complex128)
-
-kpts_t, h_kii, s_kii, h_kij, s_kij = prepare_leads_matrices(
-    H_leads_lcao,
-    S_leads_lcao,
-    unit_cell_rep_in_leads,
-    align=(0, H_sub[0, 0, 0]),
+leads_self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
+se_left = leads_self_energy[0]
+se_right = leads_self_energy[1]
+ed_self_energy = np.load(
+    f"{ed_data_folder}/self_energy_with_dcc.npy", allow_pickle=True
 )
-
-remove_pbc(device_basis, H_sub)
-remove_pbc(device_basis, S_sub)
-
-se_left = PrincipalSelfEnergy(kpts_t, (h_kii, s_kii), (h_kij, s_kij), Nr=Nr)
-se_right = PrincipalSelfEnergy(
-    kpts_t, (h_kii, s_kii), (h_kij, s_kij), Nr=Nr, id="right"
-)
-
-rotate_couplings(leads_basis, se_left, Nr)
-rotate_couplings(leads_basis, se_right, Nr)
-
+nodes = np.load(f"{data_folder}/nodes.npy")
+index_active_region = np.load(f"{data_folder}/index_active_region.npy")
+imb = 2  # index of molecule block from the nodes list
+S_molecule = hs_list_ii[imb][1]  # overlap of molecule
+S_molecule_identity = np.eye(S_molecule.shape[0])
+idx_molecule = (
+    index_active_region - nodes[imb]
+)  # indices of active region w.r.t molecule
 
 hs_ii_left, hs_ij_left = combine_HS_leads_tip_blocks(hs_list_ii, hs_list_ij, "left")
 hs_ii_right, hs_ij_right = combine_HS_leads_tip_blocks(hs_list_ii, hs_list_ij, "right")
@@ -570,6 +574,7 @@ for eta_gf in eta_gf_list:
         for i, energy in enumerate(E_local):
             sigma_L_lead = se_left.retarded(energy)
             sigma_R_lead = se_right.retarded(energy)
+            sigma_corr = ed_self_energy[energy]
 
             sigma_L_pad = pad_self_energy_to_full_space(
                 sigma_L_lead, n_full=hs_ii_left[0][0].shape[0], direction="left"
@@ -595,13 +600,12 @@ for eta_gf in eta_gf_list:
                 direction="right",
             )
 
-
             G_mol = compute_greens_function_mol(
                 H_mol=H_mol,
                 S_mol=S_mol,
                 sigma_L=sigma_L_proj,
                 sigma_R=sigma_R_proj,
-                sigma_dmft=sigma_dmft,
+                sigma_corr=sigma_corr,
                 energy=energy,
                 eta=eta_gf,
             )
@@ -631,37 +635,6 @@ for eta_gf in eta_gf_list:
             root=0,
         )
 
-        tr_gamma_L_proj = None
-        tr_gamma_R_proj = None
-        tr_gamma_L_lead = None
-        tr_gamma_R_lead = None
-        if rank == 0:
-            tr_gamma_L_proj = np.zeros(nE, dtype=float)
-            tr_gamma_R_proj = np.zeros(nE, dtype=float)
-            tr_gamma_L_lead = np.zeros(nE, dtype=float)
-            tr_gamma_R_lead = np.zeros(nE, dtype=float)
-
-        comm.Gatherv(
-            sendbuf=tr_gamma_L_proj_local,
-            recvbuf=(tr_gamma_L_proj, counts, displs, MPI.DOUBLE),
-            root=0,
-        )
-        comm.Gatherv(
-            sendbuf=tr_gamma_R_proj_local,
-            recvbuf=(tr_gamma_R_proj, counts, displs, MPI.DOUBLE),
-            root=0,
-        )
-        comm.Gatherv(
-            sendbuf=tr_gamma_L_lead_local,
-            recvbuf=(tr_gamma_L_lead, counts, displs, MPI.DOUBLE),
-            root=0,
-        )
-        comm.Gatherv(
-            sendbuf=tr_gamma_R_lead_local,
-            recvbuf=(tr_gamma_R_lead, counts, displs, MPI.DOUBLE),
-            root=0,
-        )
-
         if rank == 0:
             plt.figure()
             plt.plot(E_ref, T_dft_ref, label="DFT reference")
@@ -676,11 +649,6 @@ for eta_gf in eta_gf_list:
             plt.yscale("log")
             plt.legend()
 
-            np.save(f"{data_folder}/dft/Gamma_L_proj.npy", (E_sampler, tr_gamma_L_proj))
-            np.save(f"{data_folder}/dft/Gamma_R_proj.npy", (E_sampler, tr_gamma_R_proj))
-            np.save(f"{data_folder}/dft/Gamma_L_lead.npy", (E_sampler, tr_gamma_L_lead))
-            np.save(f"{data_folder}/dft/Gamma_R_lead.npy", (E_sampler, tr_gamma_R_lead))
-
-            out_png = f"{data_folder}/dft/projected_ET_eta_gf_{eta_gf:.0e}_eta_se_{eta_se:.0e}.png"
+            out_png = f"{ed_data_folder}/projected_ET_eta_gf_{eta_gf:.0e}_eta_se_{eta_se:.0e}.png"
             plt.savefig(out_png)
             plt.close()
