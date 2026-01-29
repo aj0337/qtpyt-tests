@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pickle
 from pathlib import Path
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +12,6 @@ from qtpyt.basis import Basis
 
 from qtpyt.base.selfenergy import DataSelfEnergy as BaseDataSelfEnergy
 from qtpyt.projector import expand
-
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -65,8 +65,14 @@ def compute_gamma_from_sigma(sigma: np.ndarray) -> np.ndarray:
 
 
 def compute_transmission(
-    sigma_L: np.ndarray, sigma_R: np.ndarray, G_r: np.ndarray
-) -> float:
+    sigma_L: np.ndarray,
+    sigma_R: np.ndarray,
+    sigma_corr: Optional[np.ndarray],
+    G_r: np.ndarray,
+    eta: complex,
+    ferretti: bool = False,
+    brazilian: bool = False,
+) -> tuple[float, float, float]:
     """
     Compute the Landauer transmission T(E) from projected self-energies and the retarded Green's function.
 
@@ -76,40 +82,78 @@ def compute_transmission(
         Left retarded self-energy on the molecular subspace Σ_L^r(E), shape (N_mol, N_mol).
     sigma_R : np.ndarray
         Right retarded self-energy on the molecular subspace Σ_R^r(E), shape (N_mol, N_mol).
+    sigma_corr : Optional[np.ndarray]
+        Correlation retarded self-energy on the molecular subspace Σ_corr^r(E), shape (N_mol, N_mol).
     G_r : np.ndarray
         Retarded Green's function on the molecular subspace G^r(E), shape (N_mol, N_mol).
-
+    ferretti : bool, optional
+        Whether to use the Ferretti et al. formula for vertex corrections (default is False).
+    brazilian : bool, optional
+        Whether to use the Brazilian formula for vertex corrections (default is False).
     Returns
     -------
-    float
-        Transmission T(E) (real scalar). Any small imaginary part produced by finite numerical
+    tuple[float, float, float]
+        Transmission components (T_elastic, T_inelastic, T_total). Any small imaginary part produced by finite numerical
         precision is discarded via `np.real(...)`.
 
     Notes
     -----
     The transmission is computed as
 
-        T(E) = Tr[ Γ_L(E) G^r(E) Γ_R(E) G^a(E) ],
+        T(E) = Tr[ Γ_L(E) G_r(E) Γ_R(E) Λ_corr G_a(E) ],
 
     where
 
         Γ_{L/R}(E) = i [Σ_{L/R}^r(E) - Σ_{L/R}^a(E)]
                    = i [Σ_{L/R}^r(E) - (Σ_{L/R}^r(E))†],
 
+        Λ_corr = I  (if ferretti == False and brazilian == False)
+
+        Λ_corr = I + (Γ_L + Γ_R + 2η S)^(-1) Γ_D (if ferretti == True)
+
+        Λ_corr = I + (Γ_L + Γ_R)^(-1) Γ_D (if brazilian == True)
+
     and
 
         G^a(E) = (G^r(E))†.
 
     Matrix operations:
-    - Compute Γ_L and Γ_R from Σ_L and Σ_R
+    - Compute Γ_L, Γ_R, Λ_corr from Σ_L, Σ_R, and Σ_corr
     - Form G^a as the conjugate transpose of G^r
-    - Multiply in the order Γ_L @ G^r @ Γ_R @ G^a
+    - Multiply in the order Γ_L @ G_r @ Γ_R @ Λ_corr @ G_a
     - Take the trace and keep the real part
+
+    Reference:
+    ----------
+    M. Ferretti et al., Phys. Rev. B 72, 125114 (2005)
+    https://journals.aps.org/prb/pdf/10.1103/PhysRevB.72.125114
     """
     G_a = G_r.conj().T
     gamma_L = compute_gamma_from_sigma(sigma_L)
     gamma_R = compute_gamma_from_sigma(sigma_R)
-    return float(np.real(np.trace(gamma_L @ G_r @ gamma_R @ G_a)))
+    T_elastic = float(np.real(np.trace(gamma_L @ G_r @ gamma_R @ G_a)))
+    if ferretti:
+        gamma_D = compute_gamma_from_sigma(sigma_corr)
+        lambda_corr = compute_vertex_correction(gamma_D, G_r, gamma_L, gamma_R, eta)
+    elif brazilian:
+        gamma_D = compute_gamma_from_sigma(sigma_corr)
+        lambda_corr = gamma_D
+    else:
+        lambda_corr = np.zeros_like(G_r, dtype=G_r.dtype)
+    T_inelastic = float(np.real(np.trace(gamma_L @ G_r @ gamma_R @ lambda_corr @ G_a)))
+    T_total = T_elastic + T_inelastic
+    return T_elastic, T_inelastic, T_total
+
+
+def compute_vertex_correction(
+    gamma_D, G_r, gamma_L, gamma_R, eta: complex
+) -> np.ndarray:
+    n_mol = G_r.shape[0]
+    identity = np.eye(n_mol, dtype=G_r.dtype)
+    lambda_corr_inv = gamma_L + gamma_R + 2 * eta * identity
+    lambda_corr = np.linalg.solve(lambda_corr_inv, gamma_D)
+    lambda_corr = lambda_corr
+    return lambda_corr
 
 
 def combine_HS_leads_tip_blocks(hs_list_ii, hs_list_ij, side: str):
@@ -507,7 +551,7 @@ cc_path = Path(GPWDEVICEDIR)
 pl_path = Path(GPWLEADSDIR)
 
 data_folder = "./output/lowdin"
-ed_data_folder = "../output/lowdin/ed"
+ed_data_folder = "./output/lowdin/ed"
 
 
 H_leads_lcao, S_leads_lcao = np.load(pl_path / "hs_pl_k.npy")
@@ -522,7 +566,7 @@ Nr = (1, 5, 3)
 unit_cell_rep_in_leads = (5, 5, 3)
 
 
-E_ref, T_dft_ref = np.load(f"{data_folder}/dft/ET.npy")
+E_ref, T_ed_ref = np.load(f"{ed_data_folder}/ET.npy")
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:
     hs_list_ii = pickle.load(f)
@@ -532,6 +576,7 @@ with open(f"{data_folder}/hs_list_ij.pkl", "rb") as f:
 
 de = 0.01
 E_sampler = np.arange(-3, 3 + de / 2.0, de).round(7)
+energies = np.arange(-3, 3 + de / 2.0, de).round(7)
 nE = len(E_sampler)
 i_start, i_end, counts, displs = split_indices(nE, size, rank)
 E_local = E_sampler[i_start:i_end]
@@ -562,10 +607,14 @@ if comm.rank == 0:
     ed_sigma = load(ed_self_energy_file)
 else:
     ed_sigma = None
+ed_sigma = comm.bcast(ed_sigma, root=0)
 
 for eta_gf in eta_gf_list:
     for eta_se in eta_se_list:
-        T_local = np.zeros(len(E_local), dtype=float)
+        # local arrays on each rank
+        T_elastic_local = np.zeros(len(E_local), dtype=float)
+        T_inelastic_local = np.zeros(len(E_local), dtype=float)
+        T_total_local = np.zeros(len(E_local), dtype=float)
 
         for i, energy in enumerate(E_local):
             sigma_L_lead = se_left.retarded(energy)
@@ -606,40 +655,59 @@ for eta_gf in eta_gf_list:
                 eta=eta_gf,
             )
 
-            T_local[i] = compute_transmission(
-                sigma_L=sigma_L_proj, sigma_R=sigma_R_proj, G_r=G_mol
+            Tel, Tin, Ttot = compute_transmission(
+                sigma_L=sigma_L_proj,
+                sigma_R=sigma_R_proj,
+                G_r=G_mol,
+                eta=eta_gf,
+                sigma_corr=sigma_corr,
+                ferretti=True,
+                brazilian=False,
             )
+            T_elastic_local[i] = Tel
+            T_inelastic_local[i] = Tin
+            T_total_local[i] = Ttot
 
-            gamma_L_proj = compute_gamma_from_sigma(sigma_L_proj)
-            gamma_R_proj = compute_gamma_from_sigma(sigma_R_proj)
-
-            gamma_L_lead = compute_gamma_from_sigma(sigma_L_lead)
-            gamma_R_lead = compute_gamma_from_sigma(sigma_R_lead)
-
-        T_energy = None
+        # root buffers
+        T_elastic = None
+        T_inelastic = None
+        T_total = None
         if rank == 0:
-            T_energy = np.zeros(nE, dtype=float)
+            T_elastic = np.zeros(nE, dtype=float)
+            T_inelastic = np.zeros(nE, dtype=float)
+            T_total = np.zeros(nE, dtype=float)
 
+        # gather all three
         comm.Gatherv(
-            sendbuf=T_local,
-            recvbuf=(T_energy, counts, displs, MPI.DOUBLE),
+            sendbuf=T_elastic_local,
+            recvbuf=(T_elastic, counts, displs, MPI.DOUBLE),
+            root=0,
+        )
+        comm.Gatherv(
+            sendbuf=T_inelastic_local,
+            recvbuf=(T_inelastic, counts, displs, MPI.DOUBLE),
+            root=0,
+        )
+        comm.Gatherv(
+            sendbuf=T_total_local,
+            recvbuf=(T_total, counts, displs, MPI.DOUBLE),
             root=0,
         )
 
+        # plot on root
         if rank == 0:
             plt.figure()
-            plt.plot(E_ref, T_dft_ref, label="DFT reference")
-            plt.plot(
-                E_sampler,
-                T_energy,
-                "-.",
-                label=f"Projected SE (η_gf={eta_gf:.0e}, η_se={eta_se:.0e})",
-            )
-            plt.ylabel("T (E)")
+            plt.plot(E_ref, T_ed_ref, label="ED reference (total)")
+
+            plt.plot(E_sampler, T_elastic, label="T_elastic")
+            plt.plot(E_sampler, T_inelastic, label="T_inelastic")
+            plt.plot(E_sampler, T_total, "-.", label="T_total")
+
+            plt.ylabel("T(E)")
             plt.xlabel("E (eV)")
             plt.yscale("log")
             plt.legend()
 
-            out_png = f"{ed_data_folder}/projected_ET_eta_gf_{eta_gf:.0e}_eta_se_{eta_se:.0e}.png"
+            out_png = f"{ed_data_folder}/projected_ET_ferretti_T_components.png"
             plt.savefig(out_png)
             plt.close()
