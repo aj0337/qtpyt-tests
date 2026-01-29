@@ -540,9 +540,7 @@ E_local = E_sampler[i_start:i_end]
 leads_self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 se_left = leads_self_energy[0]
 se_right = leads_self_energy[1]
-ed_self_energy = np.load(
-    f"{ed_data_folder}/self_energy_with_dcc.npy", allow_pickle=True
-)
+ed_self_energy_file = f"{ed_data_folder}/self_energy_with_dcc.npy"
 nodes = np.load(f"{data_folder}/nodes.npy")
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
 imb = 2  # index of molecule block from the nodes list
@@ -557,24 +555,22 @@ hs_ii_right, hs_ij_right = combine_HS_leads_tip_blocks(hs_list_ii, hs_list_ij, "
 
 H_mol, S_mol = hs_list_ii[2]
 
-
 eta_se_list = [1e-2]
 eta_gf_list = [1e-2]
+
+if comm.rank == 0:
+    ed_sigma = load(ed_self_energy_file)
+else:
+    ed_sigma = None
 
 for eta_gf in eta_gf_list:
     for eta_se in eta_se_list:
         T_local = np.zeros(len(E_local), dtype=float)
 
-        tr_gamma_L_proj_local = np.zeros(len(E_local), dtype=float)
-        tr_gamma_R_proj_local = np.zeros(len(E_local), dtype=float)
-
-        tr_gamma_L_lead_local = np.zeros(len(E_local), dtype=float)
-        tr_gamma_R_lead_local = np.zeros(len(E_local), dtype=float)
-
         for i, energy in enumerate(E_local):
             sigma_L_lead = se_left.retarded(energy)
             sigma_R_lead = se_right.retarded(energy)
-            sigma_corr = ed_self_energy[energy]
+            sigma_corr = ed_sigma.retarded(energy)
 
             sigma_L_pad = pad_self_energy_to_full_space(
                 sigma_L_lead, n_full=hs_ii_left[0][0].shape[0], direction="left"
@@ -617,13 +613,8 @@ for eta_gf in eta_gf_list:
             gamma_L_proj = compute_gamma_from_sigma(sigma_L_proj)
             gamma_R_proj = compute_gamma_from_sigma(sigma_R_proj)
 
-            tr_gamma_L_proj_local[i] = float(np.real(np.trace(gamma_L_proj)))
-            tr_gamma_R_proj_local[i] = float(np.real(np.trace(gamma_R_proj)))
-
             gamma_L_lead = compute_gamma_from_sigma(sigma_L_lead)
             gamma_R_lead = compute_gamma_from_sigma(sigma_R_lead)
-            tr_gamma_L_lead_local[i] = float(np.real(np.trace(gamma_L_lead)))
-            tr_gamma_R_lead_local[i] = float(np.real(np.trace(gamma_R_lead)))
 
         T_energy = None
         if rank == 0:

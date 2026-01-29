@@ -20,4 +20,5 @@ source $MINICONDA_PATH/etc/profile.d/conda.sh
 conda activate qtpyt
 
 
-mpirun -n 48 python get_dft_transmission.py
+# mpirun -n 48 python get_dft_transmission.py
+mpirun -n 48 python get_ed_transmission.py
