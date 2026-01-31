@@ -27,7 +27,7 @@ GPWLEADSDIR = "./dft/leads"
 cc_path = Path(GPWDEVICEDIR)
 pl_path = Path(GPWLEADSDIR)
 
-H_leads_lcao, S_leads_lcao = np.load(pl_path / "PBE/kbt_1e-2/hs_pl_k.npy")
+H_leads_lcao, S_leads_lcao = np.load(pl_path / "hs_pl_k.npy")
 
 basis_dict = {"Au": 9, "H": 5, "C": 13, "N": 13}
 

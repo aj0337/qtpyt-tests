@@ -5,7 +5,6 @@ import pickle
 import numpy as np
 from mpi4py import MPI
 from qtpyt.block_tridiag import greenfunction
-from qtpyt.parallel import comm
 import matplotlib.pyplot as plt
 from qtpyt.parallel.egrid import GridDesc
 import os
@@ -27,7 +26,7 @@ def run(outputfile):
         plt.figure()
         plt.plot(energies, T)
         plt.yscale("log")
-        plt.xlim(-4.1, 4.1)
+        plt.xlim(-2.1, 2.5)
         plt.ylim(1e-5, 1)
         plt.xlabel("Energy (eV)")
         plt.ylabel("Transmission")

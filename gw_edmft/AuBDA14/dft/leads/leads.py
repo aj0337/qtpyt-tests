@@ -10,7 +10,7 @@ basis = "szp(dzp)"
 kbt = 1e-2
 calc = GPAW(
     h=0.2,
-    xc="LDA",
+    xc="PBE",
     basis=basis,
     occupations=FermiDirac(width=kbt),
     kpts=(5, 5, 3),

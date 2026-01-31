@@ -6,7 +6,6 @@ from gpaw import restart
 from gpaw.lcao.pwf2 import LCAOwrap
 from qtpyt.basis import Basis
 from qtpyt.lo.tools import rotate_matrix, subdiagonalize_atoms, lowdin_rotation
-from qtpyt.basis import Basis
 
 # Getting localized orbitals and other prerequisites calculation (runs serially)
 
@@ -20,12 +19,12 @@ def get_species_indices(atoms, species):
 
 
 lowdin = True
-data_folder = f"./output/lowdin" if lowdin else f"./output/no_lowdin"
+data_folder = "./output/lowdin" if lowdin else "./output/no_lowdin"
 # Create the folder if it doesn't exist
 if not os.path.exists(data_folder):
     os.makedirs(data_folder)
 
-GPWDEVICEDIR = f"./dft/device/"
+GPWDEVICEDIR = "./dft/device/"
 GPWLEADSDIR = "./dft/leads/"
 SUBDIAG_SPECIES = ("C", "N", "H")
 # Define the active region within the subdiagonalized species
