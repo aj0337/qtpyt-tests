@@ -76,7 +76,6 @@ def compute_vertex_correction(
 ) -> np.ndarray:
     """
     Ferretti-like correction piece used in your code.
-    NOTE: this implementation matches your current formula.
     """
     n_mol = G_r.shape[0]
     identity = np.eye(n_mol, dtype=G_r.dtype)
