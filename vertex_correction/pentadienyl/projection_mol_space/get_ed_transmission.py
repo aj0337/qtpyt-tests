@@ -55,9 +55,7 @@ def compute_transmission(
 
     if ferretti:
         gamma_D = compute_gamma_from_sigma(sigma_corr)
-        lambda_corr = compute_vertex_correction(
-            gamma_D, G_r, gamma_L, gamma_R, S_mol, eta
-        )
+        lambda_corr = compute_ferretti_correction(gamma_D, G_r, gamma_L, gamma_R, eta)
     elif brazilian:
         gamma_D = compute_gamma_from_sigma(sigma_corr)
         lambda_corr = gamma_D
@@ -69,18 +67,16 @@ def compute_transmission(
     return T_elastic, T_inelastic, T_total
 
 
-def compute_vertex_correction(
+def compute_ferretti_correction(
     gamma_D: np.ndarray,
-    G_r: np.ndarray,
     gamma_L: np.ndarray,
     gamma_R: np.ndarray,
-    S_mol: np.ndarray,
     eta: complex,
 ) -> np.ndarray:
     """
-    Ferretti-like correction piece used in your code.
+    Ferretti-like correction piece.
     """
-    lambda_corr_inv = gamma_L + gamma_R + 2 * eta * S_mol
+    lambda_corr_inv = gamma_L + gamma_R + 2 * eta * np.eye(gamma_L.shape[0])
     lambda_corr = np.linalg.solve(lambda_corr_inv, gamma_D)
     return lambda_corr
 
