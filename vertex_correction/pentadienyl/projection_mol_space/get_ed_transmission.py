@@ -55,7 +55,7 @@ def compute_transmission(
 
     if ferretti:
         gamma_D = compute_gamma_from_sigma(sigma_corr)
-        lambda_corr = compute_ferretti_correction(gamma_D, G_r, gamma_L, gamma_R, eta)
+        lambda_corr = compute_ferretti_correction(gamma_D, gamma_L, gamma_R, eta)
     elif brazilian:
         gamma_D = compute_gamma_from_sigma(sigma_corr)
         lambda_corr = gamma_D
@@ -251,8 +251,8 @@ H_mol, S_mol = hs_list_ii[2]
 
 eta = 1e-2
 
-FERRETTI = False
-BRAZILIAN = True
+FERRETTI = True
+BRAZILIAN = False
 
 if comm.rank == 0:
     ed_sigma = load(ed_self_energy_file)
