@@ -257,8 +257,8 @@ H_mol, S_mol = hs_list_ii[2]
 
 eta = 1e-2
 
-FERRETTI = True
-BRAZILIAN = False
+FERRETTI = False
+BRAZILIAN = True
 
 if comm.rank == 0:
     ed_sigma = load(ed_self_energy_file)
