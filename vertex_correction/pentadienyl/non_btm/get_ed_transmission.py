@@ -39,8 +39,8 @@ Nr = (1, 5, 3)
 unit_cell_rep_in_leads = (5, 5, 3)
 basis_dict = {"Au": 9, "H": 5, "C": 13, "N": 13}
 
-FERRETTI = False
-BRAZILIAN = True
+FERRETTI = True
+BRAZILIAN = False
 
 
 index_active_region = np.load(f"{data_folder}/index_active_region.npy")
@@ -84,6 +84,7 @@ gf = GreenFunction(
     S_subdiagonalized[0],
     selfenergies=[(slice(None), self_energy[0]), (slice(None), self_energy[1])],
     eta=eta,
+    index_active_region=index_active_region,
 )
 
 
