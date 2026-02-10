@@ -38,7 +38,8 @@ def run(outputfile):
         plt.yscale("log")
         plt.xlabel("Energy (eV)")
         plt.ylabel("Transmission")
-        plt.xlim(-3, 3)
+        plt.xlim(-4.1, 4.1)
+        plt.ylim(1e-5, 1)
         plt.legend()
         plt.savefig(outputfile.replace(".npy", ".png"))
 
