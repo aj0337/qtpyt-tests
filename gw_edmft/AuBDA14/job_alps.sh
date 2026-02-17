@@ -3,7 +3,7 @@
 #SBATCH --time=00:30:00
 #SBATCH --partition=debug
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=200
+#SBATCH --ntasks-per-node=96
 #SBATCH --cpus-per-task=1
 #SBATCH --constraint=gpu
 #SBATCH --hint=nomultithread
@@ -22,5 +22,13 @@ conda activate qtpyt
 # mpirun -n 1 python get_los_prerequisites.py
 # mpirun -n 1 python get_gf_prerequisites.py
 # mpirun -n 1 python get_dft_states.py
+
+# mpirun -n 96 python get_active_embedding_hybridization.py
+# mpirun -n 1 python get_dft_occupancies.py
+
 # mpirun -n 200 python get_dft_transmission.py
-mpirun -n 200 python get_gw_edmft_transmission.py
+# mpirun -n 200 python get_gw_edmft_transmission.py
+
+# mpirun -n 1 python get_ed_dc_corrections.py
+mpirun -n 1 python get_ed_self_energy.py
+mpirun -n 96 python get_ed_transmission.py
