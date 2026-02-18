@@ -29,6 +29,8 @@ conda activate qtpyt
 # mpirun -n 200 python get_dft_transmission.py
 # mpirun -n 200 python get_gw_edmft_transmission.py
 
+# mpirun -n 1 python get_init_ed_self_energy.py
 # mpirun -n 1 python get_ed_dc_corrections.py
 mpirun -n 1 python get_ed_self_energy.py
-mpirun -n 96 python get_ed_transmission.py
+
+# mpirun -n 96 python get_ed_transmission.py

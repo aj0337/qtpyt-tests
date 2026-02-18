@@ -23,58 +23,38 @@ class Sigma:
         return sigma
 
 
-U_val = 3.5
-input_folder = "output/lowdin"
-output_folder = "output/lowdin/ed"
+# === Load inputs ===
+input_folder = "output/"
+output_folder = "output/ed"
 os.makedirs(output_folder, exist_ok=True)
 
-H_eff = np.load(f"{input_folder}/effective_hamiltonian.npy")
+H_eff = np.load(f"{input_folder}/hamiltonian.npy")
 occupancy_goal = np.load(f"{input_folder}/occupancies.npy")
+V = np.loadtxt(f"{input_folder}/U_matrix.txt")
 
+# === Parameters ===
+nimp = H_eff.shape[0]
 eta = 1e-2
 beta = 1000
-de = 0.01
-energies = np.arange(-8, 8 + de / 2.0, de).round(7)
-z_ret = energies + 1.0j * eta
 
-nimp = H_eff.shape[0]
-V = np.eye(H_eff.shape[0]) * U_val
-
-print("\n" + "=" * 72)
-print(f"Computing ED self-energy for U_onsite = {U_val:.1f} eV")
-print("=" * 72)
-
-dc_diag_path = f"{output_folder}/ed_dcc_diag.npy"
-
-DC_diag = np.load(dc_diag_path)
-if DC_diag.shape != (nimp,):
-    raise ValueError(
-        f"DC diag has shape {DC_diag.shape}, expected {(nimp,)} for {dc_diag_path}"
-    )
-
-DC = np.diag(DC_diag)
-
-
+DC0 = np.diag(V.diagonal() * (occupancy_goal - 0.5))
 neig = np.ones((nimp + 1) * (nimp + 1), int) * 6
-params["z"] = occupancy_goal
 
+params["z"] = occupancy_goal
 
 espace0, egs0 = build_espace(H_eff, np.zeros_like(H_eff), neig_sector=neig)
 screen_espace(espace0, egs0, beta)
 gf0 = build_gf2_lanczos(H_eff, np.zeros_like(H_eff), espace0, beta, egs0)
 
-
-espace, egs = build_espace(H_eff - DC, V, neig_sector=neig)
+espace, egs = build_espace(H_eff - DC0, V, neig_sector=neig)
 screen_espace(espace, egs, beta)
-gf = build_gf2_lanczos(H_eff - DC, V, espace, beta, egs)
-
+gf = build_gf2_lanczos(H_eff - DC0, V, espace, beta, egs)
 
 sigma = Sigma(gf0, gf, H_eff, eta=eta)
 
-
+# === Calculate self-energy ===
+de = 0.01
+energies = np.arange(-8, 8 + de / 2.0, de).round(7)
+z_ret = energies + 1.0j * eta
 sigma_ret = sigma.retarded(z_ret)
-
-out_sigma = f"{output_folder}/self_energy_with_dcc.npy"
-np.save(out_sigma, sigma_ret)
-
-print(f"[Done] Saved Σ^R(ω) to:\n  {out_sigma}")
+np.save(f"{output_folder}/ed_sigma.npy", sigma_ret)

@@ -19,8 +19,8 @@ MINICONDA_PATH=/users/ajayaraj/miniconda3
 source $MINICONDA_PATH/etc/profile.d/conda.sh
 conda activate qtpyt
 
-mpirun -n 1 python get_los_prerequisites.py
-mpirun -n 1 python get_gf_prerequisites.py
-mpirun -n 1 python get_dft_states.py
-mpirun -n 200 python get_dft_transmission.py
-mpirun -n 200 python get_gw_edmft_transmission.py
+# mpirun -n 1 python get_los_prerequisites.py
+# mpirun -n 1 python get_gf_prerequisites.py
+# mpirun -n 1 python get_dft_states.py
+# mpirun -n 200 python get_dft_transmission.py
+# mpirun -n 200 python get_gw_edmft_transmission.py

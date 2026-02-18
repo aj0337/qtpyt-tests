@@ -33,8 +33,6 @@ H_eff = np.load(f"{input_folder}/effective_hamiltonian.npy")
 occupancy_goal = np.load(f"{input_folder}/occupancies.npy")
 V = np.eye(H_eff.shape[0]) * 3.5
 V_diag = np.diag(V.diagonal())
-# V = np.loadtxt(f"{input_folder}/U_matrix.txt")
-# V_diag = np.diag(V.diagonal())
 
 # === Parameters ===
 nimp = H_eff.shape[0]
@@ -44,6 +42,7 @@ beta = 1000
 # === Initial double counting ===
 DC0 = np.diag(V.diagonal() * (occupancy_goal - 0.5))
 dc0_diag = DC0.diagonal()
+np.save(f"{output_folder}/initial_dcc_diag.npy", dc0_diag)
 
 neig = np.ones((nimp + 1) * (nimp + 1), int) * 6
 
