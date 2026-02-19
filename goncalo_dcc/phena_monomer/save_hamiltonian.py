@@ -34,16 +34,15 @@ rows = np.array(rows)
 i = rows[:, 3].astype(int) - 1
 j = rows[:, 4].astype(int) - 1
 re = rows[:, 5].astype(float)
-im = rows[:, 6].astype(float)
 
 # Determine matrix size
 n = max(i.max(), j.max()) + 1
 
 # Initialize Hamiltonian
-H = np.zeros((n, n), dtype=np.complex128)
+H = np.zeros((n, n), dtype=np.float64)
 
 # Fill Hamiltonian
-H[i, j] = re + 1j * im
+H[i, j] = re
 
 # Save Hamiltonian to a file
 os.makedirs("output", exist_ok=True)
