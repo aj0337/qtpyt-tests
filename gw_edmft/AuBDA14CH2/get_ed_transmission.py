@@ -55,7 +55,7 @@ self_energy = np.load(f"{data_folder}/self_energy.npy", allow_pickle=True)
 ed_self_energy_file = f"{ed_data_folder}/self_energy_with_dcc.npy"
 
 de = 0.01
-energies = np.arange(-3, 3 + de / 2.0, de).round(7)
+energies = np.arange(-8, 8 + de / 2.0, de).round(7)
 eta = 1e-2
 
 with open(f"{data_folder}/hs_list_ii.pkl", "rb") as f:

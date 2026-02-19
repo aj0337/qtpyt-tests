@@ -19,5 +19,5 @@ MINICONDA_PATH=/users/ajayaraj/miniconda3
 source $MINICONDA_PATH/etc/profile.d/conda.sh
 conda activate qtpyt
 
-mpirun -n 1 python get_init_ed_self_energy.py
-# mpirun -n 1 python get_ed_dc_corrections.py
+# mpirun -n 1 python get_init_ed_self_energy.py
+mpirun -n 1 python get_ed_dc_corrections.py

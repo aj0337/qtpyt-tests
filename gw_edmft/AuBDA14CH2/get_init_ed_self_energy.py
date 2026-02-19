@@ -24,13 +24,14 @@ class Sigma:
 
 
 # === Load inputs ===
-input_folder = "output/"
-output_folder = "output/ed"
+input_folder = "output/lowdin"
+output_folder = "output/lowdin/ed"
 os.makedirs(output_folder, exist_ok=True)
 
-H_eff = np.load(f"{input_folder}/hamiltonian.npy")
+H_eff = np.load(f"{input_folder}/effective_hamiltonian.npy")
 occupancy_goal = np.load(f"{input_folder}/occupancies.npy")
-V = np.loadtxt(f"{input_folder}/U_matrix.txt")
+# V = np.loadtxt(f"{input_folder}/U_matrix.txt")
+V = np.eye(H_eff.shape[0]) * 3.5
 
 # === Parameters ===
 nimp = H_eff.shape[0]
