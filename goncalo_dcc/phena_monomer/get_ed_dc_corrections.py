@@ -115,11 +115,14 @@ def residual_function(dc_diag):
     gf = build_gf2_lanczos(H_wann - DC, V_diag, espace, beta, egs)
 
     sigma = Sigma(gf0, gf, H_wann, eta=eta)
-    energies = np.array([-8, 8])
-    sig = sigma.retarded(energies)
 
-    sig_real_diag = sig.real.diagonal(axis1=1, axis2=2)
-    residual = 0.5 * (sig_real_diag[0] + sig_real_diag[1])
+    energies = np.array([-2])
+    sig = sigma.retarded(energies)
+    residual = sig.real.diagonal(axis1=1, axis2=2)
+
+    # energies = np.array([-8, 8])
+    # sig_real_diag = sig.real.diagonal(axis1=1, axis2=2)
+    # residual = 0.5 * (sig_real_diag[0] + sig_real_diag[1])
 
     res_norm = float(np.linalg.norm(residual))
     print(
