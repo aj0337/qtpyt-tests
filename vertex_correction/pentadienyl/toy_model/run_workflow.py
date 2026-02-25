@@ -34,7 +34,7 @@ except ModuleNotFoundError:
 # =====================
 OUTPUT_DIR = Path(__file__).resolve().parent / "output"
 SPECIALIZED_OUTPUT_DIR = (
-    OUTPUT_DIR / "dft"
+    OUTPUT_DIR / "ed"
 )  # for calculation-specific outputs (e.g. self-energy, transmission)
 
 # Model
@@ -126,8 +126,7 @@ def main() -> None:
             H,
             Gamma_L,
             Gamma_R,
-            sigma_D=None,
-            # sigma_D=sigma_D[eidx],
+            sigma_D=sigma_D[eidx],
             eta=float(ETA),
         )
     np.savez_compressed(
@@ -137,7 +136,7 @@ def main() -> None:
     )
 
     T = compute_transmission(
-        energies, H, Gamma_L, Gamma_R, sigma_D=None, eta=float(ETA)
+        energies, H, Gamma_L, Gamma_R, sigma_D=sigma_D, eta=float(ETA)
     )
     np.save(os.path.join(specialized_output_dir, "ET.npy"), np.array([energies, T]))
 
