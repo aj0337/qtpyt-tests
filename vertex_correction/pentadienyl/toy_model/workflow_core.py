@@ -392,7 +392,7 @@ def compute_G_retarded(
 def compute_vertex_correction(
     gamma_L: np.ndarray,
     gamma_R: np.ndarray,
-    sigma_correlated: np.ndarray,
+    sigma_correlated: np.ndarray | None,
     eta: float,
     scheme: str = "none",
 ):
@@ -450,6 +450,9 @@ def compute_vertex_correction(
     n = gamma_L.shape[0]
     if scheme_norm == "none":
         return np.zeros((n, n), dtype=complex)
+
+    if sigma_correlated is None:
+        sigma_correlated = np.zeros_like(gamma_L, dtype=complex)
 
     gamma_correlated = compute_gamma_from_sigma(sigma_correlated)
 
@@ -598,11 +601,13 @@ def compute_transmission(
     nE = energies.size
 
     if sigma_correlated is None:
-        sigma_correlated = np.zeros((nE, n, n), dtype=complex)
+        sigma_corr_arr = np.zeros((nE, n, n), dtype=complex)
+    else:
+        sigma_corr_arr = sigma_correlated
 
-    if sigma_correlated.shape != (nE, n, n):
+    if sigma_corr_arr.shape != (nE, n, n):
         raise ValueError(
-            f"sigma_correlated must be {(nE, n, n)}; got {sigma_correlated.shape}"
+            f"sigma_correlated must be {(nE, n, n)}; got {sigma_corr_arr.shape}"
         )
 
     left_idx = left_index if left_index >= 0 else n + left_index
@@ -614,7 +619,7 @@ def compute_transmission(
     T_inelastic = np.empty(nE, dtype=float)
     T_total = np.empty(nE, dtype=float)
     for eidx, E in enumerate(energies):
-        G = compute_G_retarded(E, H, gamma_L, gamma_R, sigma_correlated[eidx], eta)
+        G = compute_G_retarded(E, H, gamma_L, gamma_R, sigma_corr_arr[eidx], eta)
         Glr = G[left_idx, right_idx]
         gamma_sq = (gamma_L[left_idx, left_idx] * gamma_R[right_idx, right_idx]).real
         tel = float(gamma_sq * (abs(Glr) ** 2))
@@ -623,7 +628,7 @@ def compute_transmission(
         lam = compute_vertex_correction(
             gamma_L=gamma_L,
             gamma_R=gamma_R,
-            sigma_correlated=sigma_correlated[eidx],
+            sigma_correlated=sigma_corr_arr[eidx],
             eta=float(eta),
             scheme=scheme,
         )
