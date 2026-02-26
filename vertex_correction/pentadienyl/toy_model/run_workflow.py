@@ -13,6 +13,7 @@ try:
         compute_ed_self_energy,
         compute_G_retarded,
         compute_transmission,
+        compute_vertex_correction,
     )
 except ModuleNotFoundError:
     # Fallback when importing via package path (e.g. from repo root).
@@ -27,6 +28,7 @@ except ModuleNotFoundError:
         compute_ed_self_energy,
         compute_G_retarded,
         compute_transmission,
+        compute_vertex_correction,
     )
 
 # =====================
@@ -34,7 +36,7 @@ except ModuleNotFoundError:
 # =====================
 OUTPUT_DIR = Path(__file__).resolve().parent / "output"
 SPECIALIZED_OUTPUT_DIR = (
-    OUTPUT_DIR / "ed"
+    OUTPUT_DIR / "ed/no_vertex"
 )  # for calculation-specific outputs (e.g. self-energy, transmission)
 
 # Model
@@ -54,12 +56,16 @@ XYZ_FILENAME = "scatt.xyz"  # expected inside OUTPUT_DIR
 
 # ED parameters
 OCCUPANCIES = [1.0, 1.0, 1.0]  # set to None to default to ones
-ETA = 5e-3
+ETA = 1e-2
 BETA = 1000.0
 DE = 0.01
 EMIN = -4.0
 EMAX = 4.0
 NEIG_VALUE = 8
+
+# Vertex correction scheme for inelastic contribution
+# One of: "none", "ferretti", "brazilian"
+VERTEX_SCHEME = "none"
 
 
 def main() -> None:
@@ -106,9 +112,9 @@ def main() -> None:
     )
     np.savetxt(os.path.join(output_dir, "U_ppp.txt"), U_ppp)
 
-    energies, sigma_D = compute_ed_self_energy(
+    energies, sigma_correlated = compute_ed_self_energy(
         input_folder=str(output_dir),
-        output_folder=specialized_output_dir,
+        output_folder=str(specialized_output_dir),
         eta=float(ETA),
         beta=float(BETA),
         de=float(DE),
@@ -126,7 +132,7 @@ def main() -> None:
             H,
             Gamma_L,
             Gamma_R,
-            sigma_D=sigma_D[eidx],
+            sigma_correlated=sigma_correlated[eidx],
             eta=float(ETA),
         )
     np.savez_compressed(
@@ -136,15 +142,52 @@ def main() -> None:
     )
 
     T = compute_transmission(
-        energies, H, Gamma_L, Gamma_R, sigma_D=sigma_D, eta=float(ETA)
+        energies,
+        H,
+        Gamma_L,
+        Gamma_R,
+        sigma_correlated=sigma_correlated,
+        eta=float(ETA),
+        scheme=str(VERTEX_SCHEME),
     )
-    np.save(os.path.join(specialized_output_dir, "ET.npy"), np.array([energies, T]))
+    np.save(
+        os.path.join(specialized_output_dir, "ET.npy"),
+        np.array([energies, T["elastic"], T["inelastic"], T["total"]]),
+    )
+
+    # Save the vertex-correction matrix Lambda(E) so it can be analyzed directly.
+    # Shape: (nE, n, n)
+    Lambda = np.empty((energies.size, nsites, nsites), dtype=np.complex128)
+    for eidx in range(energies.size):
+        Lambda[eidx] = compute_vertex_correction(
+            gamma_L=Gamma_L,
+            gamma_R=Gamma_R,
+            sigma_correlated=sigma_correlated[eidx],
+            eta=float(ETA),
+            scheme=str(VERTEX_SCHEME),
+        )
+    lambda_trace = np.trace(Lambda, axis1=1, axis2=2)
+    np.savez_compressed(
+        os.path.join(specialized_output_dir, "vertex_correction.npz"),
+        energies=energies,
+        Lambda=Lambda,
+        trace=lambda_trace,
+        scheme=str(VERTEX_SCHEME),
+        eta=float(ETA),
+    )
 
     print("Workflow completed.")
     print(f"Output directory: {output_dir}")
     print(f"Saved self-energy: {specialized_output_dir / 'self_energy.npy'}")
     print(f"Saved Green's function: {specialized_output_dir / 'G_retarded.npz'}")
-    print(f"Saved transmission: {specialized_output_dir / 'ET.npy'}")
+    print(
+        "Saved transmission components (E, T_elastic, T_inelastic, T_total): "
+        f"{specialized_output_dir / 'ET.npy'}"
+    )
+    print(
+        "Saved vertex correction (energies, Lambda(E), trace(Lambda)): "
+        f"{specialized_output_dir / 'vertex_correction.npz'}"
+    )
 
 
 if __name__ == "__main__":

@@ -330,7 +330,7 @@ def compute_G_retarded(
     H: np.ndarray,
     gamma_L: np.ndarray,
     gamma_R: np.ndarray,
-    sigma_D: np.ndarray,
+    sigma_correlated: np.ndarray,
     eta: float,
 ) -> np.ndarray:
     """Compute the retarded Green's function.
@@ -346,7 +346,7 @@ def compute_G_retarded(
     gamma_L, gamma_R
         Left and right broadening matrices.
 
-    sigma_D
+    sigma_correlated
         Additional device self-energy at energy E.
 
     eta
@@ -366,7 +366,7 @@ def compute_G_retarded(
                  - H
                  + (i/2) * gamma_L
                  + (i/2) * gamma_R
-                 - sigma_D(E)
+                 - sigma_correlated(E)
                )
 
     This function returns the Green's function matrix:
@@ -376,17 +376,155 @@ def compute_G_retarded(
     n = H.shape[0]
     identity = np.eye(n, dtype=complex)
     z = E + 1j * eta
-    if sigma_D is None:
-        sigma_D = np.zeros_like(H)
+    if sigma_correlated is None:
+        sigma_correlated = np.zeros_like(H)
     A = (
         (z * identity)
         - H.astype(complex)
         + 0.5j * gamma_L.astype(complex)
         + 0.5j * gamma_R.astype(complex)
-        - sigma_D.astype(complex)
+        - sigma_correlated.astype(complex)
     )
     GD = np.linalg.inv(A)
     return GD
+
+
+def compute_vertex_correction(
+    gamma_L: np.ndarray,
+    gamma_R: np.ndarray,
+    sigma_correlated: np.ndarray,
+    eta: float,
+    scheme: str = "none",
+):
+    """Compute the vertex-correction matrix for one energy.
+
+    Parameters
+    ----------
+    gamma_L, gamma_R
+        Left and right broadening matrices (Gamma_L and Gamma_R).
+
+    sigma_correlated
+        Retarded device/correlation self-energy matrix Sigma_correlated(E) at this energy.
+
+    eta
+        Broadening used in z = E + i*eta. This eta is also used in the Ferretti
+        denominator.
+
+    scheme
+        Vertex correction scheme. Supported values:
+            - "none": no correction (returns zeros)
+            - "ferretti": Ferretti-like Lambda
+            - "brazilian": Lambda = Gamma_correlated
+
+    Returns
+    -------
+    numpy.ndarray
+        Vertex-correction matrix Lambda(E) of shape (n, n).
+
+    Notes
+    -----
+    The device broadening associated with the correlation self-energy is:
+
+        Gamma_correlated(E) = i * ( Sigma_correlated(E) - Sigma_correlated(E)^{dagger} )
+
+    where "dagger" denotes conjugate transpose.
+
+    Implemented schemes:
+
+    - Brazilian:
+
+        Lambda(E) = Gamma_correlated(E)
+
+    - Ferretti-like:
+
+        Lambda(E) = [ Gamma_L + Gamma_R + 2 * eta * I ]^{-1} * Gamma_correlated(E)
+
+    This function only constructs Lambda(E). The inelastic transmission term is
+    assembled in `compute_transmission`.
+    """
+
+    if eta < 0:
+        raise ValueError(f"eta must be non-negative; got {eta}")
+
+    scheme_norm = scheme.strip().lower()
+    n = gamma_L.shape[0]
+    if scheme_norm == "none":
+        return np.zeros((n, n), dtype=complex)
+
+    gamma_correlated = compute_gamma_from_sigma(sigma_correlated)
+
+    if scheme_norm == "brazilian":
+        return gamma_correlated
+
+    if scheme_norm == "ferretti":
+        return compute_ferretti_correction(gamma_correlated, gamma_L, gamma_R, eta)
+
+    raise ValueError(
+        f"Unknown scheme={scheme!r}. Expected one of: 'none', 'ferretti', 'brazilian'."
+    )
+
+
+def compute_gamma_from_sigma(sigma: np.ndarray) -> np.ndarray:
+    """Compute a broadening matrix Gamma from a retarded self-energy Sigma.
+
+    Parameters
+    ----------
+    sigma
+        Retarded self-energy matrix Sigma(E) at one energy.
+
+    Returns
+    -------
+    numpy.ndarray
+        Broadening matrix Gamma(E).
+
+    Notes
+    -----
+    The broadening is defined as:
+
+        Gamma(E) = i * ( Sigma(E) - Sigma(E)^{dagger} )
+
+    where "dagger" denotes conjugate transpose.
+    """
+
+    return 1j * (sigma - sigma.conj().T)
+
+
+def compute_ferretti_correction(
+    gamma_correlated: np.ndarray,
+    gamma_L: np.ndarray,
+    gamma_R: np.ndarray,
+    eta: float,
+) -> np.ndarray:
+    """Compute the Ferretti-like correction matrix Lambda.
+
+    Parameters
+    ----------
+    gamma_correlated
+        Device broadening matrix Gamma_correlated(E).
+
+    gamma_L, gamma_R
+        Left and right broadening matrices (Gamma_L and Gamma_R).
+
+    eta
+        Broadening used in z = E + i*eta.
+
+    Returns
+    -------
+    numpy.ndarray
+        The matrix Lambda(E) used in the Ferretti-like inelastic correction.
+
+    Notes
+    -----
+    The Ferretti-like correction used here is:
+
+        Lambda(E) = [ Gamma_L + Gamma_R + 2 * eta * I ]^{-1} * Gamma_correlated(E)
+
+    The matrix inverse is computed via a linear solve.
+    """
+
+    n = gamma_L.shape[0]
+    denom = gamma_L + gamma_R + 2.0 * float(eta) * np.eye(n, dtype=complex)
+    return np.linalg.solve(denom, gamma_correlated)
 
 
 def compute_transmission(
@@ -394,12 +532,13 @@ def compute_transmission(
     H: np.ndarray,
     gamma_L: np.ndarray,
     gamma_R: np.ndarray,
-    sigma_D: np.ndarray | None,
+    sigma_correlated: np.ndarray | None,
     *,
     eta: float = 1e-2,
     left_index: int = 0,
     right_index: int = -1,
-) -> np.ndarray:
+    scheme: str = "none",
+) -> dict[str, np.ndarray]:
     """Compute the transmission function on an energy grid.
 
     Parameters
@@ -413,7 +552,7 @@ def compute_transmission(
     gamma_L, gamma_R
         Left and right broadening matrices.
 
-    sigma_D
+    sigma_correlated
         Energy-dependent device self-energy.
         If None, it is treated as zero.
 
@@ -425,49 +564,74 @@ def compute_transmission(
 
     Returns
     -------
-    numpy.ndarray
-        Transmission T(E) evaluated at each energy.
+    dict
+        Dictionary with keys:
+            - 'elastic': elastic transmission
+            - 'inelastic': inelastic/vertex correction contribution
+            - 'total': elastic + inelastic
 
     Notes
     -----
-    The transmission is computed as:
+    Elastic transmission (toy-model contact-element form):
 
-        T(E) = Gamma_L(ll) * Gamma_R(rr) * |G_lr(E)|^2
+        T_elastic(E) = Gamma_L(l,l) * Gamma_R(r,r) * | G(l,r; E) |^2
 
-    where:
-        l = left_index
-        r = right_index
+    where l = left_index and r = right_index.
 
-    and G(E) is the retarded Green's function:
+    The retarded Green's function is:
 
-        G(E) = inverse(
-                   (E + i*eta) * I
+        G(E) = [ (E + i*eta) * I
                  - H
-                 + (i/2) * gamma_L
-                 + (i/2) * gamma_R
-                 - sigma_D(E)
-               )
+                 + (i/2) * Gamma_L
+                 + (i/2) * Gamma_R
+                 - Sigma_correlated(E) ]^{-1}
+
+    Inelastic (vertex-correction) contribution (trace form):
+
+        T_inelastic(E) = Re Tr[ Gamma_L * G(E) * Gamma_R * Lambda(E) * G(E)^{dagger} ]
+
+    where Lambda(E) is produced by `compute_vertex_correction` according to the
+    selected scheme.
     """
 
     n = H.shape[0]
     nE = energies.size
 
-    if sigma_D is None:
-        sigma_D = np.zeros((nE, n, n), dtype=complex)
+    if sigma_correlated is None:
+        sigma_correlated = np.zeros((nE, n, n), dtype=complex)
 
-    if sigma_D.shape != (nE, n, n):
-        raise ValueError(f"sigma_D must be {(nE, n, n)}; got {sigma_D.shape}")
+    if sigma_correlated.shape != (nE, n, n):
+        raise ValueError(
+            f"sigma_correlated must be {(nE, n, n)}; got {sigma_correlated.shape}"
+        )
 
     left_idx = left_index if left_index >= 0 else n + left_index
     right_idx = right_index if right_index >= 0 else n + right_index
     print(f"Using left contact index: {left_idx}")
     print(f"Using right contact index: {right_idx}")
 
-    T = np.empty(nE, dtype=float)
+    T_elastic = np.empty(nE, dtype=float)
+    T_inelastic = np.empty(nE, dtype=float)
+    T_total = np.empty(nE, dtype=float)
     for eidx, E in enumerate(energies):
-        G = compute_G_retarded(E, H, gamma_L, gamma_R, sigma_D[eidx], eta)
+        G = compute_G_retarded(E, H, gamma_L, gamma_R, sigma_correlated[eidx], eta)
         Glr = G[left_idx, right_idx]
         gamma_sq = (gamma_L[left_idx, left_idx] * gamma_R[right_idx, right_idx]).real
-        T[eidx] = max(0.0, float(gamma_sq * (abs(Glr) ** 2)))
+        tel = float(gamma_sq * (abs(Glr) ** 2))
+        tel = max(0.0, tel)  # clamp tiny negative from rounding
 
-    return T
+        lam = compute_vertex_correction(
+            gamma_L=gamma_L,
+            gamma_R=gamma_R,
+            sigma_correlated=sigma_correlated[eidx],
+            eta=float(eta),
+            scheme=scheme,
+        )
+        ga = G.conj().T
+        tin = float(np.real(np.trace(gamma_L @ G @ gamma_R @ lam @ ga)))
+
+        T_elastic[eidx] = tel
+        T_inelastic[eidx] = tin
+        T_total[eidx] = tel + tin
+
+    return {"elastic": T_elastic, "inelastic": T_inelastic, "total": T_total}
