@@ -44,7 +44,6 @@ class Sigma:
 
         where z is a complex energy (typically z = E + i*eta).
         """
-
         self.gf0 = gf0
         self.gf = gf
         self.eta = eta
@@ -76,7 +75,6 @@ class Sigma:
 
         which is more stable than explicitly forming inverse(G).
         """
-
         energies = np.atleast_1d(energy)
         g0 = self.gf0(energies, self.eta)
         g = self.gf(energies, self.eta)
@@ -153,15 +151,9 @@ def compute_ed_self_energy(
 
     with k chosen so that E_k <= e_max (up to rounding).
     """
-
     try:
-        from edpyt.espace import (
-            build_espace,
-            screen_espace,
-        )
-        from edpyt.gf2_lanczos import (
-            build_gf2_lanczos,
-        )
+        from edpyt.espace import build_espace, screen_espace
+        from edpyt.gf2_lanczos import build_gf2_lanczos
         from edpyt.shared import params
     except ImportError as exc:
         raise ImportError(
@@ -222,7 +214,6 @@ def build_hamiltonian(
     numpy.ndarray
         Hamiltonian matrix of shape (n, n).
     """
-
     nsites = len(onsite_params)
     if nsites == 0:
         raise ValueError("onsite_params must not be empty.")
@@ -294,7 +285,6 @@ def build_ppp_matrix(
 
     and the matrix is symmetrized as (U + U.T) / 2 to suppress numerical noise.
     """
-
     if num_sites <= 0:
         raise ValueError(f"num_sites must be positive; got {num_sites}")
 
@@ -372,7 +362,6 @@ def compute_G_retarded(
     This function returns the Green's function matrix:
 
     """
-
     n = H.shape[0]
     identity = np.eye(n, dtype=complex)
     z = E + 1j * eta
@@ -385,8 +374,7 @@ def compute_G_retarded(
         + 0.5j * gamma_R.astype(complex)
         - sigma_correlated.astype(complex)
     )
-    GD = np.linalg.inv(A)
-    return GD
+    return np.linalg.inv(A)
 
 
 def compute_vertex_correction(
@@ -442,7 +430,6 @@ def compute_vertex_correction(
     This function only constructs Lambda(E). The inelastic transmission term is
     assembled in `compute_transmission`.
     """
-
     if eta < 0:
         raise ValueError(f"eta must be non-negative; got {eta}")
 
@@ -489,10 +476,8 @@ def compute_gamma_from_sigma(sigma: np.ndarray) -> np.ndarray:
     where "dagger" denotes conjugate transpose.
     """
     gamma = 1j * (sigma - sigma.conj().T)
-    gamma_hermitian = 0.5 * (
-        gamma + gamma.conj().T
-    )  # enforce Hermiticity to suppress numerical noise
-    return gamma_hermitian
+    # enforce Hermiticity to suppress numerical noise
+    return 0.5 * (gamma + gamma.conj().T)
 
 
 def compute_ferretti_correction(
@@ -527,10 +512,108 @@ def compute_ferretti_correction(
 
     The matrix inverse is computed via a linear solve.
     """
-
     n = gamma_L.shape[0]
     denom = gamma_L + gamma_R + 2.0 * float(eta) * np.eye(n, dtype=complex)
     return np.linalg.solve(denom, gamma_correlated)
+
+
+def _prepare_sigma_corr_array(
+    energies: np.ndarray,
+    H: np.ndarray,
+    sigma_correlated: np.ndarray | None,
+) -> np.ndarray:
+    """Internal helper: validate/broadcast sigma_correlated onto (nE, n, n)."""
+    n = H.shape[0]
+    nE = energies.size
+    if sigma_correlated is None:
+        return np.zeros((nE, n, n), dtype=complex)
+
+    sigma_corr_arr = np.asarray(sigma_correlated)
+    if sigma_corr_arr.shape != (nE, n, n):
+        raise ValueError(
+            f"sigma_correlated must have shape {(nE, n, n)}; got {sigma_corr_arr.shape}"
+        )
+    return sigma_corr_arr
+
+
+def compute_elastic_transmission(
+    energies: np.ndarray,
+    H: np.ndarray,
+    gamma_L: np.ndarray,
+    gamma_R: np.ndarray,
+    sigma_correlated: np.ndarray | None,
+    *,
+    eta: float = 1e-2,
+) -> np.ndarray:
+    """Compute elastic transmission T_elastic(E) over an energy grid.
+
+    Elastic transmission (trace form):
+
+        T_elastic(E) = Re Tr[ Gamma_L * G(E) * Gamma_R * G(E)^{dagger} ]
+    """
+    nE = energies.size
+    sigma_corr_arr = _prepare_sigma_corr_array(energies, H, sigma_correlated)
+
+    T_elastic = np.empty(nE, dtype=float)
+    for eidx, E in enumerate(energies):
+        G = compute_G_retarded(E, H, gamma_L, gamma_R, sigma_corr_arr[eidx], eta)
+        ga = G.conj().T
+        T_elastic[eidx] = float(np.real(np.trace(gamma_L @ G @ gamma_R @ ga)))
+    return T_elastic
+
+
+def compute_inelastic_transmission(
+    energies: np.ndarray,
+    H: np.ndarray,
+    gamma_L: np.ndarray,
+    gamma_R: np.ndarray,
+    sigma_correlated: np.ndarray | None,
+    *,
+    eta: float = 1e-2,
+    scheme: str = "none",
+) -> np.ndarray:
+    """Compute inelastic/vertex-correction transmission T_inelastic(E).
+
+    Definitions used:
+
+    - For "ferretti" :
+        T_inelastic(E) = Re Tr[ Gamma_L * G * Gamma_R * Lambda * G^† ]
+
+    - For "brazilian":
+        T_inelastic(E) = Re Tr[ Gamma_L * G * Lambda * G^† ]
+
+    - For "none":
+        T_inelastic(E) = 0
+    """
+    nE = energies.size
+    sigma_corr_arr = _prepare_sigma_corr_array(energies, H, sigma_correlated)
+
+    scheme_norm = scheme.strip().lower()
+    if scheme_norm == "none":
+        return np.zeros(nE, dtype=float)
+
+    T_inelastic = np.empty(nE, dtype=float)
+    for eidx, E in enumerate(energies):
+        G = compute_G_retarded(E, H, gamma_L, gamma_R, sigma_corr_arr[eidx], eta)
+        ga = G.conj().T
+
+        lam = compute_vertex_correction(
+            gamma_L=gamma_L,
+            gamma_R=gamma_R,
+            sigma_correlated=sigma_corr_arr[eidx],
+            eta=float(eta),
+            scheme=scheme_norm,
+        )
+
+        if scheme_norm == "brazilian":
+            tin = np.trace(gamma_L @ G @ lam @ ga)
+        else:
+            # "ferretti"
+            tin = np.trace(gamma_L @ G @ gamma_R @ lam @ ga)
+
+        T_inelastic[eidx] = float(np.real(tin))
+
+    return T_inelastic
 
 
 def compute_transmission(
@@ -541,8 +624,6 @@ def compute_transmission(
     sigma_correlated: np.ndarray | None,
     *,
     eta: float = 1e-2,
-    left_index: int = 0,
-    right_index: int = -1,
     scheme: str = "none",
 ) -> dict[str, np.ndarray]:
     """Compute the transmission function on an energy grid.
@@ -565,8 +646,6 @@ def compute_transmission(
     eta
         Broadening used in E + i*eta.
 
-    left_index, right_index
-        Indices of the left and right contact sites.
 
     Returns
     -------
@@ -575,69 +654,27 @@ def compute_transmission(
             - 'elastic': elastic transmission
             - 'inelastic': inelastic/vertex correction contribution
             - 'total': elastic + inelastic
-
-    Notes
-    -----
-    Elastic transmission (toy-model contact-element form):
-
-        T_elastic(E) = Re Tr[ Gamma_L * G(E) * Gamma_R * G(E)^{dagger} ]
-
-    where l = left_index and r = right_index.
-
-    The retarded Green's function is:
-
-        G(E) = [ (E + i*eta) * I
-                 - H
-                 + (i/2) * Gamma_L
-                 + (i/2) * Gamma_R
-                 - Sigma_correlated(E) ]^{-1}
-
-    Inelastic (vertex-correction) contribution (trace form):
-
-        T_inelastic(E) = Re Tr[ Gamma_L * G(E) * Gamma_R * Lambda(E) * G(E)^{dagger} ]
-
-    where Lambda(E) is produced by `compute_vertex_correction` according to the
-    selected scheme.
     """
 
-    n = H.shape[0]
-    nE = energies.size
-
-    if sigma_correlated is None:
-        sigma_corr_arr = np.zeros((nE, n, n), dtype=complex)
-    else:
-        sigma_corr_arr = sigma_correlated
-
-    if sigma_corr_arr.shape != (nE, n, n):
-        raise ValueError(
-            f"sigma_correlated must be {(nE, n, n)}; got {sigma_corr_arr.shape}"
-        )
-
-    left_idx = left_index if left_index >= 0 else n + left_index
-    right_idx = right_index if right_index >= 0 else n + right_index
-    print(f"Using left contact index: {left_idx}")
-    print(f"Using right contact index: {right_idx}")
-
-    T_elastic = np.empty(nE, dtype=float)
-    T_inelastic = np.empty(nE, dtype=float)
-    T_total = np.empty(nE, dtype=float)
-    for eidx, E in enumerate(energies):
-        G = compute_G_retarded(E, H, gamma_L, gamma_R, sigma_corr_arr[eidx], eta)
-        ga = G.conj().T
-        tel = float(np.real(np.trace(gamma_L @ G @ gamma_R @ ga)))
-        # tel = max(0.0, tel)  # clamp tiny negative from rounding
-
-        lam = compute_vertex_correction(
-            gamma_L=gamma_L,
-            gamma_R=gamma_R,
-            sigma_correlated=sigma_corr_arr[eidx],
-            eta=float(eta),
-            scheme=scheme,
-        )
-        tin = float(np.real(np.trace(gamma_L @ G @ gamma_R @ lam @ ga)))
-        # tin = max(0.0, tin)  # clamp tiny negative from rounding
-        T_elastic[eidx] = tel
-        T_inelastic[eidx] = tin
-        T_total[eidx] = tel + tin
-
-    return {"elastic": T_elastic, "inelastic": T_inelastic, "total": T_total}
+    T_elastic = compute_elastic_transmission(
+        energies,
+        H,
+        gamma_L,
+        gamma_R,
+        sigma_correlated,
+        eta=eta,
+    )
+    T_inelastic = compute_inelastic_transmission(
+        energies,
+        H,
+        gamma_L,
+        gamma_R,
+        sigma_correlated,
+        eta=eta,
+        scheme=scheme,
+    )
+    return {
+        "elastic": T_elastic,
+        "inelastic": T_inelastic,
+        "total": T_elastic + T_inelastic,
+    }
