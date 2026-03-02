@@ -508,13 +508,14 @@ def compute_ferretti_correction(
     -----
     The Ferretti-like correction used here is:
 
-        Lambda(E) = [ Gamma_L + Gamma_R + 2 * eta * I ]^{-1} * Gamma_correlated(E)
+        Lambda(E) = Gamma_R * [ Gamma_L + Gamma_R + 2 * eta * I ]^{-1} * Gamma_correlated(E)
 
     The matrix inverse is computed via a linear solve.
     """
     n = gamma_L.shape[0]
     denom = gamma_L + gamma_R + 2.0 * float(eta) * np.eye(n, dtype=complex)
-    return np.linalg.solve(denom, gamma_correlated)
+    lam = gamma_R @ np.linalg.solve(denom, gamma_correlated)
+    return lam
 
 
 def _prepare_sigma_corr_array(
@@ -577,7 +578,7 @@ def compute_inelastic_transmission(
     Definitions used:
 
     - For "ferretti" :
-        T_inelastic(E) = Re Tr[ Gamma_L * G * Gamma_R * Lambda * G^† ]
+        T_inelastic(E) = Re Tr[ Gamma_L * G * Lambda * G^† ]
 
     - For "brazilian":
         T_inelastic(E) = Re Tr[ Gamma_L * G * Lambda * G^† ]
@@ -605,11 +606,7 @@ def compute_inelastic_transmission(
             scheme=scheme_norm,
         )
 
-        if scheme_norm == "brazilian":
-            tin = np.trace(gamma_L @ G @ lam @ ga)
-        else:
-            # "ferretti"
-            tin = np.trace(gamma_L @ G @ gamma_R @ lam @ ga)
+        tin = np.trace(gamma_L @ G @ lam @ ga)
 
         T_inelastic[eidx] = float(np.real(tin))
 

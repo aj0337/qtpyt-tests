@@ -43,7 +43,7 @@ OUTPUT_DIR = Path(__file__).resolve().parent / "output"
 METHOD = "ed"
 # Vertex correction scheme for inelastic contribution
 # One of: "none", "ferretti", "brazilian"
-VERTEX_SCHEME = "brazilian"
+VERTEX_SCHEME = "ferretti"
 
 # Model
 ONSITE_PARAMS = [-1.5, 0.25, 1.5]
