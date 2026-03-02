@@ -51,8 +51,8 @@ NEAREST_NEIGHBOR_T = 0.5
 SECOND_NEAREST_NEIGHBOR_T = 0.0
 
 # Leads (broadening on first/last site)
-GAMMA_L = 5e-2
-GAMMA_R = 5e-2
+GAMMA_L = 0.5
+GAMMA_R = 0.5
 
 # PPP geometry + parameters
 U_ONSITE = 4.62
@@ -64,9 +64,9 @@ XYZ_FILENAME = "scatt.xyz"  # expected inside OUTPUT_DIR
 OCCUPANCIES = [1.0, 1.0, 1.0]  # set to None to default to ones
 ETA = 1e-2
 BETA = 1000.0
-DE = 0.001
-EMIN = -1.0
-EMAX = 1.0
+DE = 0.01
+EMIN = -4.0
+EMAX = 4.0
 NEIG_VALUE = 8
 
 
