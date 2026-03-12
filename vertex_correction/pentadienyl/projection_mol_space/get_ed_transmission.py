@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from ase.io import read
 from mpi4py import MPI
-from qtpyt.basis import Basis
 from qtpyt.base.selfenergy import DataSelfEnergy as BaseDataSelfEnergy
+from qtpyt.basis import Basis
 from qtpyt.projector import expand
 
 comm = MPI.COMM_WORLD
@@ -62,7 +62,7 @@ def compute_transmission(
     else:
         lambda_corr = np.zeros_like(G_r, dtype=G_r.dtype)
 
-    T_inelastic = float(np.real(np.trace(gamma_L @ G_r @ gamma_R @ lambda_corr @ G_a)))
+    T_inelastic = float(np.real(np.trace(gamma_L @ G_r @ lambda_corr @ G_a)))
     T_total = T_elastic + T_inelastic
     return T_elastic, T_inelastic, T_total
 
@@ -77,7 +77,7 @@ def compute_ferretti_correction(
     Ferretti-like correction piece.
     """
     lambda_corr_inv = gamma_L + gamma_R + 2 * eta * np.eye(gamma_L.shape[0])
-    lambda_corr = np.linalg.solve(lambda_corr_inv, gamma_D)
+    lambda_corr = gamma_R @ (np.linalg.solve(lambda_corr_inv, gamma_D))
     return lambda_corr
 
 
