@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pickle
+
 import numpy as np
 from mpi4py import MPI
 from qtpyt.base.selfenergy import DataSelfEnergy as BaseDataSelfEnergy
@@ -28,7 +29,7 @@ def run(outputfile):
     gd = GridDesc(energies, 1, float)
     T = np.empty(gd.energies.size)
     for e, energy in enumerate(gd.energies):
-        T[e] = gf.get_transmission(energy, ferretti=True)
+        T[e] = gf.get_transmission(energy, ferretti=False)
 
     T = gd.gather_energies(T)
 
